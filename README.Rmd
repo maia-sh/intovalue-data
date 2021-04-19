@@ -88,10 +88,6 @@ n_reg_pub_link_ctgov <- nrow(filter(intovalue_ctgov, has_reg_pub_link))
 
 prop_reg_pub_link_ctgov <- n_reg_pub_link_ctgov/ n_iv_trials_w_pubs_ctgov
 
-filter(intovalue, is_c_tgov, 
-       # has_reg_pub_link
-       ) %>% filter(reference_type != "derived")
-
 n_auto <- nrow(filter(intovalue_ctgov, reference_type == "derived"))
 n_manual <- nrow(filter(intovalue_ctgov, reference_type != "derived"))
 ```

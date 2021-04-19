@@ -83,35 +83,6 @@ n_reg_pub_link_ctgov <- nrow(filter(intovalue_ctgov, has_reg_pub_link))
 
 prop_reg_pub_link_ctgov <- n_reg_pub_link_ctgov/ n_iv_trials_w_pubs_ctgov
 
-filter(intovalue, is_c_tgov, 
-       # has_reg_pub_link
-       ) %>% filter(reference_type != "derived")
-#> # A tibble: 188 x 43
-#>    id        pmid doi   url    has_summary_res… days_to_publica… days_to_summary
-#>    <chr>    <dbl> <chr> <chr>  <lgl>                       <dbl>           <dbl>
-#>  1 NCT00…  2.26e7 10.1… https… TRUE                          518            2119
-#>  2 NCT00…  2.13e7 10.1… http:… FALSE                         176              NA
-#>  3 NCT00…  2.16e7 10.1… https… FALSE                         822              NA
-#>  4 NCT00…  1.70e7 10.1… http:… FALSE                        -930              NA
-#>  5 NCT00…  2.34e7 10.1… https… FALSE                         258              NA
-#>  6 NCT00…  2.39e7 10.1… https… FALSE                         575              NA
-#>  7 NCT00…  2.19e7 10.1… https… TRUE                          711            1168
-#>  8 NCT00…  2.11e7 10.1… http:… FALSE                         682              NA
-#>  9 NCT00…  2.28e7 10.1… http:… FALSE                        1249              NA
-#> 10 NCT00…  1.99e7 10.1… http:… TRUE                          245             339
-#> # … with 178 more rows, and 36 more variables: days_reg_to_start <dbl>,
-#> #   days_reg_to_compl <dbl>, days_reg_to_publ <dbl>, is_c_tgov <lgl>,
-#> #   recruitment_status <chr>, is_multicentric <lgl>, phase <chr>,
-#> #   main_sponsor <chr>, intervention_type <chr>, completion_date <date>,
-#> #   publication_date <date>, enrollment <dbl>, masking <chr>, allocation <chr>,
-#> #   start_date <date>, lead_cities <chr>, has_publication <lgl>,
-#> #   has_german_umc_lead <lgl>, intovalue <dbl>, is_dupe <lgl>, has_pmid <lgl>,
-#> #   has_trn_abstract <lgl>, has_trn_ft_pmc <lgl>, has_trn_ft_pdf <lgl>,
-#> #   has_trn_secondary_id <lgl>, has_trn_intovalue <lgl>, has_trn_any <lgl>,
-#> #   pmcid <chr>, has_pubmed <lgl>, has_queried_pmcid <lgl>,
-#> #   has_queried_doi <lgl>, has_ft_pmc <lgl>, has_ft_pdf <lgl>,
-#> #   is_resolved <lgl>, has_reg_pub_link <lgl>, reference_type <chr>
-
 n_auto <- nrow(filter(intovalue_ctgov, reference_type == "derived"))
 n_manual <- nrow(filter(intovalue_ctgov, reference_type != "derived"))
 ```

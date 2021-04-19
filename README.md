@@ -52,7 +52,8 @@ abstract
 **Denominator**: Number of trials with PubMed publications available as
 PDF full-text
 
-39% of trials report a TRN in the abstract of their results publication.
+39% (748/1902) of trials report a TRN in the abstract of their results
+publication.
 
 ## TRN reporting in full-text
 
@@ -68,8 +69,8 @@ full-text
 **Denominator**: Number of trials with PubMed publications available as
 PDF full-text
 
-65% of trials report a TRN in the full-text (PDF) of their results
-publication.
+65% (1239/1902) of trials report a TRN in the full-text (PDF) of their
+results publication.
 
 ## Linked publication in registry
 
@@ -92,5 +93,6 @@ trial registration
 **Denominator**: Number of trials (clinicaltrials.gov only) with PubMed
 publications available as PDF full-text
 
-59% of trials report a TRN in the full-text (PDF) of their results
-publication.
+59% (854/1457) of trials on clinicaltrials.gov include a link (i.e.,
+PMID) to their PubMed publication (as available in the IntoValue
+dataset).

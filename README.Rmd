@@ -61,7 +61,7 @@ prop_trn_abs <- n_trn_abs/n_iv_trials_w_pubs
 
 **Denominator**: Number of trials with PubMed publications available as PDF full-text
 
-`r scales::percent(prop_trn_abs)` of trials report a TRN in the abstract of their results publication.
+`r scales::percent(prop_trn_abs)` (`r n_trn_abs`/`r n_iv_trials_w_pubs`) of trials report a TRN in the abstract of their results publication.
 
 ## TRN reporting in full-text
 
@@ -75,7 +75,7 @@ prop_trn_ft <- n_trn_ft/n_iv_trials_w_pubs
 
 **Denominator**: Number of trials with PubMed publications available as PDF full-text
 
-`r scales::percent(prop_trn_ft)` of trials report a TRN in the full-text (PDF) of their results publication.
+`r scales::percent(prop_trn_ft)` (`r n_trn_ft`/`r n_iv_trials_w_pubs`) of trials report a TRN in the full-text (PDF) of their results publication.
 
 ## Linked publication in registry
 
@@ -93,4 +93,4 @@ prop_reg_pub_link_ctgov <- n_reg_pub_link_ctgov/ n_iv_trials_w_pubs_ctgov
 
 **Denominator**: Number of trials (clinicaltrials.gov only) with PubMed publications available as PDF full-text
 
-`r scales::percent(prop_reg_pub_link_ctgov)` of trials report a TRN in the full-text (PDF) of their results publication.
+`r scales::percent(prop_reg_pub_link_ctgov)` (`r n_reg_pub_link_ctgov`/`r n_iv_trials_w_pubs_ctgov`) of trials on clinicaltrials.gov include a link (i.e., PMID) to their PubMed publication (as available in the IntoValue dataset).

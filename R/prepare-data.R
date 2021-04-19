@@ -19,7 +19,7 @@ intovalue %>%
     by = "pmid"
   ) %>%
   left_join(
-    select(linked_reg_pub, id = trn, pmid, has_reg_pub_link),
+    select(linked_reg_pub, id = trn, pmid, has_reg_pub_link, reference_type),
     by = c("id", "pmid")
   ) %>%
   write_csv(here::here("data", "intovalue.csv"))

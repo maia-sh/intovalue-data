@@ -80,11 +80,20 @@ prop_trn_ft <- n_trn_ft/n_iv_trials_w_pubs
 ## Linked publication in registry
 
 ```{r reg-pub-link}
-n_iv_trials_w_pubs_ctgov <- nrow(filter(intovalue, is_c_tgov))
+intovalue_ctgov <- filter(intovalue, is_c_tgov)
 
-n_reg_pub_link_ctgov <- nrow(filter(intovalue, is_c_tgov, has_reg_pub_link))
+n_iv_trials_w_pubs_ctgov <- nrow(intovalue_ctgov)
+
+n_reg_pub_link_ctgov <- nrow(filter(intovalue_ctgov, has_reg_pub_link))
 
 prop_reg_pub_link_ctgov <- n_reg_pub_link_ctgov/ n_iv_trials_w_pubs_ctgov
+
+filter(intovalue, is_c_tgov, 
+       # has_reg_pub_link
+       ) %>% filter(reference_type != "derived")
+
+n_auto <- nrow(filter(intovalue_ctgov, reference_type == "derived"))
+n_manual <- nrow(filter(intovalue_ctgov, reference_type != "derived"))
 ```
 
 *Limitations*: We currently checked only clinicaltrials.gov for linked publications. DRKS is forthcoming if feasible. We consider a publication "linked" if the PMID is included in the trial registrations. Note that some publications are included in the registrations without a PMID.
@@ -93,4 +102,4 @@ prop_reg_pub_link_ctgov <- n_reg_pub_link_ctgov/ n_iv_trials_w_pubs_ctgov
 
 **Denominator**: Number of trials (clinicaltrials.gov only) with PubMed publications available as PDF full-text
 
-`r scales::percent(prop_reg_pub_link_ctgov)` (`r n_reg_pub_link_ctgov`/`r n_iv_trials_w_pubs_ctgov`) of trials on clinicaltrials.gov include a link (i.e., PMID) to their PubMed publication (as available in the IntoValue dataset).
+`r scales::percent(prop_reg_pub_link_ctgov)` (`r n_reg_pub_link_ctgov`/`r n_iv_trials_w_pubs_ctgov`) of trials on clinicaltrials.gov include a link (i.e., PMID) to their PubMed publication (as available in the IntoValue dataset). This include `r n_auto` (`r scales::percent(n_auto/n_reg_pub_link_ctgov)`) trials with automatically indexed publications (i.e., using TRN in PubMed's secondary identifier field) and `r n_manual` (`r scales::percent(n_manual/n_reg_pub_link_ctgov)`) trials with manually added publications.

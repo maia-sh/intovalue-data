@@ -100,6 +100,6 @@ publications available as PDF full-text
 
 59% (854/1457) of trials on clinicaltrials.gov include a link (i.e.,
 PMID) to their PubMed publication (as available in the IntoValue
-dataset). This include 666 (78%) trials with automatically indexed
+dataset). This includes 666 (78%) trials with automatically indexed
 publications (i.e., using TRN in PubMed’s secondary identifier field)
 and 188 (22%) trials with manually added publications.

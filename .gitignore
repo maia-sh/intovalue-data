@@ -3,3 +3,13 @@
 .Rdata
 .httr-oauth
 .DS_Store
+
+# Python specific project settings
+.idea/
+venv/
+
+# Configuration file
+config.ini
+
+# Cache
+permissions_cache.sqlite

@@ -15,8 +15,10 @@ import re
 
 
 # Define file name without filename extension
-filename = "2021-06-22_intovalue-oa"
-shortname = re.sub("\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])*","", filename)
+# filename = "2021-06-22_intovalue-oa"
+# shortname = re.sub("\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])*","", filename)
+filename = "oa-unpaywall"
+shortname = "oa-syp"
 
 # Load paths from the config file
 cfg = configparser.ConfigParser()
@@ -24,10 +26,10 @@ cfg.read("config.ini")
 
 # Get date to add to output file names
 today = datetime.datetime.today()
-datestamp = today.strftime("%Y-%m-%d")
+# datestamp = today.strftime("%Y-%m-%d")
 
 # Define data folder
-data_folder = cfg["paths"]["data"]
+data_folder = cfg["paths"]["data"]["raw"]
 
 # Define path to file with the data
 data_file = os.path.join(data_folder, filename + ".csv")
@@ -177,13 +179,16 @@ df = pd.DataFrame(result, columns=['doi', 'can_archive', 'archiving_locations', 
                                    'permission_accepted', 'permission_published'])
 
 merged_result = data.merge(df, on='doi', how='left')
-merged_result.to_csv(os.path.join(data_folder, datestamp + shortname + "-permissions.csv"), index=False)
+# merged_result.to_csv(os.path.join(data_folder, datestamp + shortname + "-permissions.csv"), index=False)
+merged_result.to_csv(os.path.join(data_folder, shortname + "-permissions.csv"), index=False)
 
 unresolved = pd.DataFrame(unresolved_dois, columns=['doi'])
 no_best_perm = pd.DataFrame(no_best_perm_dois, columns=['doi'])
 
-unresolved.to_csv(os.path.join(data_folder, datestamp + shortname + "-unresolved-permissions.csv"), index=False)
-no_best_perm.to_csv(os.path.join(data_folder, datestamp + shortname + "-no-best-permissions.csv"), index=False)
+# unresolved.to_csv(os.path.join(data_folder, datestamp + shortname + "-unresolved-permissions.csv"), index=False)
+# no_best_perm.to_csv(os.path.join(data_folder, datestamp + shortname + "-no-best-permissions.csv"), index=False)
+unresolved.to_csv(os.path.join(data_folder, shortname + "-unresolved-permissions.csv"), index=False)
+no_best_perm.to_csv(os.path.join(data_folder, shortname + "-no-best-permissions.csv"), index=False)
 
 print("Number of unresolved DOIs: ", len(unresolved_dois))
 print("Number of DOIs without a best permission: ", len(no_best_perm_dois))

@@ -58,7 +58,7 @@ oa_results <-
     clusters = 2,
     color_hierarchy = repository_hierarchy
   ) %>%
-  rename(color = OA_color)
+  rename(color = OA_color, publication_date_unpaywall = date)
 
 
 # Query Unpaywall API with all OA routes > green OA hierarchy -------------

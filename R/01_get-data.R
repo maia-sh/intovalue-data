@@ -6,5 +6,12 @@ library(readr)
 dir_repositories <- path_norm(path_wd(".."))
 dir <- path(dir_repositories, "reg-pub-link")
 
+dir_raw <- dir_create(here::here("data", "raw"))
+
+# IntoValue
 read_rds(path(dir, "data", "processed", "trials.rds")) %>%
-  write_csv(here::here("data", "intovalue.csv"))
+  write_csv(path(dir_raw, "intovalue.csv"))
+
+# Cross-registrations
+read_rds(path(dir, "data", "processed", "cross-registrations.rds")) %>%
+  write_csv(path(dir_raw, "cross-registrations.csv"))

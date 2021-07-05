@@ -1,0 +1,4 @@
+pandas
+requests
+requests_cache
+ratelimit

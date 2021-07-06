@@ -92,7 +92,7 @@ intovalue <-
       iv_version == 2 ~ as.Date("2020-07-01")
     ),
     results_search_end_date = case_when(
-      iv_version == 1 ~ as.Date("2017-12-31"),
+      iv_version == 1 ~ as.Date("2017-12-01"),
       iv_version == 2 ~ as.Date("2020-09-01")
     ),
     results_followup_start = results_search_start_date - completion_date,

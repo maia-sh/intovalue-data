@@ -89,6 +89,20 @@ oa_unpaywall <-
 write_csv(oa_unpaywall, here("data", "raw", "oa-unpaywall.csv"))
 
 
+# Create log file  --------------------------------------------------------
+
+log_file <- "unpaywall-query.log"
+log_message <- paste0("Unpaywall query date: ",
+                      format(Sys.time(), '%d-%m-%Y %I:%M:%S %p'))
+
+if (file.exists(log_file)) {
+  write(log_message, file = log_file,
+        append = TRUE, sep = "\n")
+} else {
+  writeLines(log_message, log_file)
+}
+
+
 # Explore Unpaywall data --------------------------------------------------
 
 # Some dois do not resolve in unpaywall

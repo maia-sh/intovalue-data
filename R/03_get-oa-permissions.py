@@ -27,10 +27,6 @@ logging.info('ShareYourPaper query date:')
 cfg = configparser.ConfigParser()
 cfg.read("config.ini")
 
-# Get date to add to output file names
-today = datetime.datetime.today()
-# datestamp = today.strftime("%Y-%m-%d")
-
 # Define data folder
 data_folder = cfg["paths"]["data_raw"]
 
@@ -39,6 +35,9 @@ data_file = os.path.join(data_folder, filename_oa_data + ".csv")
 
 # Read input dataset containing DOIs and OA status
 data = pd.read_csv(data_file)
+
+# Get today's date to compare to embargo
+today = datetime.datetime.today()
 
 # Filter for closed publications
 closed = data[(data['color'] == 'closed')]

@@ -11,15 +11,12 @@ import time
 import configparser
 import datetime
 import os
-import re
 import logging
 
+# Define input and output filenames
+filename_oa_data = "oa-unpaywall"
+filename_syp_results = "oa-syp"
 
-# Define file name without filename extension
-# filename = "2021-06-22_intovalue-oa"
-# shortname = re.sub("\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])*","", filename)
-filename = "oa-unpaywall"
-shortname = "oa-syp"
 # Configure logger
 logging.basicConfig(filename='syp-query.log',
                     level=logging.INFO,
@@ -38,7 +35,7 @@ today = datetime.datetime.today()
 data_folder = cfg["paths"]["data_raw"]
 
 # Define path to file with the data
-data_file = os.path.join(data_folder, filename + ".csv")
+data_file = os.path.join(data_folder, filename_oa_data + ".csv")
 
 # Read input dataset containing DOIs and OA status
 data = pd.read_csv(data_file)
@@ -185,16 +182,13 @@ df = pd.DataFrame(result, columns=['doi', 'can_archive', 'archiving_locations', 
                                    'permission_accepted', 'permission_published'])
 
 merged_result = data.merge(df, on='doi', how='left')
-# merged_result.to_csv(os.path.join(data_folder, datestamp + shortname + "-permissions.csv"), index=False)
-merged_result.to_csv(os.path.join(data_folder, shortname + "-permissions.csv"), index=False)
+merged_result.to_csv(os.path.join(data_folder, filename_syp_results + "-permissions.csv"), index=False)
 
 unresolved = pd.DataFrame(unresolved_dois, columns=['doi'])
 no_best_perm = pd.DataFrame(no_best_perm_dois, columns=['doi'])
 
-# unresolved.to_csv(os.path.join(data_folder, datestamp + shortname + "-unresolved-permissions.csv"), index=False)
-# no_best_perm.to_csv(os.path.join(data_folder, datestamp + shortname + "-no-best-permissions.csv"), index=False)
-unresolved.to_csv(os.path.join(data_folder, shortname + "-unresolved-permissions.csv"), index=False)
-no_best_perm.to_csv(os.path.join(data_folder, shortname + "-no-best-permissions.csv"), index=False)
+unresolved.to_csv(os.path.join(data_folder, filename_syp_results + "-unresolved-permissions.csv"), index=False)
+no_best_perm.to_csv(os.path.join(data_folder, filename_syp_results + "-no-best-permissions.csv"), index=False)
 
 print("Number of unresolved DOIs: ", len(unresolved_dois))
 print("Number of DOIs without a best permission: ", len(no_best_perm_dois))

@@ -29,7 +29,7 @@ today = datetime.datetime.today()
 # datestamp = today.strftime("%Y-%m-%d")
 
 # Define data folder
-data_folder = cfg["paths"]["data"]["raw"]
+data_folder = cfg["paths"]["data_raw"]
 
 # Define path to file with the data
 data_file = os.path.join(data_folder, filename + ".csv")

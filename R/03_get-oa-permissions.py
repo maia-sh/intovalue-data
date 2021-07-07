@@ -12,6 +12,7 @@ import configparser
 import datetime
 import os
 import re
+import logging
 
 
 # Define file name without filename extension
@@ -19,6 +20,11 @@ import re
 # shortname = re.sub("\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])*","", filename)
 filename = "oa-unpaywall"
 shortname = "oa-syp"
+# Configure logger
+logging.basicConfig(filename='syp-query.log',
+                    level=logging.INFO,
+                    format='%(message)s %(asctime)s', datefmt='%d-%m-%Y %I:%M:%S %p')
+logging.info('ShareYourPaper query date:')
 
 # Load paths from the config file
 cfg = configparser.ConfigParser()

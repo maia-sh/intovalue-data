@@ -87,7 +87,6 @@ oa_unpaywall <-
   mutate(across(everything(), ~na_if(., "")))
 
 write_csv(oa_unpaywall, here("data", "raw", "oa-unpaywall.csv"))
-# write_csv(oa_unpaywall, here("data", "raw", paste0(Sys.Date(), "_oa-unpaywall.csv")))
 
 
 # Explore Unpaywall data --------------------------------------------------

@@ -137,4 +137,5 @@ intovalue <-
 # Save prepared intovalue -------------------------------------------------
 dir <- fs::dir_create(here("data", "processed"))
 
+write_rds(intovalue, fs::path(dir, "intovalue.rds"))
 write_csv(intovalue, fs::path(dir, "intovalue.csv"))

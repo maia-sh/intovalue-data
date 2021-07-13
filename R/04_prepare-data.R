@@ -104,8 +104,36 @@ intovalue <-
 
 intovalue <-
   intovalue %>%
+
+  # Join in unpaywall and share your paper data
   left_join(oa_unpaywall, by = "doi") %>%
-  left_join(oa_syp, by = "doi")
+  left_join(oa_syp, by = "doi") %>%
+
+  # Create booleans for whether publication is OA and, if not, whether can be archived
+  # `is_oa` is TRUE for any non-closed publication (gold, green, hybrid, bronze); NA if no unpaywall data
+  # `is_archivable` TRUE if EITHER accepted or published version may be archived according to SYP, regardless of unpaywall status
+  # `is_closed_archivable` is NA if `is_oa` or no unpaywall OA data, TRUE if EITHER accepted or published version may be archived according to SYP AND publication is closed according to unpaywall, FALSE if NEITHER accepted or published version may be archived according to SYP AND publication is closed according to unpaywall
+  mutate(
+    is_oa = color != "closed",
+    is_archivable = case_when(
+      permission_accepted | permission_published ~ TRUE,
+      !permission_published | !permission_published ~ FALSE,
+      TRUE ~ NA
+    ),
+    is_closed_archivable = if_else(is_oa, NA, is_archivable, missing = NA)
+  )
+
+# Add timely summary results and publication ------------------------------
+# Create booleans for timeliness within 1 year (summary results) and 2 years (summary results and publication)
+# NA for trials without summary results/publication
+intovalue <-
+  intovalue %>%
+  mutate(
+    is_summary_results_1y = days_cd_to_summary < 365*1,
+    is_summary_results_2y = days_cd_to_summary < 365*2,
+    is_publication_2y = days_cd_to_publication < 365*2
+  )
+
 
 # Explore intovalue -------------------------------------------------------
 

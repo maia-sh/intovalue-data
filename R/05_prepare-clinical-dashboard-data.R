@@ -7,7 +7,7 @@ library(dplyr)
 library(readr)
 library(here)
 
-intovalue <- read_csv(here("data", "processed", "intovalue.csv"))
+intovalue <- read_rds(here("data", "processed", "intovalue.rds"))
 
 ct_intovalue <-
 

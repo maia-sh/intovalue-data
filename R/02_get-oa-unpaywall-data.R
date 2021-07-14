@@ -105,18 +105,18 @@ if (file.exists(log_file)) {
 
 # Explore Unpaywall data --------------------------------------------------
 
-# Some dois do not resolve in unpaywall
+# DOIs that do not resolve in unpaywall
 unresolved_dois <- setdiff(intovalue_dois, oa_unpaywall$doi)
 print(paste("Unpaywall unresolved DOIs:", length(unresolved_dois)))
 
-# Some dois have green but not main data
+# DOIs with green but not main data
 oa_unpaywall %>%
   filter(is.na(color) & !is.na(color_green_only))
 
-# However no dois have main data but not green
+# DOIs with main but not green data
 oa_unpaywall %>%
   filter(!is.na(color) & is.na(color_green_only))
 
-# Some dois have neither main nor green data
+# DOIs with neither main nor green data
 oa_unpaywall %>%
   filter(is.na(color) & is.na(color_green_only))

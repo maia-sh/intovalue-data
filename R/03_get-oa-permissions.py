@@ -39,14 +39,11 @@ data = pd.read_csv(data_file)
 # Get today's date to compare to embargo
 today = datetime.datetime.today()
 
-# Filter for closed publications
-closed = data[(data['color'] == 'closed')]
-print("Number of closed publications: ", closed.shape[0])
-
 # Base URL
 url = "https://api.openaccessbutton.org/permissions/"
 
-dois = set(closed['doi'].values.tolist())
+dois = set(data['doi'].values.tolist())
+print("Number of queried publications: ", len(dois))
 
 requests_cache.install_cache('permissions_cache')
 

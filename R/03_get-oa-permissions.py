@@ -151,6 +151,7 @@ def jprint(obj):
 
 unresolved_dois = []
 no_best_perm_dois = []
+syp_response = []
 result = []
 
 # make the API request
@@ -161,14 +162,17 @@ for doi in dois:
     except Exception as e:
         print("Exception raised with DOI:", doi, e)
         unresolved_dois.append(doi)
+        syp_response.append((doi, "unresolved"))
         continue
 
     tmp = get_parameters(output)
     if not tmp:
         print(f"SKIPPED: {doi}")
         no_best_perm_dois.append(doi)
+        syp_response.append((doi, "no_best_permission"))
         continue
 
+    syp_response.append((doi, "response"))
     result.append((doi, ) + tmp)
 
 # Create a dataframe to store the results
@@ -177,14 +181,18 @@ df = pd.DataFrame(result, columns=['doi', 'can_archive', 'archiving_locations', 
                                    'permission_issuer', 'embargo', 'date_embargo_elapsed', 'is_embargo_elapsed',
                                    'permission_accepted', 'permission_published'])
 
-merged_result = data.merge(df, on='doi', how='left')
+merged_data = data.merge(df, on='doi', how='left')
+
+# Convert SYP response to dataframe and merge to create result table
+df_response = pd.DataFrame(syp_response, columns=['doi', 'syp_response'])
+merged_result = merged_data.merge(df_response, on='doi', how='left')
 merged_result.to_csv(os.path.join(data_folder, filename_syp_results + "-permissions.csv"), index=False)
 
 unresolved = pd.DataFrame(unresolved_dois, columns=['doi'])
 no_best_perm = pd.DataFrame(no_best_perm_dois, columns=['doi'])
 
-unresolved.to_csv(os.path.join(data_folder, filename_syp_results + "-unresolved-permissions.csv"), index=False)
-no_best_perm.to_csv(os.path.join(data_folder, filename_syp_results + "-no-best-permissions.csv"), index=False)
+#unresolved.to_csv(os.path.join(data_folder, filename_syp_results + "-unresolved-permissions.csv"), index=False)
+#no_best_perm.to_csv(os.path.join(data_folder, filename_syp_results + "-no-best-permissions.csv"), index=False)
 
 print("Number of unresolved DOIs: ", len(unresolved_dois))
 print("Number of DOIs without a best permission: ", len(no_best_perm_dois))

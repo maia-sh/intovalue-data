@@ -87,23 +87,33 @@ oa_unpaywall <-
   mutate(across(everything(), ~na_if(., "")))
 
 write_csv(oa_unpaywall, here("data", "raw", "oa-unpaywall.csv"))
-# write_csv(oa_unpaywall, here("data", "raw", paste0(Sys.Date(), "_oa-unpaywall.csv")))
+
+
+# Create log file  --------------------------------------------------------
+
+log_file <- "unpaywall-query.log"
+log_message <- paste0("Unpaywall query date: ",
+                      format(Sys.time(), '%d-%m-%Y %I:%M:%S %p'))
+
+if (file.exists(log_file)) {
+  write(log_message, file = log_file,
+        append = TRUE, sep = "\n")
+} else {
+  writeLines(log_message, log_file)
+}
 
 
 # Explore Unpaywall data --------------------------------------------------
 
-# Some dois do not resolve in unpaywall
-unresolved_dois <- setdiff(intovalue_dois, oa_unpaywall$doi)
-print(paste("Unpaywall unresolved DOIs:", length(unresolved_dois)))
-
-# Some dois have green but not main data
+# DOIs with green but not main data
 oa_unpaywall %>%
   filter(is.na(color) & !is.na(color_green_only))
 
-# However no dois have main data but not green
+# DOIs with main but not green data
 oa_unpaywall %>%
   filter(!is.na(color) & is.na(color_green_only))
 
-# Some dois have neither main nor green data
-oa_unpaywall %>%
+# DOIs with neither main nor green data
+unresolved_dois <- oa_unpaywall %>%
   filter(is.na(color) & is.na(color_green_only))
+print(paste("Unpaywall unresolved DOIs:", nrow(unresolved_dois)))

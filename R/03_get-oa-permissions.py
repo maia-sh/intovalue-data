@@ -11,40 +11,39 @@ import time
 import configparser
 import datetime
 import os
-import re
+import logging
 
+# Define input and output filenames
+filename_oa_data = "oa-unpaywall"
+filename_syp_results = "oa-syp"
 
-# Define file name without filename extension
-# filename = "2021-06-22_intovalue-oa"
-# shortname = re.sub("\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])*","", filename)
-filename = "oa-unpaywall"
-shortname = "oa-syp"
+# Configure logger
+logging.basicConfig(filename='syp-query.log',
+                    level=logging.INFO,
+                    format='%(message)s %(asctime)s', datefmt='%d-%m-%Y %I:%M:%S %p')
+logging.info('ShareYourPaper query date:')
 
 # Load paths from the config file
 cfg = configparser.ConfigParser()
 cfg.read("config.ini")
 
-# Get date to add to output file names
-today = datetime.datetime.today()
-# datestamp = today.strftime("%Y-%m-%d")
-
 # Define data folder
-data_folder = cfg["paths"]["data"]["raw"]
+data_folder = cfg["paths"]["data_raw"]
 
 # Define path to file with the data
-data_file = os.path.join(data_folder, filename + ".csv")
+data_file = os.path.join(data_folder, filename_oa_data + ".csv")
 
 # Read input dataset containing DOIs and OA status
 data = pd.read_csv(data_file)
 
-# Filter for closed publications
-closed = data[(data['color'] == 'closed')]
-print("Number of closed publications: ", closed.shape[0])
+# Get today's date to compare to embargo
+today = datetime.datetime.today()
 
 # Base URL
 url = "https://api.openaccessbutton.org/permissions/"
 
-dois = set(closed['doi'].values.tolist())
+dois = set(data['doi'].values.tolist())
+print("Number of queried publications: ", len(dois))
 
 requests_cache.install_cache('permissions_cache')
 
@@ -152,6 +151,7 @@ def jprint(obj):
 
 unresolved_dois = []
 no_best_perm_dois = []
+syp_response = []
 result = []
 
 # make the API request
@@ -162,14 +162,17 @@ for doi in dois:
     except Exception as e:
         print("Exception raised with DOI:", doi, e)
         unresolved_dois.append(doi)
+        syp_response.append((doi, "unresolved"))
         continue
 
     tmp = get_parameters(output)
     if not tmp:
         print(f"SKIPPED: {doi}")
         no_best_perm_dois.append(doi)
+        syp_response.append((doi, "no_best_permission"))
         continue
 
+    syp_response.append((doi, "response"))
     result.append((doi, ) + tmp)
 
 # Create a dataframe to store the results
@@ -178,17 +181,16 @@ df = pd.DataFrame(result, columns=['doi', 'can_archive', 'archiving_locations', 
                                    'permission_issuer', 'embargo', 'date_embargo_elapsed', 'is_embargo_elapsed',
                                    'permission_accepted', 'permission_published'])
 
-merged_result = data.merge(df, on='doi', how='left')
-# merged_result.to_csv(os.path.join(data_folder, datestamp + shortname + "-permissions.csv"), index=False)
-merged_result.to_csv(os.path.join(data_folder, shortname + "-permissions.csv"), index=False)
+# Convert SYP response to dataframe and merge data to create result table
+df_response = pd.DataFrame(syp_response, columns=['doi', 'syp_response'])
+merged_result = df_response.merge(df, on='doi', how='left')
+merged_result.to_csv(os.path.join(data_folder, filename_syp_results + "-permissions.csv"), index=False)
 
 unresolved = pd.DataFrame(unresolved_dois, columns=['doi'])
 no_best_perm = pd.DataFrame(no_best_perm_dois, columns=['doi'])
 
-# unresolved.to_csv(os.path.join(data_folder, datestamp + shortname + "-unresolved-permissions.csv"), index=False)
-# no_best_perm.to_csv(os.path.join(data_folder, datestamp + shortname + "-no-best-permissions.csv"), index=False)
-unresolved.to_csv(os.path.join(data_folder, shortname + "-unresolved-permissions.csv"), index=False)
-no_best_perm.to_csv(os.path.join(data_folder, shortname + "-no-best-permissions.csv"), index=False)
+#unresolved.to_csv(os.path.join(data_folder, filename_syp_results + "-unresolved-permissions.csv"), index=False)
+#no_best_perm.to_csv(os.path.join(data_folder, filename_syp_results + "-no-best-permissions.csv"), index=False)
 
 print("Number of unresolved DOIs: ", len(unresolved_dois))
 print("Number of DOIs without a best permission: ", len(no_best_perm_dois))

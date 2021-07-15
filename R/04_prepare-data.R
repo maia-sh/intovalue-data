@@ -81,11 +81,49 @@ intovalue <-
   ) %>%
 
   # Recalculate days to summary results
+  # mutate(
+  #   days_cd_to_summary = duration_days(completion_date, summary_results_date),
+  #   days_pcd_to_summary = duration_days(primary_completion_date, summary_results_date)
+  # ) %>%
   mutate(
-    days_cd_to_summary = duration_days(completion_date, summary_results_date),
-    days_pcd_to_summary = duration_days(primary_completion_date, summary_results_date)
-  ) %>%
+    days_cd_to_summary = case_when(
+      id == "DRKS00003170" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00000711" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00004721" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00003280" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00004744" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00005500" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00005683" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00013233" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00011584" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00000635" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00000156" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00003527" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00006734" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00006766" ~ duration_days(completion_date, summary_results_date),
+      id == "DRKS00007163" ~ duration_days(completion_date, summary_results_date),
+      TRUE ~ days_cd_to_summary
+    ),
 
+    days_pcd_to_summary = case_when(
+      id == "DRKS00003170" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00000711" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00004721" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00003280" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00004744" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00005500" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00005683" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00013233" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00011584" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00000635" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00000156" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00003527" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00006734" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00006766" ~ duration_days(primary_completion_date, summary_results_date),
+      id == "DRKS00007163" ~ duration_days(primary_completion_date, summary_results_date),
+      TRUE ~ days_pcd_to_summary
+    )
+  ) %>%
   arrange(summary_results_date)
 
 

@@ -13,8 +13,9 @@ knitr::opts_chunk$set(
 )
 
 library(dplyr)
+library(gtsummary)
 
-intovalue_all <- readr::read_csv(here::here("data", "intovalue.csv"))
+intovalue_all <- readr::read_csv(here::here("data", "processed", "intovalue.csv"))
 ```
 
 # IntoValue Dataset
@@ -35,18 +36,19 @@ We are interested in interventional trials with a German UMC lead completed betw
 ```{r filter-intovalue}
 intovalue <-
   intovalue_all %>% 
-  
-  # In case of dupes, exclude IV1 version
-  mutate(is_not_iv1_dupe = if_else(!(is_dupe & iv_version == 1), TRUE, FALSE)) %>% 
-  
+
   filter(
+
+    # Re-apply the IntoValue exclusion criteria
     iv_completion,
     iv_status,
     iv_interventional,
     has_german_umc_lead,
-    is_not_iv1_dupe
-  )
 
+    # In case of dupes, exclude IV1 version
+    !(is_dupe & iv_version == 1)
+  )
+    
 n_iv_trials <- nrow(intovalue)
 ```
 **Number of included trials**: `r n_iv_trials`
@@ -145,10 +147,31 @@ We consider a publication "linked" if the PMID or DOI is included in the trial r
 
 ## Registry summary results
 
-```{r}
+```{r summary-results}
 intovalue_pubs %>% 
   count(registry, has_summary_results) %>% 
   knitr::kable()
 ```
 
 *Registry Limitations*: ClinicalTrials.gov includes a structured summary results field. In contrast, DRKS includes summary results with other references, and summary results were inferred based on keywords, such as Ergebnisbericht or Abschlussbericht, in the reference title.
+
+## EUCTR Cross-registrations
+```{r euctr-crossreg}
+
+tbl_euctr <-
+  intovalue %>% 
+  tbl_cross(
+    row = has_crossreg_eudract,
+    col = registry,
+    margin = "column",
+    percent = "column",
+    label = list(
+      has_crossreg_eudract ~ "EUCTR TRN in Registration",
+      registry ~ "Registry"
+    )
+  )
+
+as_kable(tbl_euctr)
+```
+
+Of the `r n_iv_trials` unique trials completed between 2009 and 2017 and meeting the IntoValue inclusion criteria, we found that `r inline_text(tbl_euctr, row_level = "TRUE", col_level = "Total")` include an EUCTR id in their registration, and are presumably cross-registered in EUCTR. This includes `r inline_text(tbl_euctr, row_level = "TRUE", col_level = "ClinicalTrials.gov")` from ClinicalTrials.gov and `r inline_text(tbl_euctr, row_level = "TRUE", col_level = "DRKS")` from DRKS.

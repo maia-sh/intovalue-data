@@ -41,18 +41,19 @@ exclusion criteria and deduplicate to get the analysis dataset.
 ``` r
 intovalue <-
   intovalue_all %>% 
-  
-  # In case of dupes, exclude IV1 version
-  mutate(is_not_iv1_dupe = if_else(!(is_dupe & iv_version == 1), TRUE, FALSE)) %>% 
-  
+
   filter(
+
+    # Re-apply the IntoValue exclusion criteria
     iv_completion,
     iv_status,
     iv_interventional,
     has_german_umc_lead,
-    is_not_iv1_dupe
-  )
 
+    # In case of dupes, exclude IV1 version
+    !(is_dupe & iv_version == 1)
+  )
+    
 n_iv_trials <- nrow(intovalue)
 ```
 
@@ -182,14 +183,45 @@ intovalue_pubs %>%
   knitr::kable()
 ```
 
-| registry           | has\_summary\_results |    n |
-|:-------------------|:----------------------|-----:|
-| ClinicalTrials.gov | FALSE                 | 1298 |
-| ClinicalTrials.gov | TRUE                  |  151 |
-| DRKS               | FALSE                 |  442 |
-| DRKS               | TRUE                  |    5 |
+| registry           | has_summary_results |    n |
+|:-------------------|:--------------------|-----:|
+| ClinicalTrials.gov | FALSE               | 1298 |
+| ClinicalTrials.gov | TRUE                |  151 |
+| DRKS               | FALSE               |  442 |
+| DRKS               | TRUE                |    5 |
 
 *Registry Limitations*: ClinicalTrials.gov includes a structured summary
 results field. In contrast, DRKS includes summary results with other
 references, and summary results were inferred based on keywords, such as
 Ergebnisbericht or Abschlussbericht, in the reference title.
+
+## EUCTR Cross-registrations
+
+``` r
+tbl_euctr <-
+  intovalue %>% 
+  tbl_cross(
+    row = has_crossreg_eudract,
+    col = registry,
+    margin = "column",
+    percent = "column",
+    label = list(
+      has_crossreg_eudract ~ "EUCTR TRN in Registration",
+      registry ~ "Registry"
+    )
+  )
+
+as_kable(tbl_euctr)
+```
+
+| **Characteristic**            | ClinicalTrials.gov | DRKS      | **Total**   |
+|:------------------------------|:-------------------|:----------|:------------|
+| **EUCTR TRN in Registration** |                    |           |             |
+| FALSE                         | 1,926 (85%)        | 558 (87%) | 2,484 (85%) |
+| TRUE                          | 346 (15%)          | 87 (13%)  | 433 (15%)   |
+
+Of the 2917 unique trials completed between 2009 and 2017 and meeting
+the IntoValue inclusion criteria, we found that 433 (15%) include an
+EUCTR id in their registration, and are presumably cross-registered in
+EUCTR. This includes 346 (15%) from ClinicalTrials.gov and 87 (13%) from
+DRKS.

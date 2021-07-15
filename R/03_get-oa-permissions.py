@@ -181,11 +181,9 @@ df = pd.DataFrame(result, columns=['doi', 'can_archive', 'archiving_locations', 
                                    'permission_issuer', 'embargo', 'date_embargo_elapsed', 'is_embargo_elapsed',
                                    'permission_accepted', 'permission_published'])
 
-merged_data = data.merge(df, on='doi', how='left')
-
-# Convert SYP response to dataframe and merge to create result table
+# Convert SYP response to dataframe and merge data to create result table
 df_response = pd.DataFrame(syp_response, columns=['doi', 'syp_response'])
-merged_result = merged_data.merge(df_response, on='doi', how='left')
+merged_result = df_response.merge(df, on='doi', how='left')
 merged_result.to_csv(os.path.join(data_folder, filename_syp_results + "-permissions.csv"), index=False)
 
 unresolved = pd.DataFrame(unresolved_dois, columns=['doi'])

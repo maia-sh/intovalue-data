@@ -9,6 +9,11 @@ library(readr)
 library(here)
 
 
+# Helper function to calculate duration in days
+duration_days <- function(start, end){
+  as.numeric(lubridate::as.duration(lubridate::interval(start, end)), "days")
+}
+
 # Get data ----------------------------------------------------------------
 
 intovalue_raw <- read_csv(here("data", "raw", "intovalue.csv"))
@@ -74,6 +79,13 @@ intovalue <-
     ),
     summary_results_date = as.Date(summary_results_date)
   ) %>%
+
+  # Recalculate days to summary results
+  mutate(
+    days_cd_to_summary = duration_days(completion_date, summary_results_date),
+    days_pcd_to_summary = duration_days(primary_completion_date, summary_results_date)
+  ) %>%
+
   arrange(summary_results_date)
 
 

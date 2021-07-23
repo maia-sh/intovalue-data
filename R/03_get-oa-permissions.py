@@ -120,19 +120,18 @@ def get_parameters(output_formatted):
     # What is the embargo?
     embargo = best_permission.get("embargo_months")
 
+    # If embargo is 0 months, it elapsed upon publication (TODO: make publication date)
+    # If embargo > 0 months, compare the calculated elapsed date to query date
+    if embargo == 0:
+        date_embargo_elapsed = None
+        is_embargo_elapsed = True
     # If embargo_months key does not exist, we can't draw a conclusion
-    if not embargo:
+    elif not embargo:
         date_embargo_elapsed = None
         is_embargo_elapsed = None
     else:
-        # If embargo is 0 months, it elapsed upon publication (TODO: make publication date)
-        # If embargo > 0 months, compare the calculated elapsed date to query date
-        if embargo == 0:
-            date_embargo_elapsed = None
-            is_embargo_elapsed = True
-        else:
-            date_embargo_elapsed = best_permission.get("embargo_end")
-            is_embargo_elapsed = datetime.datetime.strptime(date_embargo_elapsed, '%Y-%m-%d') < today
+        date_embargo_elapsed = best_permission.get("embargo_end")
+        is_embargo_elapsed = datetime.datetime.strptime(date_embargo_elapsed, '%Y-%m-%d') < today
 
     # Define a final permission that depends on several conditions being met
     permission_accepted = can_archive and inst_repository and is_embargo_elapsed and accepted_version

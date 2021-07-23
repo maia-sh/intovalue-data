@@ -135,8 +135,8 @@ def get_parameters(output_formatted):
             is_embargo_elapsed = datetime.datetime.strptime(date_embargo_elapsed, '%Y-%m-%d') < today
 
     # Define a final permission that depends on several conditions being met
-    permission_accepted = can_archive and accepted_version and is_embargo_elapsed and inst_repository
-    permission_published = can_archive and published_version and is_embargo_elapsed and inst_repository
+    permission_accepted = can_archive and inst_repository and is_embargo_elapsed and accepted_version
+    permission_published = can_archive and inst_repository and is_embargo_elapsed and published_version
 
     return can_archive, archiving_locations, inst_repository, versions, submitted_version, accepted_version, \
            published_version, licenses_required, permission_issuer, embargo, date_embargo_elapsed, \

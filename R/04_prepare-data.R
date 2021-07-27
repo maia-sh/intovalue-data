@@ -89,8 +89,11 @@ intovalue <-
 
 # Add results search dates ------------------------------------------------
 # We are interested in follow-up time, i.e., how much time between study completion and results search
-# Add results search date based on 10.1016/j.jclinepi.2019.06.002 (for IntoValue1) and from NR correspondence on 2021-06-29 (for IntoValue2)
-# Since date not available by trial, prepare both start and end of search period
+# IntoValue recorded the start and end of the manual search period and not the search dates for individual trials
+# Search dates are taken from 10.1016/j.jclinepi.2019.06.002 (for IntoValue1) and the dataset README: https://github.com/quest-bih/IntoValue2/blob/master/data/2_dataset_cleaning/final_dataset/iv_data_readme.txt
+# For parity with IntoValue, we calculate follow-up time based on the end of the search periods (`results_search_end_date`)
+# IV1: https://github.com/quest-bih/IntoValue2/blob/master/code/3_results_analysis/Paper_Plots_Tables_IntoValue2.R#L209
+# IV2: https://github.com/quest-bih/IntoValue2/blob/master/code/3_results_analysis/Paper_Plots_Tables_IntoValue2.R#L180
 
 intovalue <-
 
@@ -105,8 +108,12 @@ intovalue <-
       iv_version == 1 ~ as.Date("2017-12-01"),
       iv_version == 2 ~ as.Date("2020-09-01")
     ),
-    results_followup_start = results_search_start_date - completion_date,
-    results_followup_end = results_search_end_date - completion_date,
+
+    # Using end of search period
+    results_followup = results_search_end_date - completion_date,
+
+    has_followup_2y = results_followup >= 365*2,
+    has_followup_5y = results_followup >= 365*5
   )
 
 
@@ -146,32 +153,12 @@ intovalue <-
   )
 
 
-# Explore intovalue -------------------------------------------------------
+# Validate intovalue ------------------------------------------------------
 
 # Check that intovalue has same number of rows
-# intovalue %>%
-#   assertr::verify(nrow(.) == nrow(intovalue_raw))
+intovalue %>%
+  assertr::verify(nrow(.) == nrow(intovalue_raw))
 
-# intovalue_explore <-
-#   intovalue %>%
-#   select(
-#     id, iv_version, completion_date,
-#     results_search_start_date, results_search_start_date,
-#     results_followup_start, results_followup_end
-#   )
-
-# Note: Since we're using approximate search dates, plus updated completion dates from the registries, some trials (n = 15) appear to have been searched *prior* to completion (e.g., NCT00118573). TODO: decide how to handle! exclude from single plot or from entire sample
-# intovalue_explore %>%
-#   filter(results_followup_start < 0)
-
-# Also, some trials appear to have less than 2 years of follow-up
-# This is likely because start date changed in the registry post-hoc
-# intovalue_explore %>%
-#   filter(results_followup_start < 365*2)
-
-# Some trials had more than 5 years of follow-up
-# intovalue_explore %>%
-#   filter(results_followup_start > 365*5)
 
 # Save prepared intovalue -------------------------------------------------
 dir <- fs::dir_create(here("data", "processed"))

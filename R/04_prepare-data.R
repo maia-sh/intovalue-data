@@ -149,7 +149,9 @@ intovalue <-
   mutate(
     is_summary_results_1y = days_cd_to_summary < 365*1,
     is_summary_results_2y = days_cd_to_summary < 365*2,
-    is_publication_2y = days_cd_to_publication < 365*2
+    is_summary_results_5y = days_cd_to_summary < 365*5,
+    is_publication_2y = days_cd_to_publication < 365*2,
+    is_publication_5y = days_cd_to_publication < 365*5
   )
 
 

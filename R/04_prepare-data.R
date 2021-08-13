@@ -116,6 +116,19 @@ intovalue <-
     has_followup_5y = results_followup >= 365*5
   )
 
+# Edit publication type for trials with non-journal article dois ----------
+# TODO: add data from manual check
+
+intovalue <-
+  intovalue %>%
+  mutate(
+    publication_type = case_when(
+      id == "NCT01171339" ~ "abstract",
+      id == "NCT01914341" ~ "dissertation",
+      id == "NCT03046940" ~ "poster",
+      id == "DRKS00005301" ~ "dissertation",
+    )
+  )
 
 # Add open access ---------------------------------------------------------
 

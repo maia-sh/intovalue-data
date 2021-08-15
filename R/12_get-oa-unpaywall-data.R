@@ -1,11 +1,12 @@
 # Get open access data from the Unpaywall API
-# NOTE: for OA plots, make sure that any given DOI is only represented once per UMC (unit of interest = publication)
 
 library(dplyr)
 library(readr)
 library(here)
-# devtools::install_github("NicoRiedel/unpaywallR")
+# renv::install("NicoRiedel/unpaywallR")
 library(unpaywallR)
+
+dir <- fs::dir_create(here("data", "raw", "open-access"))
 
 # Prepare intovalue dois --------------------------------------------------
 # Filter for trials with a publication and DOI and keep only unique DOIs
@@ -86,21 +87,13 @@ oa_unpaywall <-
   full_join(oa_results_green, oa_results, by = "doi") %>%
   mutate(across(everything(), ~na_if(., "")))
 
-write_csv(oa_unpaywall, here("data", "raw", "oa-unpaywall.csv"))
+write_csv(oa_unpaywall, fs::path(dir, "oa-unpaywall.csv"))
 
 
-# Create log file  --------------------------------------------------------
+# Log query date ----------------------------------------------------------
 
-log_file <- "unpaywall-query.log"
-log_message <- paste0("Unpaywall query date: ",
-                      format(Sys.time(), '%d-%m-%Y %I:%M:%S %p'))
-
-if (file.exists(log_file)) {
-  write(log_message, file = log_file,
-        append = TRUE, sep = "\n")
-} else {
-  writeLines(log_message, log_file)
-}
+loggit::set_logfile(here::here("queries.log"))
+loggit::loggit("INFO", "Unpaywall")
 
 
 # Explore Unpaywall data --------------------------------------------------

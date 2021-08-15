@@ -22,13 +22,33 @@ intovalue_all <- readr::read_csv(here::here("data", "processed", "intovalue.csv"
 
 ## Overview
 
-This dataset is modified from the [main IntoValue dataset](https://github.com/quest-bih/IntoValue2/blob/master/data/iv_main_dataset.csv), and includes updated registry data from ClinicalTrials.gov and DRKS queried in May 2021. It also includes additional data on associated results publications, including links in the registries and trial registration number reporting in the publications.
+This dataset is modified from the [main IntoValue dataset](https://doi.org/10.5281/zenodo.5141342), and includes updated registry data from ClinicalTrials.gov and DRKS queried in May 2021. It also includes additional data on associated results publications, including links in the registries and trial registration number reporting in the publications.
 
-The documentation for the parent IntoValue dataset is provided in a [data dictionary](https://github.com/quest-bih/IntoValue2/blob/master/data/iv_data_dictionary.csv) and [readme](https://github.com/quest-bih/IntoValue2/blob/master/data/iv_data_readme.txt).
-
-This readme serves to highlight/document changes.
+Detailed documentation for the parent IntoValue dataset is provided in a data dictionary and readme alongside the [dataset in Zenodo](https://doi.org/10.5281/zenodo.5141342). This readme serves to highlight/document changes.
 
 Note that the parent IntoValue dataset includes `summary_results_date` for the few DRKS summary results, which have been removed in this version. We remove them as they had been manually extracted (from PDFs) for only the subset of summary results manually found in IntoValue, whereas this dataset includes additional summary results found via automated search and hence without dates. For parity, we removed DRKS summary result dates. We could decide to add these from either (1) the PDF (which indicates when the summary result was created), or (2) the DRKS change history (which indicates when the summary result was uploaded and made available).
+
+## Data sources and query dates
+In addition to the main IntoValue dataset, data were queried from the following sources:
+
+```{r query-logs}
+query_logs <- loggit::read_logs(here::here("queries.log"))
+
+get_latest_query <- function(query, logs) {
+  logs %>% 
+  filter(log_msg == query) %>% 
+    arrange(desc(timestamp)) %>% 
+    slice_head(n = 1) %>% 
+    pull(timestamp) %>% 
+    as.Date.character()
+}
+```
+
+- PubMed: `r get_latest_query("PubMed", query_logs)`
+- AACT (ClinicalTrials.gov): `r get_latest_query("AACT", query_logs)`
+- DRKS: `r get_latest_query("DRKS", query_logs)`
+- Unpaywall: `r get_latest_query("Unpaywall", query_logs)`
+- ShareYourPaper: `r get_latest_query("ShareYourPaper", query_logs)`
 
 ## Analysis dataset
 We are interested in interventional trials with a German UMC lead completed between 2009 and 2017. Due to changes in the registry as well as discrepancies between IntoValue 1 and 2, we re-apply the IntoValue exclusion criteria and deduplicate to get the analysis dataset.

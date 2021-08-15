@@ -4,8 +4,13 @@
 .httr-oauth
 .DS_Store
 
+# Data
 data/raw/pubmed/
 data/raw/fulltext/
+data/raw/registries/
+data/processed/registries/
+data/processed/pubmed/
+data/processed/trn/
 
 # Python specific project settings
 .idea/

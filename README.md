@@ -6,19 +6,16 @@
 ## Overview
 
 This dataset is modified from the [main IntoValue
-dataset](https://github.com/quest-bih/IntoValue2/blob/master/data/iv_main_dataset.csv),
-and includes updated registry data from ClinicalTrials.gov and DRKS
-queried in May 2021. It also includes additional data on associated
-results publications, including links in the registries and trial
-registration number reporting in the publications.
+dataset](https://doi.org/10.5281/zenodo.5141342), and includes updated
+registry data from ClinicalTrials.gov and DRKS queried in May 2021. It
+also includes additional data on associated results publications,
+including links in the registries and trial registration number
+reporting in the publications.
 
-The documentation for the parent IntoValue dataset is provided in a
-[data
-dictionary](https://github.com/quest-bih/IntoValue2/blob/master/data/iv_data_dictionary.csv)
-and
-[readme](https://github.com/quest-bih/IntoValue2/blob/master/data/iv_data_readme.txt).
-
-This readme serves to highlight/document changes.
+Detailed documentation for the parent IntoValue dataset is provided in a
+data dictionary and readme alongside the [dataset in
+Zenodo](https://doi.org/10.5281/zenodo.5141342). This readme serves to
+highlight/document changes.
 
 Note that the parent IntoValue dataset includes `summary_results_date`
 for the few DRKS summary results, which have been removed in this
@@ -30,6 +27,30 @@ summary result dates. We could decide to add these from either (1) the
 PDF (which indicates when the summary result was created), or (2) the
 DRKS change history (which indicates when the summary result was
 uploaded and made available).
+
+## Data sources and query dates
+
+In addition to the main IntoValue dataset, data were queried from the
+following sources:
+
+``` r
+query_logs <- loggit::read_logs(here::here("queries.log"))
+
+get_latest_query <- function(query, logs) {
+  logs %>% 
+  filter(log_msg == query) %>% 
+    arrange(desc(timestamp)) %>% 
+    slice_head(n = 1) %>% 
+    pull(timestamp) %>% 
+    as.Date.character()
+}
+```
+
+-   PubMed: 2021-08-15
+-   AACT (ClinicalTrials.gov): 2021-08-15
+-   DRKS: 2021-08-15
+-   Unpaywall: 2021-08-15
+-   ShareYourPaper: 2021-07-23
 
 ## Analysis dataset
 

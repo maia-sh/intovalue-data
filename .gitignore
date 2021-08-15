@@ -5,6 +5,7 @@
 .DS_Store
 
 data/raw/pubmed/
+data/raw/fulltext/
 
 # Python specific project settings
 .idea/

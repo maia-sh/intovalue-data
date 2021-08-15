@@ -195,7 +195,7 @@ pubmed_ft_retrieved <-
   # Remove duplicates due to intovalue versions
   distinct()
 
-write_rds(pubmed_ft_retrieved, path(dir_pubmed, "pubmed-ft-pdf-retrieved.rds"))
+write_rds(pubmed_ft_retrieved, path(dir_pubmed, "pubmed-ft-retrieved.rds"))
 
 
 # Pivot wider to for one row per TRN with sources as columns --------------

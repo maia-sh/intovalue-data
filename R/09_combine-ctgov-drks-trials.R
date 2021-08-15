@@ -2,20 +2,23 @@ library(dplyr)
 library(readr)
 library(fs)
 library(lubridate)
+library(here)
 
-source(here::here("R", "functions", "duration_days.R"))
+source(here("R", "functions", "duration_days.R"))
 
 # Get data ----------------------------------------------------------------
 
-ctgov_dir <- here::here("data", "processed", "ctgov")
-drks_dir <- here::here("data", "processed", "drks")
+registries_dir <- here("data", "processed", "registries")
+ctgov_dir <- path(registries_dir, "ctgov")
+drks_dir <- path(registries_dir, "drks")
 
 ctgov_studies <- read_rds(path(ctgov_dir, "ctgov-studies.rds"))
 ctgov_references <- read_rds(path(ctgov_dir, "ctgov-references.rds"))
+ctgov_crossreg <- read_rds(path(ctgov_dir, "ctgov-crossreg.rds"))
 
 drks_studies <- read_rds(path(drks_dir, "drks-studies.rds"))
 drks_references <- read_rds(path(drks_dir, "drks-references.rds"))
-
+drks_crossreg <- read_rds(path(drks_dir, "drks-crossreg.rds"))
 
 # Combine registry studies ------------------------------------------------
 
@@ -68,7 +71,7 @@ registry_studies <-
     days_reg_to_pcd = duration_days(registration_date, primary_completion_date)
   )
 
-write_rds(registry_studies, here::here("data", "processed", "registry-studies.rds"))
+write_rds(registry_studies, path(registries_dir, "registry-studies.rds"))
 
 # Combine registry references ---------------------------------------------
 
@@ -97,4 +100,18 @@ registry_references <-
   # filter(!(is.na(doi) & is.na(pmid))) %>%
   # distinct()
 
-write_rds(registry_references, here::here("data", "processed", "registry-references.rds"))
+write_rds(registry_references, path(registries_dir, "registry-references.rds"))
+
+
+# Combine registry cross-registrations ------------------------------------
+
+registry_crossreg <-
+  bind_rows(
+    rename(ctgov_crossreg, id = nct_id),
+    rename(drks_crossreg, id = drks_id)
+  ) #%>%
+  # group_by(id) %>%
+  # mutate(n_crossreg = row_number()) %>%
+  # ungroup()
+
+write_rds(registry_crossreg, path(registries_dir, "registry-crossreg.rds"))

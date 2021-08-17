@@ -4,20 +4,19 @@
 # by querying ShareYourPaper's permissions API (https://openaccessbutton.org/api)
 # Focuses on the best permission
 
-import pandas as pd
-import requests
-import requests_cache
-from ratelimit import limits, sleep_and_retry
-import json
-import time
 import configparser
 import datetime
-import os
+import json
 import logging
+import os
+import time
 
 # Define input and output filenames
 filename_oa_data = "oa-unpaywall"
 filename_syp_results = "oa-syp"
+import pandas as pd
+import requests
+import requests_cache
 
 # Configure logger
 logging.basicConfig(filename='syp-query.log',
@@ -48,6 +47,7 @@ dois = set(data['doi'].values.tolist())
 print("Number of queried publications: ", len(dois))
 
 requests_cache.install_cache('permissions_cache')
+from ratelimit import limits, sleep_and_retry
 
 
 # Set the rate limit to 1 call per 2 seconds

@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # Gets article-level self-archiving permission for publications
 # by querying ShareYourPaper's permissions API (https://openaccessbutton.org/api)
 # Focuses on the best permission

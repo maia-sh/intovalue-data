@@ -11,42 +11,10 @@ import logging
 import os
 import time
 
-# Define input and output filenames
-filename_oa_data = "oa-unpaywall"
-filename_syp_results = "oa-syp"
 import pandas as pd
 import requests
 import requests_cache
 
-# Configure logger
-logging.basicConfig(filename='syp-query.log',
-                    level=logging.INFO,
-                    format='%(message)s %(asctime)s', datefmt='%d-%m-%Y %I:%M:%S %p')
-logging.info('ShareYourPaper query date:')
-
-# Load paths from the config file
-cfg = configparser.ConfigParser()
-cfg.read("config.ini")
-
-# Define data folder
-data_folder = cfg["paths"]["data_raw"]
-
-# Define path to file with the data
-data_file = os.path.join(data_folder, filename_oa_data + ".csv")
-
-# Read input dataset containing DOIs and OA status
-data = pd.read_csv(data_file)
-
-# Get today's date to compare to embargo
-today = datetime.datetime.today()
-
-# Base URL
-url = "https://api.openaccessbutton.org/permissions/"
-
-dois = set(data['doi'].values.tolist())
-print("Number of queried publications: ", len(dois))
-
-requests_cache.install_cache('permissions_cache')
 from ratelimit import limits, sleep_and_retry
 
 
@@ -132,6 +100,8 @@ def get_parameters(output_formatted):
         date_embargo_elapsed = None
         is_embargo_elapsed = None
     else:
+        # Get today's date to compare to embargo
+        today = datetime.datetime.today()
         date_embargo_elapsed = best_permission.get("embargo_end")
         is_embargo_elapsed = datetime.datetime.strptime(date_embargo_elapsed, '%Y-%m-%d') < today
 
@@ -150,48 +120,84 @@ def jprint(obj):
     print(text)
 
 
-unresolved_dois = []
-no_best_perm_dois = []
-syp_response = []
-result = []
+def main():
+    # Define input and output filenames
+    filename_oa_data = "oa-unpaywall"
+    filename_syp_results = "oa-syp"
 
-# make the API request
-for doi in dois:
-    print(doi)
-    try:
-        output = call_api(url, doi)
-    except Exception as e:
-        print("Exception raised with DOI:", doi, e)
-        unresolved_dois.append(doi)
-        syp_response.append((doi, "unresolved"))
-        continue
+    # Configure logger
+    logging.basicConfig(filename='syp-query.log',
+                        level=logging.INFO,
+                        format='%(message)s %(asctime)s', datefmt='%d-%m-%Y %I:%M:%S %p')
+    logging.info('ShareYourPaper query date:')
 
-    tmp = get_parameters(output)
-    if not tmp:
-        print(f"SKIPPED: {doi}")
-        no_best_perm_dois.append(doi)
-        syp_response.append((doi, "no_best_permission"))
-        continue
+    # Load paths from the config file
+    cfg = configparser.ConfigParser()
+    cfg.read("config.ini")
 
-    syp_response.append((doi, "response"))
-    result.append((doi, ) + tmp)
+    # Define data folder
+    data_folder = cfg["paths"]["data_raw"]
 
-# Create a dataframe to store the results
-df = pd.DataFrame(result, columns=['doi', 'can_archive', 'archiving_locations', 'inst_repository', 'versions',
-                                   'submitted_version', 'accepted_version', 'published_version', 'licenses_required',
-                                   'permission_issuer', 'embargo', 'date_embargo_elapsed', 'is_embargo_elapsed',
-                                   'permission_accepted', 'permission_published'])
+    # Define path to file with the data
+    data_file = os.path.join(data_folder, filename_oa_data + ".csv")
 
-# Convert SYP response to dataframe and merge data to create result table
-df_response = pd.DataFrame(syp_response, columns=['doi', 'syp_response'])
-merged_result = df_response.merge(df, on='doi', how='left')
-merged_result.to_csv(os.path.join(data_folder, filename_syp_results + "-permissions.csv"), index=False)
+    # Read input dataset containing DOIs and OA status
+    data = pd.read_csv(data_file)
 
-unresolved = pd.DataFrame(unresolved_dois, columns=['doi'])
-no_best_perm = pd.DataFrame(no_best_perm_dois, columns=['doi'])
+    # Base URL
+    url = "https://api.openaccessbutton.org/permissions/"
 
-#unresolved.to_csv(os.path.join(data_folder, filename_syp_results + "-unresolved-permissions.csv"), index=False)
-#no_best_perm.to_csv(os.path.join(data_folder, filename_syp_results + "-no-best-permissions.csv"), index=False)
+    dois = set(data['doi'].values.tolist())
+    print("Number of queried publications: ", len(dois))
 
-print("Number of unresolved DOIs: ", len(unresolved_dois))
-print("Number of DOIs without a best permission: ", len(no_best_perm_dois))
+    requests_cache.install_cache('permissions_cache')
+
+    unresolved_dois = []
+    no_best_perm_dois = []
+    syp_response = []
+    result = []
+
+    # make the API request
+    for doi in dois:
+        print(doi)
+        try:
+            output = call_api(url, doi)
+        except Exception as e:
+            print("Exception raised with DOI:", doi, e)
+            unresolved_dois.append(doi)
+            syp_response.append((doi, "unresolved"))
+            continue
+
+        tmp = get_parameters(output)
+        if not tmp:
+            print(f"SKIPPED: {doi}")
+            no_best_perm_dois.append(doi)
+            syp_response.append((doi, "no_best_permission"))
+            continue
+
+        syp_response.append((doi, "response"))
+        result.append((doi, ) + tmp)
+
+    # Create a dataframe to store the results
+    df = pd.DataFrame(result, columns=[
+        'doi', 'can_archive', 'archiving_locations', 'inst_repository', 'versions',
+        'submitted_version', 'accepted_version', 'published_version', 'licenses_required',
+        'permission_issuer', 'embargo', 'date_embargo_elapsed', 'is_embargo_elapsed',
+        'permission_accepted', 'permission_published'])
+
+    # Convert SYP response to dataframe and merge data to create result table
+    df_response = pd.DataFrame(syp_response, columns=['doi', 'syp_response'])
+    merged_result = df_response.merge(df, on='doi', how='left')
+    merged_result.to_csv(os.path.join(data_folder, filename_syp_results + "-permissions.csv"), index=False)
+
+    # unresolved = pd.DataFrame(unresolved_dois, columns=['doi'])
+    # no_best_perm = pd.DataFrame(no_best_perm_dois, columns=['doi'])
+    # unresolved.to_csv(os.path.join(data_folder, filename_syp_results + "-unresolved-permissions.csv"), index=False)
+    # no_best_perm.to_csv(os.path.join(data_folder, filename_syp_results + "-no-best-permissions.csv"), index=False)
+
+    print("Number of unresolved DOIs: ", len(unresolved_dois))
+    print("Number of DOIs without a best permission: ", len(no_best_perm_dois))
+
+
+if __name__ == "__main__":
+    main()

@@ -11,6 +11,7 @@ source(here("R", "functions", "extract_pubmed.R"))
 source(here("R", "functions", "get_grobid_ft_trn.R"))
 
 intovalue <- read_csv(here("data", "raw", "intovalue.csv"))
+pubmed_ft_retrieved <- read_rds(here("data", "processed", "pubmed", "pubmed-ft-retrieved.rds"))
 
 # Prepare directory paths
 dir_pubmed <- dir_create(here("data", "processed", "pubmed"))
@@ -23,8 +24,7 @@ pmids_dois <-
   tidyr::drop_na(pmid, doi)
 
 # Extract TRNs from: PubMed secondary identifier, PubMed abstract, and PDF full-text
-pubmed_xmls <-
-  dir_ls(here("data", "raw", "pubmed"))
+pubmed_xmls <- dir_ls(here("data", "raw", "pubmed"))
 
 
 # Secondary identifier ----------------------------------------------------
@@ -35,7 +35,7 @@ si <-
   ctregistries::mutate_trn_registry(accession_number)
 
 write_rds(si, path(dir_pubmed, "pubmed-si.rds"))
-# si <- read_rds(path_wd("data", "processed", "pubmed-si", ext = "rds"))
+# si <- read_rds(path(dir_pubmed, "pubmed-si.rds"))
 
 # Visually inspect mismatching trns and registries
 # 1 trn is eudract with preceeding letters (detected, preceeding letter removed)
@@ -106,16 +106,15 @@ ft_doi <-
   select(-pmid) %>%
   rename(trn_detected = trn, n_detected = n) %>%
   mutate(
-    source = "ft_pdf",
+    source = "ft",
     trn_cleaned = purrr::map_chr(trn_detected, ctregistries::clean_trn)
   ) %>%
   left_join(pmids_dois, by  = "doi")
 
 write_rds(ft_doi, path(dir_trn, "trn-ft-doi.rds"))
-
+# ft_doi <- read_rds(path(dir_trn, "trn-ft-doi.rds"))
 
 # Full-text PMID ----------------------------------------------------------
-
 
 ft_pmid_xmls <-
   dir_ls(here("data", "raw", "fulltext", "pmid", "xml"))
@@ -126,13 +125,13 @@ ft_pmid <-
   select(-doi) %>%
   rename(trn_detected = trn, n_detected = n) %>%
   mutate(
-    source = "ft_pdf",
+    source = "ft",
     trn_cleaned = purrr::map_chr(trn_detected, ctregistries::clean_trn)
   ) %>%
   left_join(pmids_dois, by  = "pmid")
 
 write_rds(ft_pmid, path(dir_trn, "trn-ft-pmid.rds"))
-
+# ft_pmid <- read_rds(path(dir_trn, "trn-ft-pmid.rds"))
 
 # Note: Could add whether typo and dupe after cleaning
 # mutate(has_trn_typo = if_else(trn_detected != trn_cleaned, TRUE, FALSE)) %>%
@@ -150,52 +149,52 @@ trn_combined <-
   assertr::assert(assertr::not_na, pmid, trn)
 
 write_rds(trn_combined, path(dir_trn, "trn-reported-long.rds"))
+# trn_combined <- read_rds(path(dir_trn, "trn-reported-long.rds"))
 
-
-# Prepare retrieved pubmed and pdfs (doi and pmid) ------------------------
-
-pubmed_retrieved <-
-  pubmed_xmls %>%
-  fs::path_file() %>%
-  fs::path_ext_remove()
-
-ft_doi_retrieved <-
-  ft_doi_xmls %>%
-  fs::path_file() %>%
-  stringr::str_remove(".tei.xml$") %>%
-  stringr::str_replace_all("\\+", "/")
-
-ft_pmid_retrieved <-
-  ft_pmid_xmls %>%
-  fs::path_file() %>%
-  stringr::str_remove(".tei.xml$")
-
-# Create df of retrieved pubmed and pdfs (doi and pmid), with NA if no pmid
-# Also add whether source of pdf if doi or pmid (TRUE/FALSE only)
-pubmed_ft_retrieved <-
-  intovalue %>%
-  select(id, doi, pmid) %>%
-  mutate(
-    has_pubmed = case_when(
-      is.na(pmid) ~ NA,
-      pmid %in% pubmed_retrieved ~ TRUE,
-      TRUE ~ FALSE
-    ),
-
-    has_ft_pdf = case_when(
-      is.na(pmid) ~ NA,
-      (doi %in% ft_doi_retrieved) | (pmid %in% ft_pmid_retrieved) ~ TRUE,
-      TRUE ~ FALSE
-    ),
-
-    ft_doi = if_else(doi %in% ft_doi_retrieved, TRUE, FALSE),
-    ft_pmid = if_else(pmid %in% ft_pmid_retrieved, TRUE, FALSE),
-  ) %>%
-
-  # Remove duplicates due to intovalue versions
-  distinct()
-
-write_rds(pubmed_ft_retrieved, path(dir_pubmed, "pubmed-ft-retrieved.rds"))
+# # Prepare retrieved pubmed and pdfs (doi and pmid) ------------------------
+#
+# pubmed_retrieved <-
+#   pubmed_xmls %>%
+#   fs::path_file() %>%
+#   fs::path_ext_remove()
+#
+# ft_doi_retrieved <-
+#   ft_doi_xmls %>%
+#   fs::path_file() %>%
+#   stringr::str_remove(".tei.xml$") %>%
+#   stringr::str_replace_all("\\+", "/")
+#
+# ft_pmid_retrieved <-
+#   ft_pmid_xmls %>%
+#   fs::path_file() %>%
+#   stringr::str_remove(".tei.xml$")
+#
+# # Create df of retrieved pubmed and pdfs (doi and pmid), with NA if no pmid
+# # Also add whether source of pdf if doi or pmid (TRUE/FALSE only)
+# pubmed_ft_retrieved <-
+#   intovalue %>%
+#   select(id, doi, pmid) %>%
+#   mutate(
+#     has_pubmed = case_when(
+#       is.na(pmid) ~ NA,
+#       pmid %in% pubmed_retrieved ~ TRUE,
+#       TRUE ~ FALSE
+#     ),
+#
+#     has_ft_pdf = case_when(
+#       is.na(pmid) ~ NA,
+#       (doi %in% ft_doi_retrieved) | (pmid %in% ft_pmid_retrieved) ~ TRUE,
+#       TRUE ~ FALSE
+#     ),
+#
+#     ft_doi = if_else(doi %in% ft_doi_retrieved, TRUE, FALSE),
+#     ft_pmid = if_else(pmid %in% ft_pmid_retrieved, TRUE, FALSE),
+#   ) %>%
+#
+#   # Remove duplicates due to intovalue versions
+#   distinct()
+#
+# write_rds(pubmed_ft_retrieved, path(dir_pubmed, "pubmed-ft-retrieved.rds"))
 
 
 # Pivot wider to for one row per TRN with sources as columns --------------
@@ -208,26 +207,32 @@ trn_combined <-
   tidyr::pivot_wider(
     names_from = source, names_prefix = "has_trn_",
     values_from = value, values_fill = FALSE
-  ) %>%
+  )
 
-  # Change "has_trn_SOURCE" from FALSE to NA if source *not* searched
+# Change "has_trn_SOURCE" from FALSE to NA if source *not* retrieved
+trn_combined <-
+
+  # Add info on retrieved pubmed and ft
+  pubmed_ft_retrieved %>%
+  select(-id, -ft_source) %>%
+  janitor::remove_empty("rows") %>%
+  distinct() %>%
+  left_join(trn_combined, ., by = c("pmid", "doi")) %>%
+
+  # Check that no rows added
+  assertr::verify(nrow(.) == nrow(trn_combined)) %>%
+
   mutate(
 
     # TRN in secondary id and abstract are NA if no pubmed record
-    # has_trn_secondary_id = if_else(
-    #   !pmid %in% pubmed_retrieved,
-    #   NA, has_trn_secondary_id
-    # ),
-    # has_trn_abstract = if_else(
-    #   !pmid %in% pubmed_retrieved,
-    #   NA, has_trn_abstract
-    # ),
+    has_trn_secondary_id = if_else(!has_pubmed, NA, has_trn_secondary_id),
+    has_trn_abstract = if_else(!has_pubmed, NA, has_trn_abstract),
 
     # TRN in full-text is NA no full-text
-    has_trn_ft_pdf = if_else(
-      (!doi %in% ft_doi_retrieved) & (!pmid %in% ft_pmid_retrieved),
-      NA, has_trn_ft_pdf
-  ))
+    has_trn_ft = if_else(!has_ft, NA, has_trn_ft)
+  ) %>%
+
+  select(-has_pubmed, -has_ft)
 
 write_rds(trn_combined, path(dir_trn, "trn-reported-wide.rds"))
 

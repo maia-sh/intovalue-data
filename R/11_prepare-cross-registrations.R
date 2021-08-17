@@ -64,9 +64,9 @@ pubmed_retrieved <-
   filter(has_pubmed) %>%
   pull(pmid)
 
-ft_pdf_retrieved <-
+ft_retrieved <-
   pubmed_ft_retrieved %>%
-  filter(has_ft_pdf) %>%
+  filter(has_ft) %>%
   pull(pmid)
 
 
@@ -91,9 +91,9 @@ cross_registrations <-
       FALSE, is_crossreg_abstract
     ),
 
-    is_crossreg_ft_pdf = if_else(
-      is.na(is_crossreg_ft_pdf) & pmid %in% ft_pdf_retrieved,
-      FALSE, is_crossreg_ft_pdf
+    is_crossreg_ft = if_else(
+      is.na(is_crossreg_ft) & pmid %in% ft_retrieved,
+      FALSE, is_crossreg_ft
     )
   )
 
@@ -159,9 +159,9 @@ n_cross_registrations <-
       as.integer(0), n_crossreg_abstract
     ),
 
-    n_crossreg_ft_pdf = if_else(
-      is.na(n_crossreg_ft_pdf) & pmid %in% ft_pdf_retrieved,
-      as.integer(0), n_crossreg_ft_pdf
+    n_crossreg_ft = if_else(
+      is.na(n_crossreg_ft) & pmid %in% ft_retrieved,
+      as.integer(0), n_crossreg_ft
     )
   )
 

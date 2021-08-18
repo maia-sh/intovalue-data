@@ -35,18 +35,14 @@ source(here("R", "functions", "correct_pdf_url.R"))
 
 # Get pdfs from dois ------------------------------------------------------
 
-# # Limit to dois for pubmed records
 dois <-
-intovalue %>%
-filter(!is.na(pmid) & !is.na(doi)) %>%
-distinct(doi) %>%
-pull()
-
-# dois <-
-#   intovalue %>%
-#   filter(!is.na(doi)) %>%
-#   distinct(doi) %>%
-#   pull()
+  intovalue %>%
+  filter(!is.na(doi)) %>%
+  # Alternatively, could limit to dois for pubmed records (with pmid)
+  # filter(!is.na(pmid)) %>%
+  distinct(doi) %>%
+  arrange(doi) %>%
+  pull()
 
 # If dois already downloaded and/or converted, remove those from list to download
 ft_doi_pdf <-
@@ -60,6 +56,12 @@ ft_doi_xml <-
     path_file() %>%
     str_remove(".tei.xml$") %>%
     str_replace_all("\\+", "/")
+
+# Check whether doi pdfs not converted to xml
+dois_pdf_not_xml <- setdiff(ft_doi_pdf, ft_doi_xml)
+if (length(dois_pdf_not_xml) > 0){
+  rlang::warn(glue::glue("Unconverted dois pdfs:{dois_pdf_not_xml}"))
+}
 
 # Check whether unneeded dois retrieved, and manually review and remove
 dois_downloaded_unused <-
@@ -118,6 +120,12 @@ ft_pmid_xml <-
   path_file() %>%
   str_remove(".tei.xml$") %>%
   str_replace_all("\\+", "/")
+
+# Check whether pmid pdfs not converted to xml
+pmids_pdf_not_xml <- setdiff(ft_pmid_pdf, ft_pmid_xml)
+if (length(pmids_pdf_not_xml) > 0){
+  rlang::warn(glue::glue("Unconverted pmids pdfs:{pmids_pdf_not_xml}"))
+}
 
 # Check whether unneeded pmids retrieved, and manually review and remove
 pmids_downloaded_unused <-

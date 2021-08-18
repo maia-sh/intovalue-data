@@ -67,6 +67,7 @@ si <-
   left_join(pmids_dois, by  = "pmid")
 
 write_rds(si, path(dir_trn, "trn-si.rds"))
+# si <- read_rds(path(dir_trn, "trn-si.rds"))
 
 # Abstract ----------------------------------------------------------------
 
@@ -76,7 +77,7 @@ abs <-
   ctregistries::mutate_trn_registry(abstract)
 
 write_rds(abs, path(dir_pubmed, "pubmed-abstract.rds"))
-# abs <- read_rds(path_wd("data", "processed", "pubmed-abstract", ext = "rds"))
+# abs <- read_rds(path(dir_pubmed, "pubmed-abstract.rds"))
 
 abs <-
   abs %>%
@@ -92,8 +93,7 @@ abs <-
   left_join(pmids_dois, by  = "pmid")
 
 write_rds(abs, path(dir_trn, "trn-abstract.rds"))
-# abs <- read_rds(path_wd("data", "processed", "trn-abstract", ext = "rds"))
-
+# abs <- read_rds(path(dir_trn, "trn-abstract.rds"))
 
 # Full-text DOI -----------------------------------------------------------
 
@@ -145,57 +145,11 @@ trn_combined <-
 
   distinct(pmid, doi, trn = trn_cleaned, registry, source) %>%
 
-  # All records should have a pmid and a trn
-  assertr::assert(assertr::not_na, pmid, trn)
+  # All records should have a trn
+  assertr::assert(assertr::not_na, trn)
 
 write_rds(trn_combined, path(dir_trn, "trn-reported-long.rds"))
 # trn_combined <- read_rds(path(dir_trn, "trn-reported-long.rds"))
-
-# # Prepare retrieved pubmed and pdfs (doi and pmid) ------------------------
-#
-# pubmed_retrieved <-
-#   pubmed_xmls %>%
-#   fs::path_file() %>%
-#   fs::path_ext_remove()
-#
-# ft_doi_retrieved <-
-#   ft_doi_xmls %>%
-#   fs::path_file() %>%
-#   stringr::str_remove(".tei.xml$") %>%
-#   stringr::str_replace_all("\\+", "/")
-#
-# ft_pmid_retrieved <-
-#   ft_pmid_xmls %>%
-#   fs::path_file() %>%
-#   stringr::str_remove(".tei.xml$")
-#
-# # Create df of retrieved pubmed and pdfs (doi and pmid), with NA if no pmid
-# # Also add whether source of pdf if doi or pmid (TRUE/FALSE only)
-# pubmed_ft_retrieved <-
-#   intovalue %>%
-#   select(id, doi, pmid) %>%
-#   mutate(
-#     has_pubmed = case_when(
-#       is.na(pmid) ~ NA,
-#       pmid %in% pubmed_retrieved ~ TRUE,
-#       TRUE ~ FALSE
-#     ),
-#
-#     has_ft_pdf = case_when(
-#       is.na(pmid) ~ NA,
-#       (doi %in% ft_doi_retrieved) | (pmid %in% ft_pmid_retrieved) ~ TRUE,
-#       TRUE ~ FALSE
-#     ),
-#
-#     ft_doi = if_else(doi %in% ft_doi_retrieved, TRUE, FALSE),
-#     ft_pmid = if_else(pmid %in% ft_pmid_retrieved, TRUE, FALSE),
-#   ) %>%
-#
-#   # Remove duplicates due to intovalue versions
-#   distinct()
-#
-# write_rds(pubmed_ft_retrieved, path(dir_pubmed, "pubmed-ft-retrieved.rds"))
-
 
 # Pivot wider to for one row per TRN with sources as columns --------------
 

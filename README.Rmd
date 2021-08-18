@@ -15,27 +15,47 @@ knitr::opts_chunk$set(
 library(dplyr)
 library(gtsummary)
 
-intovalue_all <- readr::read_csv(here::here("data", "processed", "intovalue.csv"))
+trials_all <- readr::read_csv(here::here("data", "processed", "trials.csv"))
 ```
 
 # IntoValue Dataset
 
 ## Overview
 
-This dataset is modified from the [main IntoValue dataset](https://github.com/quest-bih/IntoValue2/blob/master/data/iv_main_dataset.csv), and includes updated registry data from ClinicalTrials.gov and DRKS queried in May 2021. It also includes additional data on associated results publications, including links in the registries and trial registration number reporting in the publications.
+This dataset is modified from the [main IntoValue dataset](https://doi.org/10.5281/zenodo.5141342), and includes updated registry data from ClinicalTrials.gov and DRKS queried in May 2021. It also includes additional data on associated results publications, including links in the registries and trial registration number reporting in the publications.
 
-The documentation for the parent IntoValue dataset is provided in a [data dictionary](https://github.com/quest-bih/IntoValue2/blob/master/data/iv_data_dictionary.csv) and [readme](https://github.com/quest-bih/IntoValue2/blob/master/data/iv_data_readme.txt).
-
-This readme serves to highlight/document changes.
+Detailed documentation for the parent IntoValue dataset is provided in a data dictionary and readme alongside the [dataset in Zenodo](https://doi.org/10.5281/zenodo.5141342). This readme serves to highlight/document changes.
 
 Note that the parent IntoValue dataset includes `summary_results_date` for the few DRKS summary results, which have been removed in this version. We remove them as they had been manually extracted (from PDFs) for only the subset of summary results manually found in IntoValue, whereas this dataset includes additional summary results found via automated search and hence without dates. For parity, we removed DRKS summary result dates. We could decide to add these from either (1) the PDF (which indicates when the summary result was created), or (2) the DRKS change history (which indicates when the summary result was uploaded and made available).
+
+## Data sources and query dates
+In addition to the main IntoValue dataset, data were queried from the following sources:
+
+```{r query-logs}
+query_logs <- loggit::read_logs(here::here("queries.log"))
+
+get_latest_query <- function(query, logs) {
+  logs %>% 
+  filter(log_msg == query) %>% 
+    arrange(desc(timestamp)) %>% 
+    slice_head(n = 1) %>% 
+    pull(timestamp) %>% 
+    as.Date.character()
+}
+```
+
+- PubMed: `r get_latest_query("PubMed", query_logs)`
+- AACT (ClinicalTrials.gov): `r get_latest_query("AACT", query_logs)`
+- DRKS: `r get_latest_query("DRKS", query_logs)`
+- Unpaywall: `r get_latest_query("Unpaywall", query_logs)`
+- ShareYourPaper: `r get_latest_query("ShareYourPaper", query_logs)`
 
 ## Analysis dataset
 We are interested in interventional trials with a German UMC lead completed between 2009 and 2017. Due to changes in the registry as well as discrepancies between IntoValue 1 and 2, we re-apply the IntoValue exclusion criteria and deduplicate to get the analysis dataset.
 
-```{r filter-intovalue}
-intovalue <-
-  intovalue_all %>% 
+```{r filter-trials}
+trials <-
+  trials_all %>% 
 
   filter(
 
@@ -49,25 +69,33 @@ intovalue <-
     !(is_dupe & iv_version == 1)
   )
     
-n_iv_trials <- nrow(intovalue)
+n_iv_trials <- nrow(trials)
 ```
 **Number of included trials**: `r n_iv_trials`
 
-Some analyses apply only to trials with a results publication with a PMID that resolves to a PubMed record and for which we could acquire the full-text as a PDF. 
+For analyses by UMC, split trials by UMC lead city:
+
+```{r trials-by-umc}
+trials_by_umc <-
+  trials %>% 
+  mutate(lead_cities = strsplit(as.character(lead_cities), " ")) %>%
+  tidyr::unnest(lead_cities)
+```
+
+Some analyses apply only to trials with a results publication (optionally limited to journal articles to exclude dissertations and abstracts) with a PMID that resolves to a PubMed record and for which we could acquire the full-text as a PDF. 
 
 ```{r trials-with-pubs}
 
-intovalue_pubs <-
-  intovalue %>% 
+trials_pubs <-
+  trials %>% 
   filter(
-    has_publication,
-    has_pmid,
+    # publication_type == "journal publication", #optional
     has_pubmed,
-    has_ft_pdf
+    has_ft,
   )
 
-n_iv_trials_pubs <- nrow(intovalue_pubs)
-trials_same_pmid <- janitor::get_dupes(intovalue_pubs, pmid)
+n_iv_trials_pubs <- nrow(trials_pubs)
+trials_same_pmid <- janitor::get_dupes(trials_pubs, pmid)
 n_trials_same_pmid <- n_distinct(trials_same_pmid$id)
 n_pmids_same_trial <- n_distinct(trials_same_pmid$pmid)
 n_pmids_dupes <- unique(range(trials_same_pmid$dupe_count))
@@ -79,7 +107,7 @@ In general, there is max 1 publication per trial and max 1 trial per publication
 ## TRN reporting in abstract
 
 ```{r trn-abs}
-n_trn_abs <- nrow(filter(intovalue_pubs, has_iv_trn_abstract))
+n_trn_abs <- nrow(filter(trials_pubs, has_iv_trn_abstract))
 
 prop_trn_abs <- n_trn_abs/n_iv_trials_pubs
 ```
@@ -95,7 +123,7 @@ prop_trn_abs <- n_trn_abs/n_iv_trials_pubs
 ## TRN reporting in full-text
 
 ```{r trn-ft}
-n_trn_ft <- nrow(filter(intovalue_pubs, has_iv_trn_ft_pdf))
+n_trn_ft <- nrow(filter(trials_pubs, has_iv_trn_ft))
 
 prop_trn_ft <- n_trn_ft/n_iv_trials_pubs
 ```
@@ -111,23 +139,23 @@ prop_trn_ft <- n_trn_ft/n_iv_trials_pubs
 ```{r reg-pub-link}
 
 # ClinicalTrials.gov
-intovalue_ctgov <- filter(intovalue_pubs, registry == "ClinicalTrials.gov")
+trials_ctgov <- filter(trials_pubs, registry == "ClinicalTrials.gov")
 
-n_iv_trials_pubs_ctgov <- nrow(intovalue_ctgov)
+n_iv_trials_pubs_ctgov <- nrow(trials_ctgov)
 
-n_reg_pub_link_ctgov <- nrow(filter(intovalue_ctgov, has_reg_pub_link))
+n_reg_pub_link_ctgov <- nrow(filter(trials_ctgov, has_reg_pub_link))
 
 prop_reg_pub_link_ctgov <- n_reg_pub_link_ctgov/ n_iv_trials_pubs_ctgov
 
-n_auto <- nrow(filter(intovalue_ctgov, reference_derived))
-n_manual <- nrow(filter(intovalue_ctgov, reference_derived))
+n_auto <- nrow(filter(trials_ctgov, reference_derived))
+n_manual <- nrow(filter(trials_ctgov, reference_derived))
 
 # DRKS
-intovalue_drks <- filter(intovalue_pubs, registry == "DRKS")
+trials_drks <- filter(trials_pubs, registry == "DRKS")
 
-n_iv_trials_pubs_drks <- nrow(intovalue_drks)
+n_iv_trials_pubs_drks <- nrow(trials_drks)
 
-n_reg_pub_link_drks <- nrow(filter(intovalue_drks, has_reg_pub_link))
+n_reg_pub_link_drks <- nrow(filter(trials_drks, has_reg_pub_link))
 
 prop_reg_pub_link_drks <- n_reg_pub_link_drks/ n_iv_trials_pubs_drks
 
@@ -148,7 +176,7 @@ We consider a publication "linked" if the PMID or DOI is included in the trial r
 ## Registry summary results
 
 ```{r summary-results}
-intovalue_pubs %>% 
+trials_pubs %>% 
   count(registry, has_summary_results) %>% 
   knitr::kable()
 ```
@@ -159,7 +187,7 @@ intovalue_pubs %>%
 ```{r euctr-crossreg}
 
 tbl_euctr <-
-  intovalue %>% 
+  trials %>% 
   tbl_cross(
     row = has_crossreg_eudract,
     col = registry,

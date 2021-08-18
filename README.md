@@ -6,19 +6,16 @@
 ## Overview
 
 This dataset is modified from the [main IntoValue
-dataset](https://github.com/quest-bih/IntoValue2/blob/master/data/iv_main_dataset.csv),
-and includes updated registry data from ClinicalTrials.gov and DRKS
-queried in May 2021. It also includes additional data on associated
-results publications, including links in the registries and trial
-registration number reporting in the publications.
+dataset](https://doi.org/10.5281/zenodo.5141342), and includes updated
+registry data from ClinicalTrials.gov and DRKS queried in May 2021. It
+also includes additional data on associated results publications,
+including links in the registries and trial registration number
+reporting in the publications.
 
-The documentation for the parent IntoValue dataset is provided in a
-[data
-dictionary](https://github.com/quest-bih/IntoValue2/blob/master/data/iv_data_dictionary.csv)
-and
-[readme](https://github.com/quest-bih/IntoValue2/blob/master/data/iv_data_readme.txt).
-
-This readme serves to highlight/document changes.
+Detailed documentation for the parent IntoValue dataset is provided in a
+data dictionary and readme alongside the [dataset in
+Zenodo](https://doi.org/10.5281/zenodo.5141342). This readme serves to
+highlight/document changes.
 
 Note that the parent IntoValue dataset includes `summary_results_date`
 for the few DRKS summary results, which have been removed in this
@@ -31,6 +28,30 @@ PDF (which indicates when the summary result was created), or (2) the
 DRKS change history (which indicates when the summary result was
 uploaded and made available).
 
+## Data sources and query dates
+
+In addition to the main IntoValue dataset, data were queried from the
+following sources:
+
+``` r
+query_logs <- loggit::read_logs(here::here("queries.log"))
+
+get_latest_query <- function(query, logs) {
+  logs %>% 
+  filter(log_msg == query) %>% 
+    arrange(desc(timestamp)) %>% 
+    slice_head(n = 1) %>% 
+    pull(timestamp) %>% 
+    as.Date.character()
+}
+```
+
+-   PubMed: 2021-08-15
+-   AACT (ClinicalTrials.gov): 2021-08-15
+-   DRKS: 2021-08-15
+-   Unpaywall: 2021-08-15
+-   ShareYourPaper: 2021-07-23
+
 ## Analysis dataset
 
 We are interested in interventional trials with a German UMC lead
@@ -39,8 +60,8 @@ as discrepancies between IntoValue 1 and 2, we re-apply the IntoValue
 exclusion criteria and deduplicate to get the analysis dataset.
 
 ``` r
-intovalue <-
-  intovalue_all %>% 
+trials <-
+  trials_all %>% 
 
   filter(
 
@@ -54,33 +75,42 @@ intovalue <-
     !(is_dupe & iv_version == 1)
   )
     
-n_iv_trials <- nrow(intovalue)
+n_iv_trials <- nrow(trials)
 ```
 
-**Number of included trials**: 2917
+**Number of included trials**: 2915
 
-Some analyses apply only to trials with a results publication with a
-PMID that resolves to a PubMed record and for which we could acquire the
-full-text as a PDF.
+For analyses by UMC, split trials by UMC lead city:
 
 ``` r
-intovalue_pubs <-
-  intovalue %>% 
+trials_by_umc <-
+  trials %>% 
+  mutate(lead_cities = strsplit(as.character(lead_cities), " ")) %>%
+  tidyr::unnest(lead_cities)
+```
+
+Some analyses apply only to trials with a results publication
+(optionally limited to journal articles to exclude dissertations and
+abstracts) with a PMID that resolves to a PubMed record and for which we
+could acquire the full-text as a PDF.
+
+``` r
+trials_pubs <-
+  trials %>% 
   filter(
-    has_publication,
-    has_pmid,
+    # publication_type == "journal publication", #optional
     has_pubmed,
-    has_ft_pdf
+    has_ft,
   )
 
-n_iv_trials_pubs <- nrow(intovalue_pubs)
-trials_same_pmid <- janitor::get_dupes(intovalue_pubs, pmid)
+n_iv_trials_pubs <- nrow(trials_pubs)
+trials_same_pmid <- janitor::get_dupes(trials_pubs, pmid)
 n_trials_same_pmid <- n_distinct(trials_same_pmid$id)
 n_pmids_same_trial <- n_distinct(trials_same_pmid$pmid)
 n_pmids_dupes <- unique(range(trials_same_pmid$dupe_count))
 ```
 
-**Number of trials with results publications**: 1896
+**Number of trials with results publications**: 1897
 
 In general, there is max 1 publication per trial and max 1 trial per
 publication. However, there are 70 trials associated with the same 35
@@ -90,7 +120,7 @@ analysis is trials, we disregard this double-counting of publications.
 ## TRN reporting in abstract
 
 ``` r
-n_trn_abs <- nrow(filter(intovalue_pubs, has_iv_trn_abstract))
+n_trn_abs <- nrow(filter(trials_pubs, has_iv_trn_abstract))
 
 prop_trn_abs <- n_trn_abs/n_iv_trials_pubs
 ```
@@ -103,13 +133,13 @@ TRN in abstract
 **Denominator**: Number of trials with PubMed publications available as
 PDF full-text
 
-38% (714/1896) of trials report a TRN in the abstract of their results
+38% (715/1897) of trials report a TRN in the abstract of their results
 publication.
 
 ## TRN reporting in full-text
 
 ``` r
-n_trn_ft <- nrow(filter(intovalue_pubs, has_iv_trn_ft_pdf))
+n_trn_ft <- nrow(filter(trials_pubs, has_iv_trn_ft))
 
 prop_trn_ft <- n_trn_ft/n_iv_trials_pubs
 ```
@@ -120,30 +150,30 @@ TRN in PDF full-text
 **Denominator**: Number of trials with PubMed publications available as
 PDF full-text
 
-60% (1131/1896) of trials report a TRN in the full-text (PDF) of their
+60% (1137/1897) of trials report a TRN in the full-text (PDF) of their
 results publication.
 
 ## Linked publication in registry
 
 ``` r
 # ClinicalTrials.gov
-intovalue_ctgov <- filter(intovalue_pubs, registry == "ClinicalTrials.gov")
+trials_ctgov <- filter(trials_pubs, registry == "ClinicalTrials.gov")
 
-n_iv_trials_pubs_ctgov <- nrow(intovalue_ctgov)
+n_iv_trials_pubs_ctgov <- nrow(trials_ctgov)
 
-n_reg_pub_link_ctgov <- nrow(filter(intovalue_ctgov, has_reg_pub_link))
+n_reg_pub_link_ctgov <- nrow(filter(trials_ctgov, has_reg_pub_link))
 
 prop_reg_pub_link_ctgov <- n_reg_pub_link_ctgov/ n_iv_trials_pubs_ctgov
 
-n_auto <- nrow(filter(intovalue_ctgov, reference_derived))
-n_manual <- nrow(filter(intovalue_ctgov, reference_derived))
+n_auto <- nrow(filter(trials_ctgov, reference_derived))
+n_manual <- nrow(filter(trials_ctgov, reference_derived))
 
 # DRKS
-intovalue_drks <- filter(intovalue_pubs, registry == "DRKS")
+trials_drks <- filter(trials_pubs, registry == "DRKS")
 
-n_iv_trials_pubs_drks <- nrow(intovalue_drks)
+n_iv_trials_pubs_drks <- nrow(trials_drks)
 
-n_reg_pub_link_drks <- nrow(filter(intovalue_drks, has_reg_pub_link))
+n_reg_pub_link_drks <- nrow(filter(trials_drks, has_reg_pub_link))
 
 prop_reg_pub_link_drks <- n_reg_pub_link_drks/ n_iv_trials_pubs_drks
 ```
@@ -166,28 +196,28 @@ DOIs linked in trial registration
 **Denominator**: Number of trials with PubMed publications available as
 PDF full-text
 
-59% (852/1449) of trials on clinicaltrials.gov include a link (i.e.,
+59% (849/1449) of trials on clinicaltrials.gov include a link (i.e.,
 PMID, DOI) to their PubMed publication (as available in the IntoValue
-dataset). This includes 666 (78%) trials with automatically indexed
+dataset). This includes 662 (78%) trials with automatically indexed
 publications (i.e., using TRN in PubMed’s secondary identifier field)
-and 666 (78%) trials with manually added publications.
+and 662 (78%) trials with manually added publications.
 
-21% (96/447) of trials on DRKS include a link (i.e., PMID, DOI) to their
+22% (97/448) of trials on DRKS include a link (i.e., PMID, DOI) to their
 PubMed publication (as available in the IntoValue dataset).
 
 ## Registry summary results
 
 ``` r
-intovalue_pubs %>% 
+trials_pubs %>% 
   count(registry, has_summary_results) %>% 
   knitr::kable()
 ```
 
 | registry           | has_summary_results |    n |
 |:-------------------|:--------------------|-----:|
-| ClinicalTrials.gov | FALSE               | 1298 |
-| ClinicalTrials.gov | TRUE                |  151 |
-| DRKS               | FALSE               |  442 |
+| ClinicalTrials.gov | FALSE               | 1297 |
+| ClinicalTrials.gov | TRUE                |  152 |
+| DRKS               | FALSE               |  443 |
 | DRKS               | TRUE                |    5 |
 
 *Registry Limitations*: ClinicalTrials.gov includes a structured summary
@@ -199,7 +229,7 @@ Ergebnisbericht or Abschlussbericht, in the reference title.
 
 ``` r
 tbl_euctr <-
-  intovalue %>% 
+  trials %>% 
   tbl_cross(
     row = has_crossreg_eudract,
     col = registry,
@@ -217,11 +247,11 @@ as_kable(tbl_euctr)
 | **Characteristic**            | ClinicalTrials.gov | DRKS      | **Total**   |
 |:------------------------------|:-------------------|:----------|:------------|
 | **EUCTR TRN in Registration** |                    |           |             |
-| FALSE                         | 1,926 (85%)        | 558 (87%) | 2,484 (85%) |
-| TRUE                          | 346 (15%)          | 87 (13%)  | 433 (15%)   |
+| FALSE                         | 1,925 (85%)        | 558 (87%) | 2,483 (85%) |
+| TRUE                          | 345 (15%)          | 87 (13%)  | 432 (15%)   |
 
-Of the 2917 unique trials completed between 2009 and 2017 and meeting
-the IntoValue inclusion criteria, we found that 433 (15%) include an
+Of the 2915 unique trials completed between 2009 and 2017 and meeting
+the IntoValue inclusion criteria, we found that 432 (15%) include an
 EUCTR id in their registration, and are presumably cross-registered in
-EUCTR. This includes 346 (15%) from ClinicalTrials.gov and 87 (13%) from
+EUCTR. This includes 345 (15%) from ClinicalTrials.gov and 87 (13%) from
 DRKS.

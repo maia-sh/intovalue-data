@@ -11,7 +11,7 @@ data/raw/registries/
 data/processed/registries/
 data/processed/pubmed/
 data/processed/trn/
-data/raw/open-access/
+#data/raw/open-access/
 
 # Python specific project settings
 .idea/

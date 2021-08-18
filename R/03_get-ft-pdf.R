@@ -59,7 +59,11 @@ ft_doi_xml <-
 
 # Check whether doi pdfs not converted to xml
 dois_pdf_not_xml <- setdiff(ft_doi_pdf, ft_doi_xml)
-if (length(dois_pdf_not_xml) > 0){
+
+# Note: GROBID could not parse some pdfs (abstracts) so expect not be in xml
+dois_non_parseable <- c("10.1093/eurheartj/ehu322", "10.1186/cc14575")
+
+if (length(dois_pdf_not_xml) > 0 && dois_pdf_not_xml != dois_pdf_not_xml){
   rlang::warn(glue::glue("Unconverted dois pdfs:{dois_pdf_not_xml}"))
 }
 
@@ -140,3 +144,4 @@ pmids_no_dois <-
   union(ft_pmid_pdf, ft_pmid_xml) %>%
   setdiff(pmids_no_dois, .) %>%
   sort()
+

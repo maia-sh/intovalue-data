@@ -144,6 +144,9 @@ description <- tribble(
   "pub_title",
   "",
 
+  "journal_pubmed",
+  "",
+
   "ppub_date",
   "",
 
@@ -240,7 +243,7 @@ description <- tribble(
   "issn",
   "",
 
-  "journal",
+  "journal_unpaywall",
   "",
 
   "publisher",

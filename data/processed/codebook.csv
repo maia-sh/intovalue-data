@@ -51,6 +51,7 @@ has_pubmed,logical,,NA
 has_ft,logical,,NA
 ft_source,character,,doi; pmid
 pub_title,character,,NA
+journal_pubmed,character,,NA
 ppub_date,character,,NA
 epub_date,date,,NA
 has_iv_trn_abstract,logical,,NA
@@ -83,7 +84,7 @@ is_publication_5y,logical,,NA
 color_green_only,character,,bronze; closed; gold; green; hybrid
 color,character,,bronze; closed; gold; green; hybrid
 issn,character,,NA
-journal,character,,NA
+journal_unpaywall,character,,NA
 publisher,character,,NA
 publication_date_unpaywall,date,,NA
 syp_response,character,,no_best_permission; response; unresolved

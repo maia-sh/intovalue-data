@@ -191,7 +191,11 @@ trials <-
 
   # Add pubmed metadata
   left_join(
-    select(pubmed_main, pmid, pub_title = title, ppub_date = ppub, epub_date = epub),
+    select(
+      pubmed_main, pmid,
+      pub_title = title, journal_pubmed = journal,
+      ppub_date = ppub, epub_date = epub
+    ),
     by = "pmid"
   )
 
@@ -359,6 +363,9 @@ trials <-
   left_join(oa_unpaywall, by = "doi") %>%
   left_join(oa_syp, by = "doi") %>%
 
+  # Rename journal (since also pubmed journal)
+  rename(journal_unpaywall = journal) %>%
+
   # Create booleans for whether publication is OA and, if not, whether can be archived
   # `is_oa` is TRUE for publications that are either gold, green, or hybrid; FALSE if closed or bronze; NA if no unpaywall data
   # `is_archivable` TRUE if EITHER accepted or published version may be archived according to SYP, regardless of unpaywall status;
@@ -468,6 +475,7 @@ trials <-
     "has_ft",
     "ft_source",
     "pub_title",
+    "journal_pubmed",
     "ppub_date",
     "epub_date",
 
@@ -501,7 +509,7 @@ trials <-
     "color_green_only",
     "color",
     "issn",
-    "journal",
+    "journal_unpaywall",
     "publisher",
     "publication_date_unpaywall",
     "syp_response",

@@ -5,7 +5,7 @@ library(here)
 library(fs)
 library(lubridate)
 
-source(here("R", "functions", "duration_days.R"))
+source(here("scripts", "functions", "duration_days.R"))
 
 # Get data ----------------------------------------------------------------
 

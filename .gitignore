@@ -9,8 +9,9 @@ data/raw/pubmed/
 data/raw/fulltext/
 data/raw/registries/
 data/processed/registries/
-data/processed/pubmed/
 data/processed/trn/
+data/processed/pubmed/*
+!data/processed/pubmed/pubmed-si.rds
 #data/raw/open-access/
 
 # Python specific project settings

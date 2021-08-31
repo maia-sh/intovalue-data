@@ -9,7 +9,8 @@ data/raw/pubmed/
 data/raw/fulltext/
 data/raw/registries/
 data/processed/registries/
-data/processed/trn/
+data/processed/trn/*
+!data/processed/trn/cross-registrations.rds
 data/processed/pubmed/*
 !data/processed/pubmed/pubmed-si.rds
 #data/raw/open-access/

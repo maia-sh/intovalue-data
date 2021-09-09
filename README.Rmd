@@ -22,16 +22,17 @@ trials_all <- readr::read_csv(here::here("data", "processed", "trials.csv"))
 
 ## Overview
 
-This dataset is modified from the [main IntoValue dataset](https://doi.org/10.5281/zenodo.5141342), and includes updated registry data from ClinicalTrials.gov and DRKS queried in May 2021. It also includes additional data on associated results publications, including links in the registries and trial registration number reporting in the publications.
+This dataset is modified from the [main IntoValue dataset](https://doi.org/10.5281/zenodo.5141342), and includes updated registry data from ClinicalTrials.gov and DRKS. It also includes additional data on associated results publications, including links in the registries and trial registration number reporting in the publications.
 
 Detailed documentation for the parent IntoValue dataset is provided in a data dictionary and readme alongside the [dataset in Zenodo](https://doi.org/10.5281/zenodo.5141342). This readme serves to highlight/document changes.
 
 Note that the parent IntoValue dataset includes `summary_results_date` for the few DRKS summary results, which have been removed in this version. We remove them as they had been manually extracted (from PDFs) for only the subset of summary results manually found in IntoValue, whereas this dataset includes additional summary results found via automated search and hence without dates. For parity, we removed DRKS summary result dates. We could decide to add these from either (1) the PDF (which indicates when the summary result was created), or (2) the DRKS change history (which indicates when the summary result was uploaded and made available).
 
-## Data sources and query dates
-In addition to the main IntoValue dataset, data were queried from the following sources:
+## Data sources
 
-```{r query-logs}
+This dataset builds on several sources, detailed below. The latest query date is provided when applicable. Raw data, when permissible (i.e., not for full-text), is shared in either this repository or in Zenodo, depending on its size.
+
+```{r query-logs, echo = FALSE}
 query_logs <- loggit::read_logs(here::here("queries.log"))
 
 get_latest_query <- function(query, logs) {
@@ -44,13 +45,19 @@ get_latest_query <- function(query, logs) {
 }
 ```
 
-- PubMed: `r get_latest_query("PubMed", query_logs)`
-- AACT (ClinicalTrials.gov): `r get_latest_query("AACT", query_logs)`
-- DRKS: `r get_latest_query("DRKS", query_logs)`
-- Unpaywall: `r get_latest_query("Unpaywall", query_logs)`
-- ShareYourPaper: `r get_latest_query("ShareYourPaper", query_logs)`
+| Source                            | Type                          | Date                                               | Raw Data                                                                                                                  | Script                                                                                                            |
+|-----------------------------------|-------------------------------|----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| IntoValue                         | Trials                        | NA                                                 | <https://doi.org/10.5281/zenodo.5141342>                                                                                  | [get-intovalue.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/01_get-intovalue.R)                 |
+| PubMed                            | Bibliometric                  | `r get_latest_query("PubMed", query_logs)`         | Zenodo                                                                                                                    | [get-pubmed.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/02_get-pubmed.R)                       |
+| ClinicalTrials.gov/ AACT          | Registry                      | `r get_latest_query("AACT", query_logs)`           | Zenodo                                                                                                                    | [get-aact.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/06_get-aact.R)                           |
+| DRKS                              | Registry                      | `r get_latest_query("DRKS", query_logs)`           | Zenodo                                                                                                                    | [get-drks.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/08_get-drks.R)                           |
+| Unpaywall/ institutional licenses | Full-text PDF                 | NA                                                 | NA                                                                                                                        | [get-ft-pdf.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/03_get-ft-pdf.R)                       |
+| GROBID                            | Full-text XML                 | NA                                                 | NA                                                                                                                        | PDF-to-XML conversion done in Python                                                                              |
+| Unpaywall                         | Open access status            | `r get_latest_query("Unpaywall", query_logs)`      | [oa-unpaywall.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-unpaywall.csv)             | [get-oa-unpaywall-data.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/13_get-oa-unpaywall-data.R) |
+| ShareYourPaper                    | Green open access permissions | `r get_latest_query("ShareYourPaper", query_logs)` | [oa-syp-permissions.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-syp-permissions.csv) | [get-oa-permissions.py](https://github.com/maia-sh/intovalue-data/blob/main/scripts/14_get-oa-permissions.py)     |
 
 ## Analysis dataset
+
 We are interested in interventional trials with a German UMC lead completed between 2009 and 2017. Due to changes in the registry as well as discrepancies between IntoValue 1 and 2, we re-apply the IntoValue exclusion criteria and deduplicate to get the analysis dataset.
 
 ```{r filter-trials}
@@ -71,6 +78,7 @@ trials <-
     
 n_iv_trials <- nrow(trials)
 ```
+
 **Number of included trials**: `r n_iv_trials`
 
 For analyses by UMC, split trials by UMC lead city:
@@ -82,7 +90,7 @@ trials_by_umc <-
   tidyr::unnest(lead_cities)
 ```
 
-Some analyses apply only to trials with a results publication (optionally limited to journal articles to exclude dissertations and abstracts) with a PMID that resolves to a PubMed record and for which we could acquire the full-text as a PDF. 
+Some analyses apply only to trials with a results publication (optionally limited to journal articles to exclude dissertations and abstracts) with a PMID that resolves to a PubMed record and for which we could acquire the full-text as a PDF.
 
 ```{r trials-with-pubs}
 
@@ -100,6 +108,7 @@ n_trials_same_pmid <- n_distinct(trials_same_pmid$id)
 n_pmids_same_trial <- n_distinct(trials_same_pmid$pmid)
 n_pmids_dupes <- unique(range(trials_same_pmid$dupe_count))
 ```
+
 **Number of trials with results publications**: `r n_iv_trials_pubs`
 
 In general, there is max 1 publication per trial and max 1 trial per publication. However, there are `r n_trials_same_pmid` trials associated with the same `r n_pmids_same_trial` publications (i.e., `r n_pmids_dupes` publications per trial). Since the unit of analysis is trials, we disregard this double-counting of publications.
@@ -184,6 +193,7 @@ trials_pubs %>%
 *Registry Limitations*: ClinicalTrials.gov includes a structured summary results field. In contrast, DRKS includes summary results with other references, and summary results were inferred based on keywords, such as Ergebnisbericht or Abschlussbericht, in the reference title.
 
 ## EUCTR Cross-registrations
+
 ```{r euctr-crossreg}
 
 tbl_euctr <-

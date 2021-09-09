@@ -7,10 +7,10 @@
 
 This dataset is modified from the [main IntoValue
 dataset](https://doi.org/10.5281/zenodo.5141342), and includes updated
-registry data from ClinicalTrials.gov and DRKS queried in May 2021. It
-also includes additional data on associated results publications,
-including links in the registries and trial registration number
-reporting in the publications.
+registry data from ClinicalTrials.gov and DRKS. It also includes
+additional data on associated results publications, including links in
+the registries and trial registration number reporting in the
+publications.
 
 Detailed documentation for the parent IntoValue dataset is provided in a
 data dictionary and readme alongside the [dataset in
@@ -28,29 +28,23 @@ PDF (which indicates when the summary result was created), or (2) the
 DRKS change history (which indicates when the summary result was
 uploaded and made available).
 
-## Data sources and query dates
+## Data sources
 
-In addition to the main IntoValue dataset, data were queried from the
-following sources:
+This dataset builds on several sources, detailed below. The latest query
+date is provided when applicable. Raw data, when permissible (i.e., not
+for full-text), is shared in either this repository or in Zenodo,
+depending on its size.
 
-``` r
-query_logs <- loggit::read_logs(here::here("queries.log"))
-
-get_latest_query <- function(query, logs) {
-  logs %>% 
-  filter(log_msg == query) %>% 
-    arrange(desc(timestamp)) %>% 
-    slice_head(n = 1) %>% 
-    pull(timestamp) %>% 
-    as.Date.character()
-}
-```
-
--   PubMed: 2021-08-15
--   AACT (ClinicalTrials.gov): 2021-08-15
--   DRKS: 2021-08-15
--   Unpaywall: 2021-08-15
--   ShareYourPaper: 2021-07-23
+| Source                            | Type                          | Date       | Raw Data                                                                                                                  | Script                                                                                                            |
+|-----------------------------------|-------------------------------|------------|---------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| IntoValue                         | Trials                        | NA         | <https://doi.org/10.5281/zenodo.5141342>                                                                                  | [get-intovalue.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/01_get-intovalue.R)                 |
+| PubMed                            | Bibliometric                  | 2021-08-15 | Zenodo                                                                                                                    | [get-pubmed.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/02_get-pubmed.R)                       |
+| ClinicalTrials.gov/ AACT          | Registry                      | 2021-08-15 | Zenodo                                                                                                                    | [get-aact.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/06_get-aact.R)                           |
+| DRKS                              | Registry                      | 2021-08-15 | Zenodo?                                                                                                                   | [get-drks.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/08_get-drks.R)                           |
+| Unpaywall/ institutional licenses | Full-text PDF                 | NA         | NA                                                                                                                        | [get-ft-pdf.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/03_get-ft-pdf.R)                       |
+| GROBID                            | Full-text XML                 | NA         | NA                                                                                                                        | PDF-to-XML conversion done in Python                                                                              |
+| Unpaywall                         | Open access status            | 2021-08-15 | [oa-unpaywall.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-unpaywall.csv)             | [get-oa-unpaywall-data.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/13_get-oa-unpaywall-data.R) |
+| ShareYourPaper                    | Green open access permissions | 2021-07-23 | [oa-syp-permissions.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-syp-permissions.csv) | [get-oa-permissions.py](https://github.com/maia-sh/intovalue-data/blob/main/scripts/14_get-oa-permissions.py)     |
 
 ## Analysis dataset
 

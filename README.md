@@ -46,6 +46,78 @@ depending on its size.
 | Unpaywall                         | Open access status            | 2021-08-15 | [oa-unpaywall.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-unpaywall.csv)             | [get-oa-unpaywall-data.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/13_get-oa-unpaywall-data.R) |
 | ShareYourPaper                    | Green open access permissions | 2021-07-23 | [oa-syp-permissions.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-syp-permissions.csv) | [get-oa-permissions.py](https://github.com/maia-sh/intovalue-data/blob/main/scripts/14_get-oa-permissions.py)     |
 
+## Data directories
+
+Aside from full-text publications, the data directories should be
+entirely reproducible from scripts. The data directory structure should
+look as follows. Directories with a large number of individual raw files
+are indicated with curly braces.
+
+    ├── data
+        ├── processed
+        │   ├── codebook.csv
+        │   ├── trials.csv
+        │   ├── trials.rds
+        │   ├── pubmed
+        │   │   ├── pubmed-abstract.rds
+        │   │   ├── pubmed-ft-retrieved.rds
+        │   │   ├── pubmed-main.rds
+        │   │   └── pubmed-si.rds
+        │   ├── registries
+        │   │   ├── ctgov
+        │   │   │   ├── ctgov-crossreg.rds
+        │   │   │   ├── ctgov-facility-affiliations.rds
+        │   │   │   ├── ctgov-ids.rds
+        │   │   │   ├── ctgov-lead-affiliations.rds
+        │   │   │   ├── ctgov-references.rds
+        │   │   │   └── ctgov-studies.rds
+        │   │   ├── drks
+        │   │   │   ├── drks-crossreg.rds
+        │   │   │   ├── drks-facility-affiliations.rds
+        │   │   │   ├── drks-ids.rds
+        │   │   │   ├── drks-lead-affiliations.rds
+        │   │   │   ├── drks-references.rds
+        │   │   │   └── drks-studies.rds
+        │   │   ├── registry-crossreg.rds
+        │   │   ├── registry-references.rds
+        │   │   └── registry-studies.rds
+        │   └── trn
+        │       ├──  cross-registrations.rds
+        │       ├──  n-cross-registrations.rds
+        │       ├──  trn-abstract.rds
+        │       ├──  trn-all.rds
+        │       ├──  trn-ft-doi.rds
+        │       ├──  trn-ft-pmid.rds
+        │       ├──  trn-reported-long.rds
+        │       ├──  trn-reported-wide.rds
+        │       └──  trn-si.rds
+        └── raw
+            ├── intovalue.csv
+            ├── pubmed {raw files named [pmid].xml}
+            ├── registries
+            │   ├── ctgov
+            │   │   ├── centers.csv
+            │   │   ├── designs.csv
+            │   │   ├── facilities.csv
+            │   │   ├── ids.csv
+            │   │   ├── interventions.csv
+            │   │   ├── officials.csv
+            │   │   ├── references.csv
+            │   │   ├── responsible-parties.csv
+            │   │   ├── sponsors.csv
+            │   │   └── studies.csv
+            │   └── drks {raw files named [drks trn]}
+            ├── fulltext
+            │   ├── doi
+            │   │   ├── pdf {raw files named [doi].pdf}
+            │   │   └── xml {raw files named [doi].tei.xml}
+            │   └── pmid
+            │       ├── pdf {raw files named [pmid].pdf}
+            │       └── xml {raw files named [pmid].tei.xml}
+            └── open-access
+                ├── oa-syp-permissions.csv
+                └── oa-unpaywall.csv
+
 ## Analysis dataset
 
 We are interested in interventional trials with a German UMC lead

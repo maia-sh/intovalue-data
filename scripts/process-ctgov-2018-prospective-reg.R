@@ -18,6 +18,18 @@ ctgov_2018 <- read_rds(path(dir_main, "CT_gov_delayed_registration_3.rds"))
 # Check that all all ctgov trials
 if (nrow(filter(ctgov_2018, str_detect(id, "^NCT", negate = TRUE))) != 0){stop("There are some non-ctgov trials!")}
 
+# Prepare cities
+# Input data has one row per trial, per UMC, plus "All trials combined"
+# NCT03563677 has many UMCs
+cities <-
+  ctgov_2018 %>%
+  filter(city != "All trials combined") %>%
+  select(id, city) %>%
+  group_by(id) %>%
+  mutate(cities = str_c(city, collapse = " ")) %>%
+  ungroup() %>%
+  select(-city) %>%
+  distinct()
 
 # Query AACT --------------------------------------------------------------
 # Note: We only need `studies` but run all queries to have raw data
@@ -105,10 +117,13 @@ loggit::loggit("INFO", "AACT_ctgov_2018")
 
 # Process AACT ------------------------------------------------------------
 
-trials <-
+studies <- read_csv(path(dir_ctgov, "studies", ext = "csv"))
+
+trials2 <-
   studies %>%
 
   rename(
+    id = nct_id,
     registration_date = study_first_submitted_date,
     summary_results_date = results_first_submitted_date,
     recruitment_status = overall_status
@@ -157,7 +172,9 @@ trials <-
   select(
     -official_title,
     # -has_single_facility, -number_of_facilities
-  )
+  ) %>%
+
+  tidylog::left_join(cities, by = "id")
 
 # Check for missing trns
 message("There are TRNs not retrieved from AACT: ", setdiff(ct_trns, studies$nct_id))
@@ -190,7 +207,7 @@ prospective_reg_trials <-
   ) %>%
 
   select(
-    id = nct_id,
+    id,
     registration_date,
     start_date,
     days_reg_to_start,

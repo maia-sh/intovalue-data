@@ -119,7 +119,7 @@ loggit::loggit("INFO", "AACT_ctgov_2018")
 
 studies <- read_csv(path(dir_ctgov, "studies", ext = "csv"))
 
-trials2 <-
+trials <-
   studies %>%
 
   rename(
@@ -174,7 +174,8 @@ trials2 <-
     # -has_single_facility, -number_of_facilities
   ) %>%
 
-  tidylog::left_join(cities, by = "id")
+  # Add in cities
+  left_join(cities, by = "id")
 
 # Check for missing trns
 message("There are TRNs not retrieved from AACT: ", setdiff(ct_trns, studies$nct_id))
@@ -208,6 +209,7 @@ prospective_reg_trials <-
 
   select(
     id,
+    cities,
     registration_date,
     start_date,
     days_reg_to_start,

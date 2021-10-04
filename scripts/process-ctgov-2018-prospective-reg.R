@@ -138,6 +138,8 @@ trials <-
     .keep = "unused"
   ) %>%
 
+  mutate(completion_year = year(completion_date)) %>%
+
   mutate(
     has_summary_results = if_else(!is.na(summary_results_date), TRUE, FALSE)
   ) %>%
@@ -201,11 +203,28 @@ prospective_reg_trials <-
          floor_date(start_date, unit = "month"))
   ) %>%
 
-  # Exclude trials with start date missing or after 2018
-  filter(
-    start_date < "2018-12-31",
-    !is.na(start_date)
+  # Add intovalue exclusion criteria
+  mutate(
+
+    # IntoValue includes all drks and some ctgov recruitment statuses
+    iv_status = if_else(
+      recruitment_status %in% c("Completed" , "Terminated" , "Suspended", "Unknown status"), TRUE, FALSE
+    ),
+
+    # IntoValue includes only interventional studies
+    iv_interventional = if_else(study_type == "Interventional", TRUE, FALSE)
   ) %>%
+
+  # Add start date exclusion criteria
+  # Start date should not be missing and be by 2018
+  mutate(
+    start_by_2018 = if_else(!is.na(start_date) & start_date < "2018-12-31", TRUE, FALSE)
+  ) %>%
+  # # Exclude trials with start date missing or after 2018
+  # filter(
+  #   start_date < "2018-12-31",
+  #   !is.na(start_date)
+  # ) %>%
 
   select(
     id,
@@ -213,7 +232,14 @@ prospective_reg_trials <-
     registration_date,
     start_date,
     days_reg_to_start,
-    is_prospective
+    is_prospective,
+
+    # Variables for exclusion criteria
+    start_by_2018,
+    iv_status,
+    recruitment_status,
+    iv_interventional,
+    study_type
   )
 
 

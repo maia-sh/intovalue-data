@@ -215,16 +215,10 @@ prospective_reg_trials <-
     iv_interventional = if_else(study_type == "Interventional", TRUE, FALSE)
   ) %>%
 
-  # Add start date exclusion criteria
-  # Start date should not be missing and be by 2018
+  # Start date should not be missing and be between 2006 and 2018
   mutate(
-    start_by_2018 = if_else(!is.na(start_date) & start_date < "2018-12-31", TRUE, FALSE)
+    start_2006_2018 = if_else(!is.na(start_date) & start_date < "2018-12-31" & start_date > "2006-01-01", TRUE, FALSE)
   ) %>%
-  # # Exclude trials with start date missing or after 2018
-  # filter(
-  #   start_date < "2018-12-31",
-  #   !is.na(start_date)
-  # ) %>%
 
   select(
     id,
@@ -235,15 +229,16 @@ prospective_reg_trials <-
     is_prospective,
 
     # Variables for exclusion criteria
-    start_by_2018,
+    start_2006_2018,
     iv_status,
     recruitment_status,
     iv_interventional,
     study_type
   )
 
+# Apply exclusion criteria per decision on 2021-10-08
+prospective_reg_trials %>%
 
-write_csv(prospective_reg_trials, here(dir_main, "prospective-reg-ctgov-2018-trials.csv"))
+  filter(start_2006_2018 & iv_interventional & iv_status) %>%
 
-
-
+  write_csv(here(dir_main, "prospective-reg-ctgov-2018-trials.csv"))

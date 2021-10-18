@@ -1,6 +1,6 @@
 #' Get AACT tables for given NCT ids
 #'
-#' Calls \code{connect_aact} to connect to AACT database and \code{query_aact} to query and download individual AACT tables. Dataframes saved to specified \code{dir} as .csv. If \code{tables} not specified, all tables (as prespecified in function and messaged to user) will be queried.
+#' Calls \code{connect_aact} to connect to AACT database and \code{query_aact} to query and download individual AACT tables. Dataframes saved to specified \code{dir} as .csv. If \code{tables} not specified, all tables (as prespecified in function and messaged to user) will be queried. Logs query date with \code{loggit}.
 #'
 #' AACT documentation available in the [database schema](https://aact.ctti-clinicaltrials.org/schema) and [data dictionary](https://aact.ctti-clinicaltrials.org/data_dictionary).
 

@@ -9,7 +9,8 @@
 #' @param user Character. AACT username.
 #' @param password Character. Default is NULL. If not provided, password will be searched for in \code{keyring} under the \code{aact} service with the provided \code{username}. If no password found, user will be interactively asked and input will be stored in keyring.
 #' @param tables Character. Vector of AACT tables to query. Default of `NULL` results in querying all tables ("studies", "designs", "interventions", "references", "ids", "centers", "officials", "responsible-parties", "sponsors", "facilities").
-#' @param overwrite logical, if all tables already downloaded, should they be overwritten? Defaults to `FALSE`. Note that if *any* table is missing, *all* tables will be queried.
+#' @param overwrite Logical. If all tables already downloaded, should they be overwritten? Defaults to `FALSE`. Note that if *any* table is missing, *all* tables will be queried.
+#' @param query Character. Query `INFO` for \code{loggit}. Defaults to "AACT".
 #'
 #' @return NULL
 #'
@@ -26,7 +27,8 @@ download_aact <- function(ids,
                      dir = here::here(),
                      user, password = NULL,
                      tables = NULL,
-                     overwrite = FALSE){
+                     overwrite = FALSE,
+                     query = "AACT"){
 
   # Queries prepared for certain tables
   valid_tables <- c("studies", "designs", "interventions", "references", "ids", "centers", "officials", "responsible-parties", "sponsors", "facilities")
@@ -44,7 +46,6 @@ download_aact <- function(ids,
 
   # Prepare log
   LOGFILE <- here::here("queries.log")
-  QUERY <- "AACT"
   loggit::set_logfile(LOGFILE)
 
   # If all tables already downloaded and not overwriting, then inform user and return
@@ -71,7 +72,7 @@ download_aact <- function(ids,
       } else {"No previous query"}
     }
 
-    rlang::inform(glue::glue("Already downloaded on {get_latest_query(QUERY)}: {tables_txt}"))
+    rlang::inform(glue::glue("Already downloaded on {get_latest_query(query)}: {tables_txt}"))
     return(NULL)
   }
 
@@ -170,7 +171,7 @@ download_aact <- function(ids,
   RPostgreSQL::dbDisconnect(con)
 
   # Log query date
-  loggit::loggit("INFO", QUERY)
+  loggit::loggit("INFO", query)
 }
 
 # Get clinicaltrials.gov data via https://aact.ctti-clinicaltrials.org/

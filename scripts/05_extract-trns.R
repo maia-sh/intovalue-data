@@ -7,8 +7,8 @@ library(ctregistries)
 # renv::install("maia-sh/tidypubmed")
 library(tidypubmed)
 
-source(here("R", "functions", "extract_pubmed.R"))
-source(here("R", "functions", "get_grobid_ft_trn.R"))
+source(here("scripts", "functions", "extract_pubmed.R"))
+source(here("scripts", "functions", "get_grobid_ft_trn.R"))
 
 intovalue <- read_csv(here("data", "raw", "intovalue.csv"))
 pubmed_ft_retrieved <- read_rds(here("data", "processed", "pubmed", "pubmed-ft-retrieved.rds"))

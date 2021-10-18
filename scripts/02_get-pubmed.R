@@ -2,7 +2,7 @@ library(dplyr)
 library(fs)
 library(here)
 
-source(here("R", "functions", "download_pubmed.R"))
+source(here("scripts", "functions", "download_pubmed.R"))
 
 dir <- dir_create(here("data", "raw", "pubmed"))
 intovalue <- readr::read_csv(here("data", "raw", "intovalue.csv"))

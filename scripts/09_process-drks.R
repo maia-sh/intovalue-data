@@ -5,8 +5,8 @@ library(readr)
 library(stringr)
 library(ctregistries)
 
-source(here::here("R", "functions", "drks-functions.R"))
-source(here::here("R", "functions", "duration_days.R"))
+source(here::here("scripts", "functions", "drks-functions.R"))
+source(here::here("scripts", "functions", "duration_days.R"))
 
 input_dir <- here::here("data", "raw", "registries", "drks")
 output_dir <- dir_create(here::here("data", "processed", "registries", "drks"))

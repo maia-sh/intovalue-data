@@ -1,7 +1,7 @@
 library(dplyr)
 library(purrr)
 
-source(here::here("R", "functions", "drks-functions.R"))
+source(here::here("scripts", "functions", "drks-functions.R"))
 
 dir <- fs::dir_create(here::here("data", "raw", "registries", "drks"))
 

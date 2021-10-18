@@ -4,7 +4,7 @@ library(fs)
 library(here)
 library(tidypubmed)
 
-source(here("R", "functions", "extract_pubmed.R"))
+source(here("scripts", "functions", "extract_pubmed.R"))
 
 dir <- here("data", "processed", "pubmed")
 

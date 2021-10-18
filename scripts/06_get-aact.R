@@ -3,7 +3,7 @@ library(dbplyr)
 library(DBI)
 library(RPostgreSQL)
 
-source(here::here("R", "functions", "aact-functions.R"))
+source(here::here("scripts", "functions", "aact-functions.R"))
 
 dir <- fs::dir_create(here::here("data", "raw", "registries", "ctgov"))
 

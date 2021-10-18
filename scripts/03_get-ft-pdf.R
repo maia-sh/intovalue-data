@@ -29,9 +29,9 @@ dir_pmid_xml <- dir_create(path(dir_pmid, "xml"))
 
 intovalue <- read_csv(here("data", "raw", "intovalue.csv"))
 
-source(here("R", "functions", "retrieve_pdf.R"))
-source(here("R", "functions", "resolve_doi.R"))
-source(here("R", "functions", "correct_pdf_url.R"))
+source(here("scripts", "functions", "retrieve_pdf.R"))
+source(here("scripts", "functions", "resolve_doi.R"))
+source(here("scripts", "functions", "correct_pdf_url.R"))
 
 # Get pdfs from dois ------------------------------------------------------
 

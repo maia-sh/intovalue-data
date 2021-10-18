@@ -4,7 +4,7 @@ library(fs)
 library(assertr)
 library(ctregistries)
 
-source(here::here("R", "functions", "duration_days.R"))
+source(here::here("scripts", "functions", "duration_days.R"))
 
 input_dir <- here::here("data", "raw", "registries", "ctgov")
 output_dir <- dir_create(here::here("data", "processed", "registries", "ctgov"))

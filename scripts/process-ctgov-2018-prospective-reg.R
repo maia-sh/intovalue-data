@@ -106,6 +106,9 @@ trials <-
   # Use intervention_type from input data
   left_join(distinct(ctgov_2018, id, intervention_type), by = "id") %>%
 
+  # Add cities
+  left_join(cities, by = "id") %>%
+
   # Add intovalue exclusion criteria
   mutate(
 

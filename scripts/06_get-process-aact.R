@@ -12,7 +12,8 @@ library(RPostgreSQL)
 
 source(here::here("scripts", "functions", "aact-functions.R"))
 
-dir <- fs::dir_create(here::here("data", "raw", "registries", "ctgov"))
+dir_raw <- here::here("data", "raw", "registries", "ctgov")
+dir_processed <- here::here("data", "processed", "registries", "ctgov")
 
 # Get clinicaltrial.gov trns
 ct_trns <-
@@ -23,4 +24,6 @@ ct_trns <-
 # Specify aact username
 AACT_USER <- "respmetrics"
 
-download_aact(ids = ct_trns, dir = dir, user = AACT_USER)
+download_aact(ids = ct_trns, dir = dir_raw, user = AACT_USER)
+
+process_aact(dir_raw, dir_processed)

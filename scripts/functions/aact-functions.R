@@ -257,7 +257,7 @@ query_aact <- function(table, ids, con, filepath = NULL, ...){
 
 #' @param dir_in Character. Directory from which to get raw .csv files. Defaults to working directory with `here::here("raw")`.
 #' #' @param dir_out Character. Directory in which to save processed .rds files. Defaults to working directory with `here::here("processed")`.
-#' @param overwrite Logical. If all tables already processed, should they be overwritten? Defaults to `FALSE`. Note that if *any* table is not processed, *all* tables will be processed.
+#' @param overwrite Logical. If all valid output tables already processed, should they be overwritten? Defaults to `FALSE`. Note that if *any* table is not processed, *all* tables will be processed. Since this checks that *all* valid output tables are processed, if *all* valid input tables aren't included in \code{dir_in}, *all* available raw tables will be re-processed each time.
 #'
 #' @return NULL
 #'
@@ -280,7 +280,8 @@ process_aact <- function(dir_in = here::here("raw"),
   fs::dir_create(dir_out)
 
   # Processing prepared for certain tables
-  valid_tables <- c("studies", "designs", "interventions", "references", "ids", "centers", "officials", "responsible-parties", "sponsors", "facilities")
+  valid_in_tables <- c("studies", "designs", "interventions", "references", "ids", "centers", "officials", "responsible-parties", "sponsors", "facilities")
+  valid_out_tables <- c("ctgov-lead-affiliations", "ctgov-facility-affiliations", "ctgov-studies", "ctgov-ids", "ctgov-crossreg",  "ctgov-references")
 
   # If all tables already processed and not overwriting, then inform user and return
   raw_tables <-
@@ -289,18 +290,16 @@ process_aact <- function(dir_in = here::here("raw"),
     fs::path_ext_remove() %>%
 
     # Limit to valid tables in case of additional files
-    intersect(valid_tables)
+    intersect(valid_in_tables)
 
   processed_tables <-
     fs::dir_ls(dir_out) %>%
     fs::path_file() %>%
     fs::path_ext_remove()
 
-  unprocessed_tables <- setdiff(raw_tables, processed_tables)
+  if (all(valid_out_tables %in% processed_tables) & !overwrite){
 
-  if (rlang::is_empty(unprocessed_tables) & !overwrite){
-
-    rlang::inform(glue::glue("Already downloaded all tables: ", glue::glue_collapse(unprocessed_tables, sep = ", ", last = ", and ")))
+    rlang::inform(glue::glue("Already processed all valid output tables: ", glue::glue_collapse(valid_out_tables, sep = ", ", last = ", and ")))
     return(NULL)
 
   }

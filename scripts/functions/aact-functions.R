@@ -5,7 +5,7 @@
 #' AACT documentation available in the [database schema](https://aact.ctti-clinicaltrials.org/schema) and [data dictionary](https://aact.ctti-clinicaltrials.org/data_dictionary).
 
 #' @param ids Character. Vector of NCT ids to query.
-#' @param dir character, director in which to save XMLs. Defaults to working directory with `here::here()`.
+#' @param dir Character. Directory in which to save raw CSVs. Defaults to working directory with `here::here("raw")`.
 #' @param user Character. AACT username.
 #' @param password Character. Default is NULL. If not provided, password will be searched for in \code{keyring} under the \code{aact} service with the provided \code{username}. If no password found, user will be interactively asked and input will be stored in keyring.
 #' @param tables Character. Vector of AACT tables to query. Default of `NULL` results in querying all tables ("studies", "designs", "interventions", "references", "ids", "centers", "officials", "responsible-parties", "sponsors", "facilities").
@@ -19,12 +19,12 @@
 #' @example
 #' \dontrun{
 #' download_aact(ids = c("NCT00868166", "NCT00869726"),
-#'               dir = fs::dir_create(here::here("data", "TEST")),
+#'               dir = here::here("data", "TEST", "raw"),
 #'               user = "respmetrics")
 #'}
 
 download_aact <- function(ids,
-                     dir = here::here(),
+                     dir = here::here("raw"),
                      user, password = NULL,
                      tables = NULL,
                      overwrite = FALSE,
@@ -47,6 +47,10 @@ download_aact <- function(ids,
   # Prepare log
   LOGFILE <- here::here("queries.log")
   loggit::set_logfile(LOGFILE)
+
+
+  # Create output directory if doesn't exist
+  fs::dir_create(dir)
 
   # If all tables already downloaded and not overwriting, then inform user and return
   downloaded_tables <-

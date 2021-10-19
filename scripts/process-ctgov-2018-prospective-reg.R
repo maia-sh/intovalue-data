@@ -242,3 +242,4 @@ prospective_reg_trials %>%
   filter(start_2006_2018 & iv_interventional & iv_status) %>%
 
   write_csv(here(dir_main, "prospective-reg-ctgov-2018-trials.csv"))
+

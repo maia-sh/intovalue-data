@@ -12,8 +12,12 @@ data/processed/registries/drks/
 data/processed/registries/ctgov/
 data/processed/trn/*
 !data/processed/trn/cross-registrations.rds
+!data/processed/trn/n-cross-registrations.rds
+!data/processed/trn/trn-reported-wide.rds
 data/processed/pubmed/*
 !data/processed/pubmed/pubmed-si.rds
+!data/processed/pubmed/pubmed-ft-retrieved.rds
+!data/processed/pubmed/pubmed-main.rds
 #data/raw/open-access/
 
 # Python specific project settings

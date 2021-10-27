@@ -8,7 +8,8 @@
 data/raw/pubmed/
 data/raw/fulltext/
 data/raw/registries/
-data/processed/registries/
+data/processed/registries/drks/
+data/processed/registries/ctgov/
 data/processed/trn/*
 !data/processed/trn/cross-registrations.rds
 data/processed/pubmed/*

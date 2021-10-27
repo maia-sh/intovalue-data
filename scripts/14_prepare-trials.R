@@ -370,7 +370,7 @@ trials <-
   # `is_oa` is TRUE for publications that are either gold, green, or hybrid; FALSE if closed or bronze; NA if no unpaywall data
   # `is_archivable` TRUE if EITHER accepted or published version may be archived according to SYP, regardless of unpaywall status;
   #                 FALSE if NEITHER accepted nor published can be archived regardless of unpaywall status
-  # `is_closed_archivable` is NA if `is_oa` or no unpaywall OA data, TRUE if EITHER accepted or published version may be archived according to SYP AND publication is closed according to unpaywall, FALSE if NEITHER accepted or published version may be archived according to SYP AND publication is closed according to unpaywall
+  # `is_closed_archivable` is NA if OA status anything other than closed or if no unpaywall OA data, TRUE if EITHER accepted or published version may be archived according to SYP AND publication is closed according to unpaywall, FALSE if NEITHER accepted or published version may be archived according to SYP AND publication is closed according to unpaywall
   mutate(
     is_oa = color == "gold" | color == "hybrid" | color == "green",
     is_archivable = case_when(
@@ -378,7 +378,7 @@ trials <-
       !(permission_accepted | permission_published) ~ FALSE,
       TRUE ~ NA
     ),
-    is_closed_archivable = if_else(is_oa, NA, is_archivable, missing = NA)
+    is_closed_archivable = if_else(color != "closed", NA, is_archivable, missing = NA)
   )
 
 

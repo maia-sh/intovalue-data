@@ -8,7 +8,7 @@
 #' @param dir Character. Directory in which to save raw CSVs. Defaults to working directory with `here::here("raw")`.
 #' @param user Character. AACT username.
 #' @param password Character. Default is NULL. If not provided, password will be searched for in \code{keyring} under the \code{aact} service with the provided \code{username}. If no password found, user will be interactively asked and input will be stored in keyring.
-#' @param tables Character. Vector of AACT tables to query. Default of `NULL` results in querying all tables ("studies", "designs", "interventions", "references", "ids", "centers", "officials", "responsible-parties", "sponsors", "facilities").
+#' @param tables Character. Vector of AACT tables to query. Default of `NULL` results in querying all tables ("studies", "designs", "interventions", "references", "ids", "centers", "officials", "responsible-parties", "sponsors", "facilities", "central-contacts", "facility-contacts", "result-contacts").
 #' @param overwrite Logical. If all tables already downloaded, should they be overwritten? Defaults to `FALSE`. Note that if *any* table is missing, *all* tables will be queried.
 #' @param query Character. Query `INFO` for \code{loggit}. Defaults to "AACT".
 #'
@@ -31,7 +31,7 @@ download_aact <- function(ids,
                      query = "AACT"){
 
   # Queries prepared for certain tables
-  valid_tables <- c("studies", "designs", "interventions", "references", "ids", "centers", "officials", "responsible-parties", "sponsors", "facilities")
+  valid_tables <- c("studies", "designs", "interventions", "references", "ids", "centers", "officials", "responsible-parties", "sponsors", "facilities", "central-contacts", "facility-contacts", "result-contacts")
 
   # If no user-specified tables, query all tables
   if (rlang::is_null(tables)) tables <- valid_tables
@@ -39,9 +39,12 @@ download_aact <- function(ids,
   tables_txt <-
     glue::glue_collapse(glue::glue("'{tables}'"), sep = ", ", last = ", and ")
 
+  valid_tables_txt <-
+    glue::glue_collapse(glue::glue("'{valid_tables}'"), sep = ", ", last = ", and ")
+
   # Check for valid tables
   if (any(!tables %in% valid_tables)){
-    rlang::abort(glue::glue("All `tables` must be in {tables_txt}"))
+    rlang::abort(glue::glue("All `tables` must be in {valid_tables_txt}"))
   }
 
   # Prepare log
@@ -171,6 +174,31 @@ download_aact <- function(ids,
     )
   }
 
+  if ("central-contacts" %in% tables){
+    query_aact(
+      "central_contacts", ids,
+      con, filepath = fs::path(dir, "central-contacts", ext = "csv"),
+      contact_type, name, email, phone
+    )
+  }
+
+  if ("facility-contacts" %in% tables){
+    query_aact(
+      "facility_contacts", ids,
+      con, filepath = fs::path(dir, "facility-contacts", ext = "csv"),
+      facility_id, contact_type, name, email, phone
+    )
+  }
+
+  if ("result-contacts" %in% tables){
+    query_aact(
+      "result_contacts", ids,
+      con, filepath = fs::path(dir, "result-contacts", ext = "csv"),
+      organization, name, email, phone
+    )
+  }
+
+
   # Disconnect aact database
   RPostgreSQL::dbDisconnect(con)
 
@@ -280,8 +308,8 @@ process_aact <- function(dir_in = here::here("raw"),
   fs::dir_create(dir_out)
 
   # Processing prepared for certain tables
-  valid_in_tables <- c("studies", "designs", "interventions", "references", "ids", "centers", "officials", "responsible-parties", "sponsors", "facilities")
-  valid_out_tables <- c("ctgov-lead-affiliations", "ctgov-facility-affiliations", "ctgov-studies", "ctgov-ids", "ctgov-crossreg",  "ctgov-references")
+  valid_in_tables <- c("studies", "designs", "interventions", "references", "ids", "centers", "officials", "responsible-parties", "sponsors", "facilities", "central-contacts", "facility-contacts", "result-contacts")
+  valid_out_tables <- c("ctgov-lead-affiliations", "ctgov-facility-affiliations", "ctgov-studies", "ctgov-ids", "ctgov-crossreg",  "ctgov-references", "ctgov-contacts")
 
   # If all tables already processed and not overwriting, then inform user and return
   raw_tables <-
@@ -492,5 +520,31 @@ process_aact <- function(dir_in = here::here("raw"),
       dplyr::mutate(reference_derived = dplyr::if_else(reference_type == "derived", TRUE, FALSE))
 
     readr::write_rds(references, fs::path(dir_out, "ctgov-references", ext = "rds"))
+  }
+
+  # Process contacts --------------------------------------------------------
+
+  if (all(c("central-contacts", "facility-contacts", "result-contacts") %in% raw_tables)){
+    central_contacts <-
+      readr::read_csv(fs::path(dir_in, "central-contacts", ext = "csv")) %>%
+      dplyr::distinct() %>%
+      dplyr::mutate(contact_type = stringr::str_c("central_", contact_type))
+
+    facility_contacts <-
+      readr::read_csv(fs::path(dir_in, "facility-contacts", ext = "csv")) %>%
+      dplyr::distinct() %>%
+      dplyr::mutate(contact_type = stringr::str_c("facility_", contact_type))
+
+    result_contacts <-
+      readr::read_csv(fs::path(dir_in, "result-contacts", ext = "csv")) %>%
+      dplyr::distinct() %>%
+      dplyr::mutate(contact_type = "result")
+
+    contacts <-
+      dplyr::bind_rows(central_contacts, facility_contacts, result_contacts) %>%
+      dplyr::distinct() %>%
+      dplyr::arrange(nct_id)
+
+    readr::write_rds(contacts, fs::path(dir_out, "ctgov-contacts", ext = "rds"))
   }
 }

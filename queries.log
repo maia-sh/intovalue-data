@@ -4,3 +4,5 @@
 {"timestamp": "2021-08-15T23:46:33+0200", "log_lvl": "INFO", "log_msg": "Unpaywall"}
 {"timestamp": "2021-07-23T09:38:07+0200", "log_lvl": "INFO", "log_msg": "ShareYourPaper"}
 {"timestamp": "2021-11-03T17:27:25+0100", "log_lvl": "INFO", "log_msg": "AACT_contacts"}
+{"timestamp": "2022-01-11T22:06:39-0500", "log_lvl": "INFO", "log_msg": "Historical CTGOV"}
+{"timestamp": "2022-01-11T23:28:17-0500", "log_lvl": "INFO", "log_msg": "Historical DRKS"}

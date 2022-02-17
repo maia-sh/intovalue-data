@@ -409,6 +409,44 @@ trials <-
   mutate(across(c(ends_with("_date"), -ppub_date), as.Date))
 
 
+# Change UMC city names ---------------------------------------------------
+
+# Cities as included in intovalue
+city_lookup_iv <- readr::read_csv(here::here("data", "raw", "city-lookup-intovalue.csv"))
+
+# Cities with desired umc names
+city_lookup_umc <- readr::read_csv(here::here("data", "raw", "city-lookup-umc.csv"))
+
+# Prepare umc city lookup table for intovalue city names
+city_lookup <-
+  city_lookup_umc %>%
+  left_join(city_lookup_iv, by = "city_id") %>%
+  select(-city_id)
+
+# In order to correct lead cities, unnest, join in correct names, and re-nest
+trials <-
+  trials %>%
+  mutate(lead_cities = strsplit(as.character(lead_cities), " ")) %>%
+  tidyr::unnest(lead_cities) %>%
+  left_join(city_lookup, by = "lead_cities") %>%
+  group_by(id) %>%
+  mutate(lead_cities = stringr::str_c(city, collapse = " ")) %>%
+  ungroup() %>%
+  select(-city) %>%
+  distinct()
+
+# In order to correct facility cities, unnest, join in correct names, and re-nest
+trials <-
+  trials %>%
+  mutate(facility_cities = strsplit(as.character(facility_cities), " ")) %>%
+  tidyr::unnest(facility_cities) %>%
+  left_join(city_lookup, by = c("facility_cities" = "lead_cities")) %>%
+  group_by(id) %>%
+  mutate(facility_cities = stringr::str_c(city, collapse = " ")) %>%
+  ungroup() %>%
+  select(-city) %>%
+  distinct()
+
 # Reorganize columns ------------------------------------------------------
 
 trials <-

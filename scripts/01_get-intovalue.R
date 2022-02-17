@@ -29,5 +29,7 @@ read_csv("https://zenodo.org/record/5141343/files/iv_main_dataset.csv?download=1
 
   # 2022-01-11: NCT02632292 is led by Lübeck/Schleswig-Holstein and NOT Berlin
   mutate(lead_cities = if_else(id == "NCT02632292", "Schleswig-Holstein", lead_cities)) %>%
+  # 2022-02-17: NCT01338922 had lead_city NA (IV1) and Schleswig-Holstein (IV2) -> checked and it's Schleswig-Holstein
+  mutate(lead_cities = if_else(id == "NCT01338922", "Schleswig-Holstein", lead_cities))
 
   write_csv(path(dir, "intovalue.csv"))

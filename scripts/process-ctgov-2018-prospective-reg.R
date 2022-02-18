@@ -23,24 +23,44 @@ ctgov_2018 <-
   read_rds(path(dir_main, "CT_gov_delayed_registration_3.rds")) %>%
   janitor::clean_names()
 
-# Check that all all ctgov trials
+# Check that all ctgov trials
 if (nrow(filter(ctgov_2018, str_detect(id, "^NCT", negate = TRUE))) != 0){stop("There are some non-ctgov trials!")}
-
-# Prepare cities
-# Input data has one row per trial, per UMC, plus "All trials combined"
-# NCT03563677 has many UMCs
-cities <-
-  ctgov_2018 %>%
-  filter(city != "All trials combined") %>%
-  select(id, city) %>%
-  group_by(id) %>%
-  mutate(cities = str_c(city, collapse = " ")) %>%
-  ungroup() %>%
-  select(-city) %>%
-  distinct()
 
 # Get unique clinicaltrial.gov trns
 ct_trns <- unique(ctgov_2018$id)
+
+
+# Prepare cities/umcs -----------------------------------------------------
+
+# Input data has one row per trial, per UMC, plus "All trials combined"
+# Also change city names to use desired UMC names
+# Note: NCT03563677 has many UMCs
+
+# Cities as included in intovalue
+city_lookup_iv <- readr::read_csv(here::here("data", "raw", "city-lookup-intovalue.csv"))
+
+# Cities with desired umc names
+city_lookup_umc <- readr::read_csv(here::here("data", "raw", "city-lookup-umc.csv"))
+
+# Prepare umc city lookup table for intovalue city names
+city_lookup <-
+  city_lookup_umc %>%
+  left_join(city_lookup_iv, by = "city_id") %>%
+  select(-city_id)
+
+cities <-
+  ctgov_2018 %>%
+  filter(city != "All trials combined") %>%
+  select(id, lead_cities = city) %>%
+  left_join(city_lookup, by = "lead_cities") %>%
+  group_by(id) %>%
+  mutate(cities = str_c(city, collapse = " ")) %>%
+  ungroup() %>%
+  select(-lead_cities, -city) %>%
+  distinct()
+
+# Check that number of trials and number of cities/trial match
+if (nrow(cities) != length(ct_trns)){stop("There is a mismatch between the cities and trials!")}
 
 
 # Download and process AACT data ------------------------------------------
@@ -128,9 +148,5 @@ trials <-
 
   select(-last_update_submitted_date)
 
-# Apply exclusion criteria per decision on 2021-10-08
-trials %>%
-
-  filter(start_2006_2018 & iv_interventional & iv_status) %>%
-
-  write_csv(here(dir_main, "prospective-reg-ctgov-2018-trials.csv"))
+# Note: this include only TRNs resolved in AACT (i.e., excludes NCT01921660)
+write_csv(trials, here(dir_main, "prospective-reg-ctgov-2018-trials.csv"))

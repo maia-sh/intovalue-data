@@ -3,7 +3,10 @@
 library(dplyr)
 library(readr)
 library(here)
-# renv::install("NicoRiedel/unpaywallR")
+
+# For the current version of the code, execute following 2 lines once
+#library(devtools)
+#install_github("delwen/unpaywallR")
 library(unpaywallR)
 
 dir <- fs::dir_create(here("data", "raw", "open-access"))
@@ -43,9 +46,16 @@ email_api  <-
   }
 )
 
-# Query Unpaywall API with journal > repository hierarchy (except  --------
+# Query Unpaywall
+oa_results_raw <-
+  unpaywallR::dois_OA_colors_fetch(
+    intovalue_dois,
+    email_api,
+    clusters = 2)
 
-repository_hierarchy <-
+# Pick OA color based on hierarchy journal > repository (except bronze)  --------
+
+hierarchy <-
   c("gold",
     "hybrid",
     "green",
@@ -53,16 +63,14 @@ repository_hierarchy <-
     "closed")
 
 oa_results <-
-  unpaywallR::dois_OA_colors(
-    intovalue_dois,
-    email_api,
-    clusters = 2,
-    color_hierarchy = repository_hierarchy
+    unpaywallR::dois_OA_pick_color(
+      oa_results_raw,
+      hierarchy
   ) %>%
   rename(color = OA_color, publication_date_unpaywall = date)
 
 
-# Query Unpaywall API with all OA routes > green OA hierarchy -------------
+# Pick OA color based on hierarchy all OA routes > green OA -------------
 
 green_oa_hierarchy <-
   c("gold",
@@ -72,11 +80,9 @@ green_oa_hierarchy <-
     "closed")
 
 oa_results_green <-
-  unpaywallR::dois_OA_colors(
-    intovalue_dois,
-    email_api,
-    clusters = 2,
-    color_hierarchy = green_oa_hierarchy
+  unpaywallR::dois_OA_pick_color(
+    oa_results_raw,
+    green_oa_hierarchy
   ) %>%
   select(doi, color_green_only = OA_color)
 

@@ -43,7 +43,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1159/000323444,closed,closed,"0033-3190,1423-0348",Psychotherapy and Psychosomatics,S. Karger AG,2011-01-01
 10.1056/nejmoa1105575,green,green,"0028-4793,1533-4406",New England Journal of Medicine,Massachusetts Medical Society,2012-01-12
 10.1182/blood-2011-05-355594,green,green,"0006-4971,1528-0020",Blood,American Society of Hematology,2011-10-27
-10.1093/eurheartj/ehu165,green,green,"0195-668X,1522-9645",European Heart Journal,Oxford University Press (OUP),2014-04-25
+10.1093/eurheartj/ehu165,bronze,green,"0195-668X,1522-9645",European Heart Journal,Oxford University Press (OUP),2014-04-25
 10.2337/dc11-1343,hybrid,hybrid,"0149-5992,1935-5548",Diabetes Care,American Diabetes Association,2012-04-11
 10.1016/s0140-6736(11)61938-7,closed,closed,0140-6736,The Lancet,Elsevier BV,2012-04-01
 10.1111/bjh.13222,closed,closed,0007-1048,British Journal of Haematology,Wiley,2014-11-17
@@ -93,7 +93,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1371/journal.pmed.1001119,gold,gold,1549-1676,PLoS Medicine,Public Library of Science (PLoS),2011-11-08
 10.1093/annonc/mdt270,bronze,bronze,0923-7534,Annals of Oncology,Elsevier BV,2013-10-01
 10.3174/ajnr.a3755,hybrid,hybrid,"0195-6108,1936-959X",American Journal of Neuroradiology,American Society of Neuroradiology (ASNR),2013-11-01
-10.7326/m14-2062,closed,closed,0003-4819,Annals of Internal Medicine,American College of Physicians,2015-05-05
+10.7326/m14-2062,closed,closed,"0003-4819,1539-3704",Annals of Internal Medicine,American College of Physicians,2015-05-05
 10.2215/cjn.05840710,bronze,green,"1555-9041,1555-905X",Clinical Journal of the American Society of Nephrology,American Society of Nephrology (ASN),2010-11-04
 10.1053/j.gastro.2010.06.066,closed,closed,0016-5085,Gastroenterology,Elsevier BV,2010-10-01
 10.1093/eurheartj/ehr418,bronze,bronze,"0195-668X,1522-9645",European Heart Journal,Oxford University Press (OUP),2011-11-21
@@ -185,11 +185,11 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1200/jco.2011.38.7522,green,green,"0732-183X,1527-7755",Journal of Clinical Oncology,American Society of Clinical Oncology (ASCO),2012-10-01
 10.3892/ijo.2014.2382,hybrid,hybrid,"1019-6439,1791-2423",International Journal of Oncology,Spandidos Publications,2014-04-11
 10.1185/03007995.2014.880674,closed,closed,"0300-7995,1473-4877",Current Medical Research and Opinion,Informa Healthcare,2014-01-30
-10.3945/ajcn.110.004374,bronze,bronze,"0002-9165,1938-3207",The American Journal of Clinical Nutrition,Oxford University Press (OUP),2011-06-01
+10.3945/ajcn.110.004374,closed,closed,"0002-9165,1938-3207",The American Journal of Clinical Nutrition,Oxford University Press (OUP),2011-06-01
 10.1056/nejmoa1014164,closed,closed,"0028-4793,1533-4406",New England Journal of Medicine,Massachusetts Medical Society,2012-08-09
 10.1016/j.cllc.2013.12.005,closed,closed,1525-7304,Clinical Lung Cancer,Elsevier BV,2014-05-01
 10.1161/circulationaha.111.026732,bronze,bronze,"0009-7322,1524-4539",Circulation,Ovid Technologies (Wolters Kluwer Health),2011-08-02
-10.2340/00015555-1434,gold,gold,0001-5555,Acta Dermato Venereologica,Acta Dermato-Venereologica,2013-01-01
+10.2340/00015555-1434,gold,gold,0001-5555,Acta Dermato Venereologica,Medical Journals Sweden AB,2013-01-01
 10.1016/j.jacc.2013.07.044,bronze,bronze,0735-1097,Journal of the American College of Cardiology,Elsevier BV,2013-12-01
 10.1002/ccd.22823,closed,closed,1522-1946,Catheterization and Cardiovascular Interventions,Wiley,2011-03-11
 10.1016/j.carrev.2014.02.001,closed,closed,1553-8389,Cardiovascular Revascularization Medicine,Elsevier BV,2014-03-01
@@ -1320,7 +1320,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.3325/cmj.2010.51.493,gold,gold,"0353-9504,1332-8166",Croatian Medical Journal,Croatian Medical Journals,2010-12-01
 10.3109/15412555.2013.829437,closed,closed,"1541-2555,1541-2563",COPD: Journal of Chronic Obstructive Pulmonary Disease,Informa UK Limited,2013-10-10
 10.1007/s00784-015-1475-7,closed,closed,"1432-6981,1436-3771",Clinical Oral Investigations,Springer Science and Business Media LLC,2015-04-22
-10.3238/arztebl.2014.0592,green,green,1866-0452,Deutsches Aerzteblatt Online,Deutscher Arzte-Verlag GmbH,2014-09-01
+10.3238/arztebl.2014.0592,green,green,1866-0452,Deutsches Ärzteblatt international,Deutscher Arzte-Verlag GmbH,2014-09-01
 10.1007/s00520-014-2193-4,closed,closed,"0941-4355,1433-7339",Supportive Care in Cancer,Springer Science and Business Media LLC,2014-03-18
 10.1159/000369468,closed,closed,"0033-3190,1423-0348",Psychotherapy and Psychosomatics,S. Karger AG,2015-02-21
 10.1161/circulationaha.112.096370,bronze,bronze,"0009-7322,1524-4539",Circulation,Ovid Technologies (Wolters Kluwer Health),2012-07-17
@@ -1404,7 +1404,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1016/j.jpeds.2013.07.014,closed,closed,0022-3476,The Journal of Pediatrics,Elsevier BV,2013-12-01
 10.1016/j.jpain.2012.08.004,closed,closed,1526-5900,The Journal of Pain,Elsevier BV,2012-11-01
 10.1016/j.jpain.2014.10.009,closed,closed,1526-5900,The Journal of Pain,Elsevier BV,2015-01-01
-10.3238/arztebl.2015.0672,green,green,1866-0452,Deutsches Aerzteblatt Online,Deutscher Arzte-Verlag GmbH,2015-10-02
+10.3238/arztebl.2015.0672,green,green,1866-0452,Deutsches Ärzteblatt international,Deutscher Arzte-Verlag GmbH,2015-10-02
 10.1017/s0007114515002950,hybrid,hybrid,"0007-1145,1475-2662",British Journal of Nutrition,Cambridge University Press (CUP),2015-09-02
 10.1038/bjc.2013.826,hybrid,hybrid,"0007-0920,1532-1827",British Journal of Cancer,Springer Science and Business Media LLC,2014-01-16
 10.1159/000371769,bronze,bronze,"0025-7931,1423-0356",Respiration,S. Karger AG,2015-01-01
@@ -1587,7 +1587,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1089/acm.2017.0209,closed,closed,"1075-5535,1557-7708",The Journal of Alternative and Complementary Medicine,Mary Ann Liebert Inc,2018-03-01
 10.1002/hbm.23469,bronze,green,"1065-9471,1097-0193",Human Brain Mapping,Wiley,2016-11-11
 10.1016/j.neuroimage.2016.06.057,closed,closed,1053-8119,NeuroImage,Elsevier BV,2016-11-01
-10.1093/neuros/nyx420,hybrid,hybrid,"0148-396X,1524-4040",Neurosurgery,Oxford University Press (OUP),2017-08-04
+10.1093/neuros/nyx420,hybrid,hybrid,"0148-396X,1524-4040",Neurosurgery,Ovid Technologies (Wolters Kluwer Health),2017-08-04
 10.1016/j.ctim.2017.07.005,closed,closed,0965-2299,Complementary Therapies in Medicine,Elsevier BV,2017-10-01
 10.1002/bjs5.81,hybrid,hybrid,2474-9842,BJS Open,Oxford University Press (OUP),2018-06-14
 10.1523/jneurosci.0260-17.2017,bronze,green,"0270-6474,1529-2401",The Journal of Neuroscience,Society for Neuroscience,2017-06-21
@@ -1647,14 +1647,14 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1056/nejmoa1506459,bronze,green,"0028-4793,1533-4406",New England Journal of Medicine,Massachusetts Medical Society,2015-09-17
 10.1200/jco.2017.76.8093,closed,closed,"0732-183X,1527-7755",Journal of Clinical Oncology,American Society of Clinical Oncology (ASCO),2018-07-10
 10.1016/j.nmd.2016.12.014,hybrid,hybrid,0960-8966,Neuromuscular Disorders,Elsevier BV,2017-04-01
-10.1177/2047487318800072,closed,closed,"2047-4873,2047-4881",European Journal of Preventive Cardiology,Oxford University Press (OUP),2018-09-10
+10.1177/2047487318800072,green,green,"2047-4873,2047-4881",European Journal of Preventive Cardiology,Oxford University Press (OUP),2018-09-10
 10.1016/j.abb.2018.05.016,green,green,0003-9861,Archives of Biochemistry and Biophysics,Elsevier BV,2018-08-01
 10.1093/ajcn/nqy229,hybrid,hybrid,"0002-9165,1938-3207",The American Journal of Clinical Nutrition,Oxford University Press (OUP),2018-10-24
 10.1016/j.bja.2018.02.064,bronze,bronze,0007-0912,British Journal of Anaesthesia,Elsevier BV,2018-06-01
 10.1093/gerona/glz047,green,green,"1079-5006,1758-535X",The Journals of Gerontology: Series A,Oxford University Press (OUP),2019-02-16
 10.3390/nu9030268,gold,gold,2072-6643,Nutrients,MDPI AG,2017-03-11
 10.1007/s00345-015-1612-6,closed,closed,"0724-4983,1433-8726",World Journal of Urology,Springer Science and Business Media LLC,2015-06-09
-10.3945/ajcn.116.140046,bronze,green,"0002-9165,1938-3207",The American Journal of Clinical Nutrition,Oxford University Press (OUP),2016-12-21
+10.3945/ajcn.116.140046,green,green,"0002-9165,1938-3207",The American Journal of Clinical Nutrition,Oxford University Press (OUP),2016-12-21
 10.1017/s0007114515002822,bronze,green,"0007-1145,1475-2662",British Journal of Nutrition,Cambridge University Press (CUP),2015-09-09
 10.1007/s00406-019-01064-3,closed,closed,"0940-1334,1433-8491",European Archives of Psychiatry and Clinical Neuroscience,Springer Science and Business Media LLC,2019-09-13
 10.1007/s11357-015-9794-9,hybrid,hybrid,"0161-9152,1574-4647",AGE,Springer Science and Business Media LLC,2015-05-27
@@ -1892,7 +1892,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.23736/s1121-421x.18.02478-9,closed,closed,"1121-421X,1827-1642",Minerva Gastroenterologica e Dietologica,Edizioni Minerva Medica,2018-07-01
 10.1089/jamp.2017.1432,closed,closed,"1941-2711,1941-2703",Journal of Aerosol Medicine and Pulmonary Drug Delivery,Mary Ann Liebert Inc,2018-08-01
 10.1007/s00330-019-06411-5,closed,closed,"0938-7994,1432-1084",European Radiology,Springer Science and Business Media LLC,2019-08-30
-10.1093/europace/euv249,closed,closed,"1099-5129,1532-2092",Europace,Oxford University Press (OUP),2015-08-27
+10.1093/europace/euv249,bronze,bronze,"1099-5129,1532-2092",Europace,Oxford University Press (OUP),2015-08-27
 10.1016/j.athoracsur.2014.09.022,closed,closed,0003-4975,The Annals of Thoracic Surgery,Elsevier BV,2015-01-01
 10.1016/s0140-6736(18)30726-8,closed,closed,0140-6736,The Lancet,Elsevier BV,2018-06-01
 10.1093/eurheartj/ehv463,bronze,bronze,"0195-668X,1522-9645",European Heart Journal,Oxford University Press (OUP),2015-09-17
@@ -2091,7 +2091,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1056/nejmoa1710261,bronze,green,"0028-4793,1533-4406",New England Journal of Medicine,Massachusetts Medical Society,2017-12-21
 10.1155/2020/2416582,gold,gold,"1741-427X,1741-4288",Evidence-Based Complementary and Alternative Medicine,Hindawi Limited,2020-01-31
 10.3390/nu11030656,gold,gold,2072-6643,Nutrients,MDPI AG,2019-03-18
-10.1093/ajcn/nqy307,closed,closed,"0002-9165,1938-3207",The American Journal of Clinical Nutrition,Oxford University Press (OUP),2019-02-01
+10.1093/ajcn/nqy307,bronze,bronze,"0002-9165,1938-3207",The American Journal of Clinical Nutrition,Oxford University Press (OUP),2019-02-01
 10.1002/mnfr.201700838,closed,closed,1613-4125,Molecular Nutrition & Food Research,Wiley,2018-03-01
 10.1016/j.apergo.2019.05.018,closed,closed,0003-6870,Applied Ergonomics,Elsevier BV,2019-10-01
 10.15496/publikation-24421,NA,NA,NA,NA,NA,NA
@@ -2270,7 +2270,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1186/s12871-020-00960-9,gold,gold,1471-2253,BMC Anesthesiology,Springer Science and Business Media LLC,2020-02-20
 10.1186/s12986-017-0175-5,gold,gold,1743-7075,Nutrition & Metabolism,Springer Science and Business Media LLC,2017-02-20
 10.1016/j.jcin.2016.10.004,bronze,bronze,1936-8798,JACC: Cardiovascular Interventions,Elsevier BV,2017-01-01
-10.3238/arztebl.2018.0469,green,green,1866-0452,Deutsches Aerzteblatt Online,Deutscher Arzte-Verlag GmbH,2018-07-09
+10.3238/arztebl.2018.0469,green,green,1866-0452,Deutsches Ärzteblatt international,Deutscher Arzte-Verlag GmbH,2018-07-09
 10.1108/he-11-2016-0061,closed,closed,0965-4283,Health Education,Emerald,2018-01-02
 10.1101/409276,green,green,NA,NA,Cold Spring Harbor Laboratory,2018-09-12
 10.1155/2019/1907168,gold,gold,"1741-427X,1741-4288",Evidence-Based Complementary and Alternative Medicine,Hindawi Limited,2019-12-23
@@ -2436,7 +2436,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1016/s2352-3026(15)00251-3,closed,closed,2352-3026,The Lancet Haematology,Elsevier BV,2016-02-01
 10.1186/s12887-018-1092-0,gold,gold,1471-2431,BMC Pediatrics,Springer Science and Business Media LLC,2018-03-16
 10.1001/jama.2015.4189,bronze,bronze,0098-7484,JAMA,American Medical Association (AMA),2015-06-02
-10.2340/00015555-3120,gold,gold,0001-5555,Acta Dermato Venereologica,Acta Dermato-Venereologica,2019-01-01
+10.2340/00015555-3120,gold,gold,0001-5555,Acta Dermato Venereologica,Medical Journals Sweden AB,2019-01-01
 10.1007/s00134-016-4670-3,hybrid,hybrid,"0342-4642,1432-1238",Intensive Care Medicine,Springer Science and Business Media LLC,2017-01-21
 10.1016/j.gaitpost.2018.03.034,hybrid,hybrid,0966-6362,Gait & Posture,Elsevier BV,2018-05-01
 10.1007/s00402-017-2706-y,green,green,"0936-8051,1434-3916",Archives of Orthopaedic and Trauma Surgery,Springer Science and Business Media LLC,2017-05-10

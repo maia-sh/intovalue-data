@@ -164,11 +164,18 @@ trials <-
       iv_version == 2 ~ as.Date("2020-09-01")
     ),
 
-    # Using end of search period
-    results_followup = duration_days(completion_date, results_search_end_date),
+    # This needs to be updated with every registry update
+    registry_download_date = as.Date("2021-08-15"),
 
-    has_followup_2y = results_followup >= 365*2,
-    has_followup_5y = results_followup >= 365*5
+    # Using end of search period for reporting as publication
+    results_followup_pub = duration_days(completion_date, results_search_end_date),
+    # Using registry download date for reporting as summary results
+    results_followup_sumres = duration_days(completion_date, registry_download_date),
+
+    has_followup_2y_pub = results_followup_pub >= 365*2,
+    has_followup_5y_pub = results_followup_pub >= 365*5,
+    has_followup_2y_sumres = results_followup_sumres >= 365*2,
+    has_followup_5y_sumres = results_followup_sumres >= 365*5
   ) %>%
 
   # Create booleans for timeliness within 1 year (summary results) and 2 years (summary results and publication)
@@ -428,6 +435,7 @@ trials <-
   trials %>%
   mutate(lead_cities = strsplit(as.character(lead_cities), " ")) %>%
   tidyr::unnest(lead_cities) %>%
+  distinct(id, lead_cities, iv_version, .keep_all = TRUE) %>%
   left_join(city_lookup, by = "lead_cities") %>%
   group_by(id) %>%
   mutate(lead_cities = stringr::str_c(city, collapse = " ")) %>%
@@ -440,6 +448,7 @@ trials <-
   trials %>%
   mutate(facility_cities = strsplit(as.character(facility_cities), " ")) %>%
   tidyr::unnest(facility_cities) %>%
+  distinct(id, facility_cities, iv_version, .keep_all = TRUE) %>%
   left_join(city_lookup, by = c("facility_cities" = "lead_cities")) %>%
   group_by(id) %>%
   mutate(facility_cities = stringr::str_c(city, collapse = " ")) %>%
@@ -502,6 +511,7 @@ trials <-
     "days_reg_to_publication",
     "results_search_start_date",
     "results_search_end_date",
+    "registry_download_date",
 
     # Publication info
     "doi",
@@ -534,9 +544,12 @@ trials <-
     "n_reg_pub_doi_or_pmid",
 
     # Timely results
-    "results_followup",
-    "has_followup_2y",
-    "has_followup_5y",
+    "results_followup_pub",
+    "results_followup_sumres",
+    "has_followup_2y_pub",
+    "has_followup_2y_sumres",
+    "has_followup_5y_pub",
+    "has_followup_5y_sumres",
     "is_summary_results_1y",
     "is_summary_results_2y",
     "is_summary_results_5y",

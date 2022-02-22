@@ -435,7 +435,7 @@ trials <-
   trials %>%
   mutate(lead_cities = strsplit(as.character(lead_cities), " ")) %>%
   tidyr::unnest(lead_cities) %>%
-  distinct(id, lead_cities, .keep_all = TRUE) %>%
+  distinct(id, lead_cities, iv_version, .keep_all = TRUE) %>%
   left_join(city_lookup, by = "lead_cities") %>%
   group_by(id) %>%
   mutate(lead_cities = stringr::str_c(city, collapse = " ")) %>%
@@ -448,7 +448,7 @@ trials <-
   trials %>%
   mutate(facility_cities = strsplit(as.character(facility_cities), " ")) %>%
   tidyr::unnest(facility_cities) %>%
-  distinct(id, facility_cities, .keep_all = TRUE) %>%
+  distinct(id, facility_cities, iv_version, .keep_all = TRUE) %>%
   left_join(city_lookup, by = c("facility_cities" = "lead_cities")) %>%
   group_by(id) %>%
   mutate(facility_cities = stringr::str_c(city, collapse = " ")) %>%

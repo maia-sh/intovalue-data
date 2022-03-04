@@ -430,6 +430,16 @@ city_lookup <-
   left_join(city_lookup_iv, by = "city_id") %>%
   select(-city_id)
 
+# Some trials have different lead cities across IV versions, so unite manually
+trials <-
+  trials %>%
+  mutate(lead_cities = case_when(
+    id == "NCT00847444" ~ "Düsseldorf LMU_München",
+    id == "NCT00996229" ~ "Berlin Münster",
+    id == "NCT01783639" ~ "Hamburg Leipzig",
+    TRUE ~ lead_cities
+  ))
+
 # In order to correct lead cities, unnest, join in correct names, and re-nest
 trials <-
   trials %>%
@@ -437,11 +447,43 @@ trials <-
   tidyr::unnest(lead_cities) %>%
   distinct(id, lead_cities, iv_version, .keep_all = TRUE) %>%
   left_join(city_lookup, by = "lead_cities") %>%
-  group_by(id) %>%
+  group_by(id, iv_version) %>%
   mutate(lead_cities = stringr::str_c(city, collapse = " ")) %>%
   ungroup() %>%
   select(-city) %>%
   distinct()
+
+# Lead cities should not be NA for iv2
+iv2_missing_lead_cities <-
+  trials %>%
+  filter(iv_version == 2 & is.na(lead_cities))
+
+if (nrow(iv2_missing_lead_cities) > 0) {
+  stop("There are IV2 trials missing lead cities!")
+}
+
+# Check for single appearance of umc per id, per iv version
+umcs_per_id_per_iv <-
+  trials %>%
+  mutate(lead_cities = strsplit(as.character(lead_cities), " ")) %>%
+  tidyr::unnest(lead_cities) %>%
+  janitor::get_dupes(id, lead_cities, iv_version)
+
+if (nrow(umcs_per_id_per_iv) > 0) {
+  stop("A single UMC appears more than once per trial (per iv version)!")
+}
+
+# Check for same umcs per id across iv versions
+different_umcs_per_id_across_iv <-
+  trials %>%
+  group_by(id) %>%
+  mutate(n_lead_cities_types = n_distinct(lead_cities)) %>%
+  ungroup() %>%
+  filter(n_lead_cities_types > 1)
+
+if (nrow(different_umcs_per_id_across_iv) > 0) {
+  stop("A single trial has different UMCs across iv versions!")
+}
 
 # In order to correct facility cities, unnest, join in correct names, and re-nest
 trials <-
@@ -450,11 +492,31 @@ trials <-
   tidyr::unnest(facility_cities) %>%
   distinct(id, facility_cities, iv_version, .keep_all = TRUE) %>%
   left_join(city_lookup, by = c("facility_cities" = "lead_cities")) %>%
-  group_by(id) %>%
+  group_by(id, iv_version) %>%
   mutate(facility_cities = stringr::str_c(city, collapse = " ")) %>%
   ungroup() %>%
   select(-city) %>%
   distinct()
+
+# Facility cities should always be NA for iv2
+iv2_extra_facility_cities <-
+  trials %>%
+  filter(iv_version == 2 & !is.na(facility_cities))
+
+if (nrow(iv2_extra_facility_cities) > 0) {
+  stop("There are IV2 trials with extra facility cities!")
+}
+
+# Check for single appearance of umc per id, per iv version
+umcs_per_id_per_iv <-
+  trials %>%
+  mutate(facility_cities = strsplit(as.character(facility_cities), " ")) %>%
+  tidyr::unnest(facility_cities) %>%
+  janitor::get_dupes(id, facility_cities, iv_version)
+
+if (nrow(umcs_per_id_per_iv) > 0) {
+  stop("A single UMC appears more than once per trial (per iv version)!")
+}
 
 # Reorganize columns ------------------------------------------------------
 

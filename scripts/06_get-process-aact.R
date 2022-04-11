@@ -6,11 +6,7 @@
 # do no re-fetch variables that are either less likely to change or unclear how to clean like intovalue, e.g.: allocation (shouldn't change), main_sponsor (unclear source), is_multicentric (unclear source), lead_cities (unclear source and lots of intovalue munging)
 
 library(dplyr)
-library(dbplyr)
-library(DBI)
-library(RPostgreSQL)
-
-source(here::here("scripts", "functions", "aact-functions.R"))
+library(aactr)
 
 dir_raw <- here::here("data", "raw", "registries", "ctgov")
 dir_processed <- here::here("data", "processed", "registries", "ctgov")

@@ -67,7 +67,7 @@ def get_parameters(output_formatted):
     if not archiving_locations:
         inst_repository = None
     else:
-        inst_repository = 'institutional repository' in archiving_locations
+        inst_repository = 'institutional repository' in [location.lower() for location in archiving_locations]
 
     # What versions can be archived?
     versions = best_permission.get("versions")

@@ -4,6 +4,7 @@ library(readr)
 library(here)
 library(fs)
 library(lubridate)
+library(stringr)
 
 source(here("scripts", "functions", "duration_days.R"))
 
@@ -41,7 +42,7 @@ drks_query_date <- get_latest_query("DRKS", query_logs)
 # Exclude "days_DATE_to_publication" columns since will recalculate from registries
 iv_cols_to_keep <-
   setdiff(colnames(intovalue), colnames(registry_studies)) %>%
-  setdiff(stringr::str_subset(., "^days_")) %>%
+  setdiff(str_subset(., "^days_")) %>%
   c("id", .)
 
 trials <-
@@ -204,6 +205,42 @@ trials <-
 
 # Add pubmed and full-text ------------------------------------------------
 
+# Prepare pubmed variables, including citation: "author et al. (year) title"
+pubmed <-
+  pubmed_main %>%
+
+  # Some author lists start with or consist only of "NA NA" so remove "NA NA" and make NA if blank or use next author
+  mutate(
+    citation =
+      str_remove(authors, "^NA NA(, )?") %>%
+      na_if(., "")
+  ) %>%
+
+  # Prepare author citations based on # authors
+  mutate(citation = case_when(
+
+    # 1 --> as is
+    !str_detect(citation, ",") ~ citation,
+
+    # 2 --> "&"
+    !str_detect(citation, ",.*,") ~
+      str_remove(citation, "(?<=\\w) [A-Z]*$") %>%
+      str_replace(., "[A-Z]*,", "&"),
+
+    # 3 --> "et al."
+    TRUE ~ str_replace(citation, "(?<=\\s)[A-Z]*,.*$", "et al.")
+  )) %>%
+
+  # Add year
+  mutate(citation = glue::glue("{citation} ({year}) {title}")) %>%
+
+  select(
+    pmid,
+    pub_title = title, journal_pubmed = journal,
+    ppub_date = ppub, epub_date = epub,
+    citation
+  )
+
 trials <-
   trials %>%
 
@@ -211,14 +248,7 @@ trials <-
   left_join(pubmed_ft_retrieved, by = c("id", "doi", "pmid")) %>%
 
   # Add pubmed metadata
-  left_join(
-    select(
-      pubmed_main, pmid,
-      pub_title = title, journal_pubmed = journal,
-      ppub_date = ppub, epub_date = epub
-    ),
-    by = "pmid"
-  )
+  left_join(pubmed, by = "pmid")
 
 
 # Add intovalue trns ------------------------------------------------------
@@ -462,7 +492,7 @@ trials <-
   distinct(id, lead_cities, iv_version, .keep_all = TRUE) %>%
   left_join(city_lookup, by = "lead_cities") %>%
   group_by(id, iv_version) %>%
-  mutate(lead_cities = stringr::str_c(city, collapse = " ")) %>%
+  mutate(lead_cities = str_c(city, collapse = " ")) %>%
   ungroup() %>%
   select(-city) %>%
   distinct()
@@ -507,7 +537,7 @@ trials <-
   distinct(id, facility_cities, iv_version, .keep_all = TRUE) %>%
   left_join(city_lookup, by = c("facility_cities" = "lead_cities")) %>%
   group_by(id, iv_version) %>%
-  mutate(facility_cities = stringr::str_c(city, collapse = " ")) %>%
+  mutate(facility_cities = str_c(city, collapse = " ")) %>%
   ungroup() %>%
   select(-city) %>%
   distinct()
@@ -602,6 +632,7 @@ trials <-
     "journal_pubmed",
     "ppub_date",
     "epub_date",
+    "citation",
 
     # TRN/registration-publication link
     "has_iv_trn_abstract",
@@ -658,7 +689,6 @@ trials <-
     "is_archivable",
     "is_closed_archivable"
   )
-
 
 
 # Check that all intovalue columns in trials (except `has_publication`)

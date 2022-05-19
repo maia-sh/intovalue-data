@@ -17,16 +17,15 @@ data dictionary and readme alongside the [dataset in
 Zenodo](https://doi.org/10.5281/zenodo.5141342). This readme serves to
 highlight/document changes.
 
-Note that the parent IntoValue dataset includes `summary_results_date`
-for the few DRKS summary results, which have been removed in this
-version. We remove them as they had been manually extracted (from PDFs)
-for only the subset of summary results manually found in IntoValue,
-whereas this dataset includes additional summary results found via
-automated search and hence without dates. For parity, we removed DRKS
-summary result dates. We could decide to add these from either (1) the
-PDF (which indicates when the summary result was created), or (2) the
-DRKS change history (which indicates when the summary result was
-uploaded and made available).
+Note that `summary_results_date` for DRKS summary results was changed
+from the parent IntoValue dataset. The parent dataset included only a
+subset of summary results *manually* found during searches, whereas this
+dataset includes additional summary results found via *automated*
+search. The parent dataset used the `summary_results_date` manually
+extracted from *PDFs*, whereas this dataset uses the
+`summary_results_date` manually extracted from DRKS’ *change history*
+and reflects the date the results were uploaded and made publicly
+available.
 
 ## Data sources
 
@@ -39,12 +38,12 @@ depending on its size.
 |-----------------------------------|-------------------------------|------------|---------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
 | IntoValue                         | Trials                        | NA         | <https://doi.org/10.5281/zenodo.5141342>                                                                                  | [get-intovalue.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/01_get-intovalue.R)                 |
 | PubMed                            | Bibliometric                  | 2021-08-15 | Zenodo                                                                                                                    | [get-pubmed.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/02_get-pubmed.R)                       |
-| ClinicalTrials.gov/ AACT          | Registry                      | 2021-08-15 | Zenodo                                                                                                                    | [get-aact.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/06_get-aact.R)                           |
-| DRKS                              | Registry                      | 2021-08-15 | Zenodo                                                                                                                    | [get-drks.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/08_get-drks.R)                           |
+| ClinicalTrials.gov/ AACT          | Registry                      | 2022-04-11 | Zenodo                                                                                                                    | [get-aact.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/06_get-aact.R)                           |
+| DRKS                              | Registry                      | 2022-04-11 | Zenodo                                                                                                                    | [get-drks.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/08_get-drks.R)                           |
 | Unpaywall/ institutional licenses | Full-text PDF                 | NA         | NA, available only on local server `/data01/responsible_metrics/intovalue-data/fulltext`                                  | [get-ft-pdf.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/03_get-ft-pdf.R)                       |
 | GROBID                            | Full-text XML                 | NA         | NA, available only on local server `/data01/responsible_metrics/intovalue-data/fulltext`                                  | PDF-to-XML conversion done in Python                                                                              |
-| Unpaywall                         | Open access status            | 2021-08-15 | [oa-unpaywall.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-unpaywall.csv)             | [get-oa-unpaywall-data.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/13_get-oa-unpaywall-data.R) |
-| ShareYourPaper                    | Green open access permissions | 2021-07-23 | [oa-syp-permissions.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-syp-permissions.csv) | [get-oa-permissions.py](https://github.com/maia-sh/intovalue-data/blob/main/scripts/14_get-oa-permissions.py)     |
+| Unpaywall                         | Open access status            | 2022-04-13 | [oa-unpaywall.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-unpaywall.csv)             | [get-oa-unpaywall-data.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/13_get-oa-unpaywall-data.R) |
+| ShareYourPaper                    | Green open access permissions | 2022-04-13 | [oa-syp-permissions.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-syp-permissions.csv) | [get-oa-permissions.py](https://github.com/maia-sh/intovalue-data/blob/main/scripts/14_get-oa-permissions.py)     |
 
 ## Data directories
 
@@ -144,7 +143,7 @@ trials <-
 n_iv_trials <- nrow(trials)
 ```
 
-**Number of included trials**: 2915
+**Number of included trials**: 2912
 
 For analyses by UMC, split trials by UMC lead city:
 
@@ -262,13 +261,13 @@ DOIs linked in trial registration
 **Denominator**: Number of trials with PubMed publications available as
 PDF full-text
 
-59% (849/1449) of trials on clinicaltrials.gov include a link (i.e.,
+59% (856/1449) of trials on clinicaltrials.gov include a link (i.e.,
 PMID, DOI) to their PubMed publication (as available in the IntoValue
-dataset). This includes 662 (78%) trials with automatically indexed
+dataset). This includes 667 (78%) trials with automatically indexed
 publications (i.e., using TRN in PubMed’s secondary identifier field)
-and 662 (78%) trials with manually added publications.
+and 667 (78%) trials with manually added publications.
 
-22% (97/448) of trials on DRKS include a link (i.e., PMID, DOI) to their
+1% (3/448) of trials on DRKS include a link (i.e., PMID, DOI) to their
 PubMed publication (as available in the IntoValue dataset).
 
 ## Registry summary results
@@ -281,10 +280,9 @@ trials_pubs %>%
 
 | registry           | has_summary_results |    n |
 |:-------------------|:--------------------|-----:|
-| ClinicalTrials.gov | FALSE               | 1297 |
-| ClinicalTrials.gov | TRUE                |  152 |
-| DRKS               | FALSE               |  443 |
-| DRKS               | TRUE                |    5 |
+| ClinicalTrials.gov | FALSE               | 1294 |
+| ClinicalTrials.gov | TRUE                |  155 |
+| DRKS               | FALSE               |  448 |
 
 *Registry Limitations*: ClinicalTrials.gov includes a structured summary
 results field. In contrast, DRKS includes summary results with other
@@ -310,14 +308,14 @@ tbl_euctr <-
 as_kable(tbl_euctr)
 ```
 
-| **Characteristic**            | ClinicalTrials.gov | DRKS      | **Total**   |
-|:------------------------------|:-------------------|:----------|:------------|
+| **Characteristic**            | ClinicalTrials.gov |   DRKS    |  **Total**  |
+|:------------------------------|:------------------:|:---------:|:-----------:|
 | **EUCTR TRN in Registration** |                    |           |             |
-| FALSE                         | 1,925 (85%)        | 558 (87%) | 2,483 (85%) |
-| TRUE                          | 345 (15%)          | 87 (13%)  | 432 (15%)   |
+| FALSE                         |    1,922 (85%)     | 557 (86%) | 2,479 (85%) |
+| TRUE                          |     346 (15%)      | 87 (14%)  |  433 (15%)  |
 
-Of the 2915 unique trials completed between 2009 and 2017 and meeting
-the IntoValue inclusion criteria, we found that 432 (15%) include an
+Of the 2912 unique trials completed between 2009 and 2017 and meeting
+the IntoValue inclusion criteria, we found that 433 (15%) include an
 EUCTR id in their registration, and are presumably cross-registered in
-EUCTR. This includes 345 (15%) from ClinicalTrials.gov and 87 (13%) from
+EUCTR. This includes 346 (15%) from ClinicalTrials.gov and 87 (14%) from
 DRKS.

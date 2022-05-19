@@ -26,7 +26,7 @@ This dataset is modified from the [main IntoValue dataset](https://doi.org/10.52
 
 Detailed documentation for the parent IntoValue dataset is provided in a data dictionary and readme alongside the [dataset in Zenodo](https://doi.org/10.5281/zenodo.5141342). This readme serves to highlight/document changes.
 
-Note that the parent IntoValue dataset includes `summary_results_date` for the few DRKS summary results, which have been removed in this version. We remove them as they had been manually extracted (from PDFs) for only the subset of summary results manually found in IntoValue, whereas this dataset includes additional summary results found via automated search and hence without dates. For parity, we removed DRKS summary result dates. We could decide to add these from either (1) the PDF (which indicates when the summary result was created), or (2) the DRKS change history (which indicates when the summary result was uploaded and made available).
+Note that `summary_results_date` for DRKS summary results was changed from the parent IntoValue dataset. The parent dataset included only a subset of summary results *manually* found during searches, whereas this dataset includes additional summary results found via *automated* search. The parent dataset used the `summary_results_date` manually extracted from *PDFs*, whereas this dataset uses the `summary_results_date` manually extracted from DRKS’ *change history* and reflects the date the results were uploaded and made publicly available.
 
 ## Data sources
 

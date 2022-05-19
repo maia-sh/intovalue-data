@@ -14,3 +14,7 @@
 {"timestamp": "2022-02-07T15:34:41+0200", "log_lvl": "INFO", "log_msg": "ShareYourPaper"}
 {"timestamp": "2022-02-20T00:22:21+0100", "log_lvl": "INFO", "log_msg": "Unpaywall"}
 {"timestamp": "2022-02-20T11:21:28+0200", "log_lvl": "INFO", "log_msg": "ShareYourPaper"}
+{"timestamp": "2022-04-11T19:39:41+0200", "log_lvl": "INFO", "log_msg": "AACT"}
+{"timestamp": "2022-04-11T20:27:44+0200", "log_lvl": "INFO", "log_msg": "DRKS"}
+{"timestamp": "2022-04-13T00:22:21+0100", "log_lvl": "INFO", "log_msg": "Unpaywall"}
+{"timestamp": "2022-04-13T11:21:28+0200", "log_lvl": "INFO", "log_msg": "ShareYourPaper"}

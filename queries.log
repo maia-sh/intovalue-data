@@ -21,3 +21,5 @@
 {"timestamp": "2022-05-19T16:25:15+0200", "log_lvl": "INFO", "log_msg": "PubMed"}
 {"timestamp": "2022-05-19T17:04:41+0200", "log_lvl": "INFO", "log_msg": "AACT"}
 {"timestamp": "2022-05-19T17:26:16+0200", "log_lvl": "INFO", "log_msg": "DRKS"}
+{"timestamp": "2022-05-19T22:42:45+0200", "log_lvl": "INFO", "log_msg": "Unpaywall"}
+{"timestamp": "2022-05-19T22:45:27+0200", "log_lvl": "INFO", "log_msg": "ShareYourPaper"}

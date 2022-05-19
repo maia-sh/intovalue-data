@@ -16,6 +16,12 @@ trials %>%
   # Check that same number of rows as intovalue
   assertr::verify(nrow(.) == nrow(intovalue)) %>%
 
+  # Check that cross-registrations removed
+  pointblank::col_vals_not_in_set(
+    columns = vars(id),
+    set = c("DRKS00005219", "DRKS00004195")
+  ) %>%
+
   # Validate publication dois
   pointblank::col_vals_regex(
     columns = vars(doi),

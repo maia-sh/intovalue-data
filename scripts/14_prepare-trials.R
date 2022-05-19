@@ -53,7 +53,7 @@ trials <-
   select(all_of(iv_cols_to_keep))
 
 
-# Edit publication types --------------------------------------------------
+# Edit publication types and add has_publication --------------------------
 # Edit publication type for trials with non-journal article dois
 
 dissertations <- c(
@@ -76,7 +76,14 @@ abstracts <- c(
   "10.1093/neuonc/nov229.01",
   "10.1093/schbul/sby016.317",
   "10.13140/rg.2.2.19672.85765", #poster
-  "10.3205/11dkvf049"
+  "10.3205/11dkvf049",
+
+  # 2022-05-19: Added based on trackvalue manual checks
+  "10.1007/s00106-016-0243-6",
+  "10.1200/jco.2016.34.15_suppl.6035",
+  "10.1200/jco.2018.36.15_suppl.e17553",
+  "10.1055/s-0037-1607119",
+  "10.1200/jco.2018.36.5_suppl.61"
 )
 
 # Additional edge cases currently kept as journal articles
@@ -109,7 +116,10 @@ trials <-
       doi %in% dissertations ~ "dissertation",
       TRUE ~ publication_type
     )
-  )
+  ) %>%
+
+  # Count journal publications as having publication
+  mutate(has_publication = if_else(publication_type == "journal publication", TRUE, FALSE, missing = FALSE))
 
 # Add registry data -------------------------------------------------------
 
@@ -625,6 +635,7 @@ trials <-
     "url",
     "publication_date",
     "publication_type",
+    "has_publication",
     "has_pubmed",
     "has_ft",
     "ft_source",

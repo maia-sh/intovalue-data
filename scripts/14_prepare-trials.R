@@ -24,6 +24,17 @@ pubmed_main <- read_rds(path(dir_processed, "pubmed", "pubmed-main.rds"))
 oa_unpaywall <- read_csv(path(dir_raw, "open-access", "oa-unpaywall.csv"))
 oa_syp <- read_csv(path(dir_raw, "open-access", "oa-syp-permissions.csv"))
 
+query_logs <- loggit::read_logs(here::here("queries.log"))
+get_latest_query <- function(query, logs) {
+  logs %>%
+    filter(log_msg == query) %>%
+    arrange(desc(timestamp)) %>%
+    slice_head(n = 1) %>%
+    pull(timestamp) %>%
+    as.Date.character()
+}
+aact_query_date <- get_latest_query("AACT", query_logs)
+drks_query_date <- get_latest_query("DRKS", query_logs)
 
 # Prepare intovalue columns -----------------------------------------------
 
@@ -165,7 +176,10 @@ trials <-
     ),
 
     # This needs to be updated with every registry update
-    registry_download_date = as.Date("2021-08-15"),
+    registry_download_date = case_when(
+      registry == "ClinicalTrials.gov" ~ aact_query_date,
+      registry == "DRKS" ~ drks_query_date
+    ),
 
     # Using end of search period for reporting as publication
     results_followup_pub = duration_days(completion_date, results_search_end_date),

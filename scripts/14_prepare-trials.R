@@ -4,6 +4,7 @@ library(readr)
 library(here)
 library(fs)
 library(lubridate)
+library(stringr)
 
 source(here("scripts", "functions", "duration_days.R"))
 
@@ -41,7 +42,7 @@ drks_query_date <- get_latest_query("DRKS", query_logs)
 # Exclude "days_DATE_to_publication" columns since will recalculate from registries
 iv_cols_to_keep <-
   setdiff(colnames(intovalue), colnames(registry_studies)) %>%
-  setdiff(stringr::str_subset(., "^days_")) %>%
+  setdiff(str_subset(., "^days_")) %>%
   c("id", .)
 
 trials <-
@@ -52,7 +53,7 @@ trials <-
   select(all_of(iv_cols_to_keep))
 
 
-# Edit publication types --------------------------------------------------
+# Edit publication types and add has_publication --------------------------
 # Edit publication type for trials with non-journal article dois
 
 dissertations <- c(
@@ -75,7 +76,14 @@ abstracts <- c(
   "10.1093/neuonc/nov229.01",
   "10.1093/schbul/sby016.317",
   "10.13140/rg.2.2.19672.85765", #poster
-  "10.3205/11dkvf049"
+  "10.3205/11dkvf049",
+
+  # 2022-05-19: Added based on trackvalue manual checks
+  "10.1007/s00106-016-0243-6",
+  "10.1200/jco.2016.34.15_suppl.6035",
+  "10.1200/jco.2018.36.15_suppl.e17553",
+  "10.1055/s-0037-1607119",
+  "10.1200/jco.2018.36.5_suppl.61"
 )
 
 # Additional edge cases currently kept as journal articles
@@ -108,7 +116,10 @@ trials <-
       doi %in% dissertations ~ "dissertation",
       TRUE ~ publication_type
     )
-  )
+  ) %>%
+
+  # Count journal publications as having publication
+  mutate(has_publication = if_else(publication_type == "journal publication", TRUE, FALSE, missing = FALSE))
 
 # Add registry data -------------------------------------------------------
 
@@ -204,6 +215,42 @@ trials <-
 
 # Add pubmed and full-text ------------------------------------------------
 
+# Prepare pubmed variables, including citation: "author et al. (year) title"
+pubmed <-
+  pubmed_main %>%
+
+  # Some author lists start with or consist only of "NA NA" so remove "NA NA" and make NA if blank or use next author
+  mutate(
+    citation =
+      str_remove(authors, "^NA NA(, )?") %>%
+      na_if(., "")
+  ) %>%
+
+  # Prepare author citations based on # authors
+  mutate(citation = case_when(
+
+    # 1 --> as is
+    !str_detect(citation, ",") ~ citation,
+
+    # 2 --> "&"
+    !str_detect(citation, ",.*,") ~
+      str_remove(citation, "(?<=\\w) [A-Z]*$") %>%
+      str_replace(., "[A-Z]*,", "&"),
+
+    # 3 --> "et al."
+    TRUE ~ str_replace(citation, "(?<=\\s)[A-Z]*,.*$", "et al.")
+  )) %>%
+
+  # Add year
+  mutate(citation = glue::glue("{citation} ({year}) {title}")) %>%
+
+  select(
+    pmid,
+    pub_title = title, journal_pubmed = journal,
+    ppub_date = ppub, epub_date = epub,
+    citation
+  )
+
 trials <-
   trials %>%
 
@@ -211,14 +258,7 @@ trials <-
   left_join(pubmed_ft_retrieved, by = c("id", "doi", "pmid")) %>%
 
   # Add pubmed metadata
-  left_join(
-    select(
-      pubmed_main, pmid,
-      pub_title = title, journal_pubmed = journal,
-      ppub_date = ppub, epub_date = epub
-    ),
-    by = "pmid"
-  )
+  left_join(pubmed, by = "pmid")
 
 
 # Add intovalue trns ------------------------------------------------------
@@ -462,7 +502,7 @@ trials <-
   distinct(id, lead_cities, iv_version, .keep_all = TRUE) %>%
   left_join(city_lookup, by = "lead_cities") %>%
   group_by(id, iv_version) %>%
-  mutate(lead_cities = stringr::str_c(city, collapse = " ")) %>%
+  mutate(lead_cities = str_c(city, collapse = " ")) %>%
   ungroup() %>%
   select(-city) %>%
   distinct()
@@ -507,7 +547,7 @@ trials <-
   distinct(id, facility_cities, iv_version, .keep_all = TRUE) %>%
   left_join(city_lookup, by = c("facility_cities" = "lead_cities")) %>%
   group_by(id, iv_version) %>%
-  mutate(facility_cities = stringr::str_c(city, collapse = " ")) %>%
+  mutate(facility_cities = str_c(city, collapse = " ")) %>%
   ungroup() %>%
   select(-city) %>%
   distinct()
@@ -595,6 +635,7 @@ trials <-
     "url",
     "publication_date",
     "publication_type",
+    "has_publication",
     "has_pubmed",
     "has_ft",
     "ft_source",
@@ -602,6 +643,7 @@ trials <-
     "journal_pubmed",
     "ppub_date",
     "epub_date",
+    "citation",
 
     # TRN/registration-publication link
     "has_iv_trn_abstract",
@@ -658,7 +700,6 @@ trials <-
     "is_archivable",
     "is_closed_archivable"
   )
-
 
 
 # Check that all intovalue columns in trials (except `has_publication`)

@@ -21,7 +21,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1161/circinterventions.111.962324,bronze,bronze,"1941-7640,1941-7632",Circulation: Cardiovascular Interventions,Ovid Technologies (Wolters Kluwer Health),2011-10-01
 10.3109/15622975.2011.583940,closed,closed,"1562-2975,1814-1412",The World Journal of Biological Psychiatry,Informa UK Limited,2011-07-08
 10.1056/nejmoa1212722,green,green,"0028-4793,1533-4406",New England Journal of Medicine,Massachusetts Medical Society,2013-04-18
-10.2337/db09-1630,hybrid,hybrid,"0012-1797,1939-327X",Diabetes,American Diabetes Association,2011-01-26
+10.2337/db09-1630,green,green,"0012-1797,1939-327X",Diabetes,American Diabetes Association,2011-01-26
 10.1016/s1470-2045(12)70349-2,closed,closed,1470-2045,The Lancet Oncology,Elsevier BV,2012-10-01
 10.3324/haematol.13378,gold,gold,"0390-6078,1592-8721",Haematologica,Ferrata Storti Foundation (Haematologica),2009-01-01
 10.1182/blood-2013-05-503847,green,green,"0006-4971,1528-0020",Blood,American Society of Hematology,2013-08-29
@@ -179,7 +179,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1016/s1470-2045(11)70397-7,closed,closed,1470-2045,The Lancet Oncology,Elsevier BV,2012-02-01
 10.1371/journal.pone.0026166,gold,gold,1932-6203,PLoS ONE,Public Library of Science (PLoS),2011-11-08
 10.1371/journal.pone.0053081,gold,gold,1932-6203,PLoS ONE,Public Library of Science (PLoS),2013-01-04
-10.1007/s00701-011-1144-9,closed,closed,"0001-6268,0942-0940",Acta Neurochirurgica,Springer Science and Business Media LLC,2011-09-10
+10.1007/s00701-011-1144-9,green,green,"0001-6268,0942-0940",Acta Neurochirurgica,Springer Science and Business Media LLC,2011-09-10
 10.1200/jco.2013.55.0095,closed,closed,"0732-183X,1527-7755",Journal of Clinical Oncology,American Society of Clinical Oncology (ASCO),2014-10-20
 10.1056/nejmoa1304839,green,green,"0028-4793,1533-4406",New England Journal of Medicine,Massachusetts Medical Society,2014-01-23
 10.1200/jco.2011.38.7522,green,green,"0732-183X,1527-7755",Journal of Clinical Oncology,American Society of Clinical Oncology (ASCO),2012-10-01
@@ -246,7 +246,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1016/j.jval.2015.03.1787,bronze,bronze,1098-3015,Value in Health,Elsevier BV,2015-07-01
 10.1093/eurheartj/ehq445,bronze,green,"0195-668X,1522-9645",European Heart Journal,Oxford University Press (OUP),2010-12-09
 10.1016/s0140-6736(11)61613-9,closed,closed,0140-6736,The Lancet,Elsevier BV,2011-12-01
-10.1038/bmt.2015.202,bronze,bronze,"0268-3369,1476-5365",Bone Marrow Transplantation,Springer Science and Business Media LLC,2015-09-14
+10.1038/bmt.2015.202,closed,closed,"0268-3369,1476-5365",Bone Marrow Transplantation,Springer Science and Business Media LLC,2015-09-14
 10.1056/nejmoa1306687,green,green,"0028-4793,1533-4406",New England Journal of Medicine,Massachusetts Medical Society,2013-10-10
 10.1179/1074935714z.0000000047,closed,closed,"1074-9357,1945-5119",Topics in Stroke Rehabilitation,Informa UK Limited,2015-04-28
 10.1371/journal.pone.0037885,gold,gold,1932-6203,PLoS ONE,Public Library of Science (PLoS),2012-06-08
@@ -557,8 +557,8 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1016/j.clnu.2012.12.010,closed,closed,0261-5614,Clinical Nutrition,Elsevier BV,2013-10-01
 10.1038/clpt.2014.124,hybrid,hybrid,"0009-9236,1532-6535",Clinical Pharmacology & Therapeutics,Springer Science and Business Media LLC,2014-06-09
 10.1016/j.euroneuro.2014.09.014,hybrid,hybrid,0924-977X,European Neuropsychopharmacology,Elsevier BV,2014-12-01
-10.2337/dc11-0471,hybrid,hybrid,"0149-5992,1935-5548",Diabetes Care,American Diabetes Association,2011-07-20
-10.2337/dc14-2690,bronze,bronze,"0149-5992,1935-5548",Diabetes Care,American Diabetes Association,2015-06-17
+10.2337/dc11-0471,green,green,"0149-5992,1935-5548",Diabetes Care,American Diabetes Association,2011-07-20
+10.2337/dc14-2690,closed,closed,"0149-5992,1935-5548",Diabetes Care,American Diabetes Association,2015-06-17
 10.1093/humrep/deu205,bronze,bronze,"0268-1161,1460-2350",Human Reproduction,Oxford University Press (OUP),2014-08-27
 10.1093/bja/aev294,bronze,bronze,0007-0912,British Journal of Anaesthesia,Elsevier BV,2016-01-01
 10.1186/s12885-016-2806-z,gold,gold,1471-2407,BMC Cancer,Springer Science and Business Media LLC,2016-10-05
@@ -575,7 +575,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1016/s1474-4422(13)70221-7,closed,closed,1474-4422,The Lancet Neurology,Elsevier BV,2013-11-01
 10.2215/cjn.06820613,bronze,green,"1555-9041,1555-905X",Clinical Journal of the American Society of Nephrology,American Society of Nephrology (ASN),2014-01-02
 10.1136/gutjnl-2014-308337,closed,closed,"0017-5749,1468-3288",Gut,BMJ,2015-01-07
-10.1093/bja/aet072,bronze,bronze,0007-0912,British Journal of Anaesthesia,Elsevier BV,2013-09-01
+10.1093/bja/aet072,bronze,green,0007-0912,British Journal of Anaesthesia,Elsevier BV,2013-09-01
 10.1186/1472-6882-11-63,gold,gold,1472-6882,BMC Complementary and Alternative Medicine,Springer Science and Business Media LLC,2011-08-15
 10.1159/000357501,closed,closed,"1660-5527,1660-5535",Skin Pharmacology and Physiology,S. Karger AG,2014-07-15
 10.1093/europace/eut124,bronze,bronze,"1099-5129,1532-2092",Europace,Oxford University Press (OUP),2013-05-23
@@ -773,7 +773,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1111/ddg.12100,closed,closed,1610-0379,JDDG: Journal der Deutschen Dermatologischen Gesellschaft,Wiley,2013-07-23
 10.1016/j.juro.2012.03.008,green,green,"0022-5347,1527-3792",Journal of Urology,Ovid Technologies (Wolters Kluwer Health),2012-07-01
 10.1111/jdv.14041,closed,closed,0926-9959,Journal of the European Academy of Dermatology and Venereology,Wiley,2016-12-07
-10.1002/j.1532-2149.2011.00062.x,green,green,"1090-3801,1532-2149",European Journal of Pain,Wiley,2011-12-19
+10.1002/j.1532-2149.2011.00062.x,bronze,green,"1090-3801,1532-2149",European Journal of Pain,Wiley,2011-12-19
 10.1016/j.jacl.2016.05.010,hybrid,hybrid,1933-2874,Journal of Clinical Lipidology,Elsevier BV,2016-09-01
 10.1016/j.clbc.2016.11.008,closed,closed,1526-8209,Clinical Breast Cancer,Elsevier BV,2017-07-01
 10.1001/jamaoncol.2017.0515,bronze,green,2374-2437,JAMA Oncology,American Medical Association (AMA),2017-09-01
@@ -795,7 +795,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1179/1528433614z.0000000011,bronze,green,"1528-4336,1945-5771",HIV Clinical Trials,Informa UK Limited,2015-04-01
 10.1093/ejo/cjw060,bronze,bronze,"0141-5387,1460-2210",The European Journal of Orthodontics,Oxford University Press (OUP),2016-10-04
 10.1093/annonc/mdu101,hybrid,hybrid,0923-7534,Annals of Oncology,Elsevier BV,2014-07-01
-10.1158/1078-0432.ccr-15-2512,bronze,bronze,"1078-0432,1557-3265",Clinical Cancer Research,American Association for Cancer Research (AACR),2016-02-02
+10.1158/1078-0432.ccr-15-2512,closed,closed,"1078-0432,1557-3265",Clinical Cancer Research,American Association for Cancer Research (AACR),2016-02-02
 10.1093/annonc/mdu096,hybrid,hybrid,0923-7534,Annals of Oncology,Elsevier BV,2014-07-01
 10.1016/j.brat.2012.04.006,closed,closed,0005-7967,Behaviour Research and Therapy,Elsevier BV,2012-08-01
 10.1186/s12883-017-0839-9,gold,gold,1471-2377,BMC Neurology,Springer Science and Business Media LLC,2017-03-23
@@ -833,7 +833,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1007/s00392-011-0393-1,closed,closed,"1861-0684,1861-0692",Clinical Research in Cardiology,Springer Science and Business Media LLC,2011-12-21
 10.1200/jco.2012.46.4990,closed,closed,"0732-183X,1527-7755",Journal of Clinical Oncology,American Society of Clinical Oncology (ASCO),2013-09-01
 10.1016/j.jcf.2010.10.003,bronze,green,1569-1993,Journal of Cystic Fibrosis,Elsevier BV,2011-01-01
-10.1158/1078-0432.ccr-10-2082,bronze,green,"1078-0432,1557-3265",Clinical Cancer Research,American Association for Cancer Research (AACR),2010-09-29
+10.1158/1078-0432.ccr-10-2082,bronze,bronze,"1078-0432,1557-3265",Clinical Cancer Research,American Association for Cancer Research (AACR),2010-09-29
 10.3109/10428194.2014.961011,closed,closed,"1042-8194,1029-2403",Leukemia & Lymphoma,Informa UK Limited,2014-10-09
 10.1055/s-0029-1222046,closed,closed,"1861-9002,1861-9010",Diabetologie und Stoffwechsel,Georg Thieme Verlag KG,2009-04-01
 10.1111/ajt.13835,closed,closed,1600-6135,American Journal of Transplantation,Wiley,2016-06-15
@@ -949,14 +949,14 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1159/000381957,closed,closed,"0033-3190,1423-0348",Psychotherapy and Psychosomatics,S. Karger AG,2015-01-01
 10.3324/haematol.2012.071456,gold,gold,"0390-6078,1592-8721",Haematologica,Ferrata Storti Foundation (Haematologica),2012-09-14
 10.1007/s00392-013-0572-3,closed,closed,"1861-0684,1861-0692",Clinical Research in Cardiology,Springer Science and Business Media LLC,2013-05-05
-10.1111/j.1365-2133.2012.10887.x,green,green,0007-0963,British Journal of Dermatology,Wiley,2012-06-01
+10.1111/j.1365-2133.2012.10887.x,closed,closed,0007-0963,British Journal of Dermatology,Wiley,2012-06-01
 10.1016/s0959-8049(11)70845-0,closed,closed,0959-8049,European Journal of Cancer,Elsevier BV,2011-09-01
 10.1016/j.nmd.2013.06.580,closed,closed,0960-8966,Neuromuscular Disorders,Elsevier BV,2013-10-01
 10.1016/j.ijcard.2013.01.003,green,green,0167-5273,International Journal of Cardiology,Elsevier BV,2013-10-01
 10.1200/jco.2015.63.2596,closed,closed,"0732-183X,1527-7755",Journal of Clinical Oncology,American Society of Clinical Oncology (ASCO),2016-07-01
 10.1111/jce.12910,bronze,bronze,1045-3873,Journal of Cardiovascular Electrophysiology,Wiley,2016-03-01
 10.1177/0268355514529507,closed,closed,"0268-3555,1758-1125",Phlebology: The Journal of Venous Disease,SAGE Publications,2014-05-01
-10.1093/ejcts/ezv040,bronze,green,"1010-7940,1873-734X",European Journal of Cardio-Thoracic Surgery,Oxford University Press (OUP),2015-03-06
+10.1093/ejcts/ezv040,bronze,bronze,"1010-7940,1873-734X",European Journal of Cardio-Thoracic Surgery,Oxford University Press (OUP),2015-03-06
 10.3928/01477447-20160509-10,closed,closed,"0147-7447,1938-2367",Orthopedics,"SLACK, Inc.",2016-05-01
 10.1111/liv.12750,closed,closed,1478-3223,Liver International,Wiley,2015-01-17
 10.1111/ene.12344,closed,closed,1351-5101,European Journal of Neurology,Wiley,2014-01-21
@@ -1082,7 +1082,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1093/europace/euu064,bronze,green,"1099-5129,1532-2092",Europace,Oxford University Press (OUP),2014-05-19
 10.2967/jnumed.115.169987,bronze,bronze,"0161-5505,2159-662X",Journal of Nuclear Medicine,Society of Nuclear Medicine,2016-02-09
 10.1038/bjc.2017.226,hybrid,hybrid,"0007-0920,1532-1827",British Journal of Cancer,Springer Science and Business Media LLC,2017-08-03
-10.1038/leu.2015.321,bronze,bronze,"0887-6924,1476-5551",Leukemia,Springer Science and Business Media LLC,2015-11-20
+10.1038/leu.2015.321,closed,closed,"0887-6924,1476-5551",Leukemia,Springer Science and Business Media LLC,2015-11-20
 10.1007/s00415-016-8169-1,closed,closed,"0340-5354,1432-1459",Journal of Neurology,Springer Science and Business Media LLC,2016-05-26
 10.1016/j.metabol.2013.11.005,hybrid,hybrid,0026-0495,Metabolism,Elsevier BV,2014-03-01
 10.1016/j.ejca.2015.03.023,closed,closed,0959-8049,European Journal of Cancer,Elsevier BV,2015-07-01
@@ -1169,7 +1169,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.3238/arztebl.2015.0683,green,green,1866-0452,Deutsches Aerzteblatt Online,Deutscher Arzte-Verlag GmbH,2015-10-09
 10.1016/j.ctim.2016.04.002,closed,closed,0965-2299,Complementary Therapies in Medicine,Elsevier BV,2016-06-01
 10.1530/eje-16-0357,hybrid,hybrid,"0804-4643,1479-683X",European Journal of Endocrinology,Bioscientifica,2016-12-01
-10.1148/radiol.12112061,bronze,bronze,"0033-8419,1527-1315",Radiology,Radiological Society of North America (RSNA),2012-09-01
+10.1148/radiol.12112061,closed,closed,"0033-8419,1527-1315",Radiology,Radiological Society of North America (RSNA),2012-09-01
 10.1001/jama.2016.3964,bronze,green,0098-7484,JAMA,American Medical Association (AMA),2016-04-26
 10.1093/infdis/jiu325,bronze,green,"0022-1899,1537-6613",The Journal of Infectious Diseases,Oxford University Press (OUP),2014-06-06
 10.1016/j.jad.2016.07.006,hybrid,hybrid,0165-0327,Journal of Affective Disorders,Elsevier BV,2016-12-01
@@ -1479,6 +1479,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1200/jco.2017.35.15_suppl.2046,closed,closed,"0732-183X,1527-7755",Journal of Clinical Oncology,American Society of Clinical Oncology (ASCO),2017-05-20
 10.1200/jco.2017.35.4_suppl.99,closed,closed,"0732-183X,1527-7755",Journal of Clinical Oncology,American Society of Clinical Oncology (ASCO),2017-02-01
 10.1007/s00213-020-05691-w,hybrid,hybrid,"0033-3158,1432-2072",Psychopharmacology,Springer Science and Business Media LLC,2020-11-17
+10.1016/j.jaci.2016.03.043,closed,closed,0091-6749,Journal of Allergy and Clinical Immunology,Elsevier BV,2016-09-01
 10.2340/00015555-2780,gold,gold,0001-5555,Acta Dermato Venereologica,Medical Journals Sweden AB,2018-01-01
 10.1371/journal.pone.0173872,gold,gold,1932-6203,PLOS ONE,Public Library of Science (PLoS),2017-03-21
 10.1200/jco.2018.36.15_suppl.e17553,closed,closed,"0732-183X,1527-7755",Journal of Clinical Oncology,American Society of Clinical Oncology (ASCO),2018-05-20
@@ -1561,12 +1562,12 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1016/j.jaad.2019.02.044,hybrid,hybrid,0190-9622,Journal of the American Academy of Dermatology,Elsevier BV,2019-06-01
 10.1016/j.ijnurstu.2016.10.010,closed,closed,0020-7489,International Journal of Nursing Studies,Elsevier BV,2017-01-01
 10.1016/j.jpsychires.2016.08.005,closed,closed,0022-3956,Journal of Psychiatric Research,Elsevier BV,2016-12-01
-10.1017/s0033291716001379,green,green,"0033-2917,1469-8978",Psychological Medicine,Cambridge University Press (CUP),2016-06-23
+10.1017/s0033291716001379,closed,closed,"0033-2917,1469-8978",Psychological Medicine,Cambridge University Press (CUP),2016-06-23
 10.3389/fnins.2019.00147,gold,gold,1662-453X,Frontiers in Neuroscience,Frontiers Media SA,2019-03-11
 10.1016/s0140-6736(20)30167-7,green,green,0140-6736,The Lancet,Elsevier BV,2020-05-01
 10.1186/s12871-019-0828-1,gold,gold,1471-2253,BMC Anesthesiology,Springer Science and Business Media LLC,2019-08-22
 10.1186/s13104-019-4268-2,gold,gold,1756-0500,BMC Research Notes,Springer Science and Business Media LLC,2019-04-25
-10.1111/aogs.13213,closed,closed,0001-6349,Acta Obstetricia et Gynecologica Scandinavica,Wiley,2017-09-21
+10.1111/aogs.13213,bronze,bronze,0001-6349,Acta Obstetricia et Gynecologica Scandinavica,Wiley,2017-09-21
 10.1007/s00280-018-3734-1,closed,closed,"0344-5704,1432-0843",Cancer Chemotherapy and Pharmacology,Springer Science and Business Media LLC,2018-12-08
 10.1186/s13613-016-0167-z,gold,gold,2110-5820,Annals of Intensive Care,Springer Science and Business Media LLC,2016-07-21
 10.1016/j.nut.2017.08.004,closed,closed,0899-9007,Nutrition,Elsevier BV,2018-02-01
@@ -1845,7 +1846,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1016/j.ejca.2017.12.001,closed,closed,0959-8049,European Journal of Cancer,Elsevier BV,2018-02-01
 10.1016/j.ijrobp.2019.09.036,closed,closed,0360-3016,International Journal of Radiation Oncology*Biology*Physics,Elsevier BV,2020-01-01
 10.1186/s13014-019-1381-2,gold,gold,1748-717X,Radiation Oncology,Springer Science and Business Media LLC,2019-10-21
-10.1158/1078-0432.ccr-14-0951-t,bronze,bronze,"1078-0432,1557-3265",Clinical Cancer Research,American Association for Cancer Research (AACR),2014-10-22
+10.1158/1078-0432.ccr-14-0951-t,closed,closed,"1078-0432,1557-3265",Clinical Cancer Research,American Association for Cancer Research (AACR),2014-10-22
 10.1016/s1474-4422(16)00110-1,closed,closed,1474-4422,The Lancet Neurology,Elsevier BV,2016-05-01
 10.1053/j.ajkd.2015.07.031,hybrid,hybrid,0272-6386,American Journal of Kidney Diseases,Elsevier BV,2016-05-01
 10.1159/000501385,closed,closed,"0033-3190,1423-0348",Psychotherapy and Psychosomatics,S. Karger AG,2019-01-01
@@ -1881,7 +1882,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1093/annonc/mdw275,bronze,bronze,0923-7534,Annals of Oncology,Elsevier BV,2016-10-01
 10.1161/jaha.117.008181,gold,gold,"2047-9980,2047-9980",Journal of the American Heart Association,Ovid Technologies (Wolters Kluwer Health),2018-03-20
 10.1111/ejh.13188,closed,closed,"0902-4441,1600-0609",European Journal of Haematology,Wiley,2019-01-07
-10.1038/mp.2012.196,bronze,bronze,"1359-4184,1476-5578",Molecular Psychiatry,Springer Science and Business Media LLC,2013-01-22
+10.1038/mp.2012.196,closed,closed,"1359-4184,1476-5578",Molecular Psychiatry,Springer Science and Business Media LLC,2013-01-22
 10.1007/s00417-011-1792-8,closed,closed,"0721-832X,1435-702X",Graefe's Archive for Clinical and Experimental Ophthalmology,Springer Science and Business Media LLC,2011-09-08
 10.1111/bjh.15741,bronze,bronze,"0007-1048,1365-2141",British Journal of Haematology,Wiley,2018-12-28
 10.1097/sla.0000000000001911,green,green,0003-4932,Annals of Surgery,Ovid Technologies (Wolters Kluwer Health),2016-11-01
@@ -2041,7 +2042,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1159/000356323,closed,closed,"1015-9770,1421-9786",Cerebrovascular Diseases,S. Karger AG,2014-01-01
 10.1111/aos.13359,bronze,bronze,1755-375X,Acta Ophthalmologica,Wiley,2017-01-13
 10.1016/j.jsxm.2020.05.002,closed,closed,1743-6095,The Journal of Sexual Medicine,Elsevier BV,2020-08-01
-10.2174/1874325001307010133,hybrid,hybrid,1874-3250,The Open Orthopaedics Journal,Bentham Science Publishers Ltd.,2013-05-03
+10.2174/1874325001307010133,green,green,1874-3250,The Open Orthopaedics Journal,Bentham Science Publishers Ltd.,2013-05-03
 10.1186/s12888-016-1181-2,gold,gold,1471-244X,BMC Psychiatry,Springer Science and Business Media LLC,2017-01-18
 10.1007/s10877-019-00435-4,closed,closed,"1387-1307,1573-2614",Journal of Clinical Monitoring and Computing,Springer Science and Business Media LLC,2019-11-30
 10.3389/fneur.2017.00494,gold,gold,1664-2295,Frontiers in Neurology,Frontiers Media SA,2017-09-21
@@ -2124,13 +2125,13 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1016/s2215-0366(17)30291-2,closed,closed,2215-0366,The Lancet Psychiatry,Elsevier BV,2017-09-01
 10.1016/j.jcf.2017.02.003,bronze,bronze,1569-1993,Journal of Cystic Fibrosis,Elsevier BV,2017-05-01
 10.1159/000505001,green,green,"0030-3747,1423-0259",Ophthalmic Research,S. Karger AG,2019-11-26
-10.2337/dc14-2319,bronze,bronze,"0149-5992,1935-5548",Diabetes Care,American Diabetes Association,2015-03-20
+10.2337/dc14-2319,closed,closed,"0149-5992,1935-5548",Diabetes Care,American Diabetes Association,2015-03-20
 10.1038/s41540-017-0012-5,gold,gold,2056-7189,npj Systems Biology and Applications,Springer Science and Business Media LLC,2017-03-28
 10.1001/jamapediatrics.2016.2681,bronze,bronze,2168-6203,JAMA Pediatrics,American Medical Association (AMA),2017-01-01
 10.1111/dom.13268,closed,closed,"1462-8902,1463-1326","Diabetes, Obesity and Metabolism",Wiley,2018-03-22
 10.1111/bjd.14222,closed,closed,0007-0963,British Journal of Dermatology,Wiley,2016-01-09
 10.1007/s00262-016-1944-0,closed,closed,"0340-7004,1432-0851","Cancer Immunology, Immunotherapy",Springer Science and Business Media LLC,2016-12-22
-10.1158/1078-0432.ccr-18-0244,bronze,bronze,"1078-0432,1557-3265",Clinical Cancer Research,American Association for Cancer Research (AACR),2018-05-17
+10.1158/1078-0432.ccr-18-0244,closed,closed,"1078-0432,1557-3265",Clinical Cancer Research,American Association for Cancer Research (AACR),2018-05-17
 10.1093/annonc/mdw290,bronze,bronze,0923-7534,Annals of Oncology,Elsevier BV,2016-10-01
 10.1136/bjophthalmol-2017-310156,closed,closed,"0007-1161,1468-2079",British Journal of Ophthalmology,BMJ,2017-09-13
 10.1007/s00402-015-2370-z,closed,closed,"0936-8051,1434-3916",Archives of Orthopaedic and Trauma Surgery,Springer Science and Business Media LLC,2015-11-27
@@ -2263,7 +2264,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1111/jsr.13102,hybrid,hybrid,"0962-1105,1365-2869",Journal of Sleep Research,Wiley,2020-06-28
 10.1136/archdischild-2017-313190,closed,closed,"1359-2998,1468-2052",Archives of Disease in Childhood - Fetal and Neonatal Edition,BMJ,2017-09-16
 10.1159/000501425,closed,closed,"2504-2092,2504-2106",Complementary Medicine Research,S. Karger AG,2019-08-07
-10.1111/ajt.14138,bronze,bronze,1600-6135,American Journal of Transplantation,Wiley,2017-01-05
+10.1111/ajt.14138,bronze,green,1600-6135,American Journal of Transplantation,Wiley,2017-01-05
 10.1111/pan.13927,hybrid,hybrid,"1155-5645,1460-9592",Pediatric Anesthesia,Wiley,2020-06-18
 10.1213/ane.0000000000001991,closed,closed,0003-2999,Anesthesia & Analgesia,Ovid Technologies (Wolters Kluwer Health),2017-10-01
 10.1016/j.ultrasmedbio.2018.08.011,hybrid,hybrid,0301-5629,Ultrasound in Medicine & Biology,Elsevier BV,2018-12-01
@@ -2299,7 +2300,7 @@ doi,color_green_only,color,issn,journal,publisher,publication_date_unpaywall
 10.1186/s12888-016-0990-7,gold,gold,1471-244X,BMC Psychiatry,Springer Science and Business Media LLC,2016-08-05
 10.1016/j.jgo.2017.04.002,closed,closed,1879-4068,Journal of Geriatric Oncology,Elsevier BV,2017-07-01
 10.1055/a-0842-6901,bronze,bronze,"0940-6689,1439-085X","Physikalische Medizin, Rehabilitationsmedizin, Kurortmedizin",Georg Thieme Verlag KG,2019-05-02
-10.3171/2017.9.jns17533,bronze,bronze,"0022-3085,1933-0693",Journal of Neurosurgery,Journal of Neurosurgery Publishing Group (JNSPG),2019-02-01
+10.3171/2017.9.jns17533,closed,closed,"0022-3085,1933-0693",Journal of Neurosurgery,Journal of Neurosurgery Publishing Group (JNSPG),2019-02-01
 10.1186/s13019-018-0739-0,gold,gold,1749-8090,Journal of Cardiothoracic Surgery,Springer Science and Business Media LLC,2018-05-21
 10.1186/s13063-019-3522-1,gold,gold,1745-6215,Trials,Springer Science and Business Media LLC,2019-07-09
 10.25673/32106,NA,NA,NA,NA,NA,NA

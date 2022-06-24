@@ -58,20 +58,44 @@ write_rds(drks_crossreg, path(output_dir, "drks-crossreg", ext = "rds"))
 
 # Parse references --------------------------------------------------------
 
-drks_references <-
-  drks_htmls %>%
 
-  map_dfr(parse_drks_references) %>%
+drks_references_parsed <-
+  drks_htmls %>%
+  map_dfr(parse_drks_references)
+
+# There should only be 1 doi/pmid per citation/link
+# Check for any with >1 and manually fix in dataset
+drks_references_multi <-
+  drks_references_parsed %>%
+  mutate(
+    doi_citation_count = str_count(citation, "10\\.\\d{4,9}/\\s?[-‑.;()/:\\w\\d]+"),
+    pmid_citation_count = str_count(citation, "(?<!\\d|DRKS|(?<!pubmed)/)[1-9]{1}[0-9]{7}(?!\\d)"),
+    pmcid_citation = str_count(citation, "PMC[0-9]{7}"),
+    doi_link_count = str_count(link, "10\\.\\d{4,9}/\\s?[-‑.;()/:\\w\\d]+"),
+    pmid_link_count = str_count(link, "(?<!\\d|DRKS|(?<!pubmed)/)[1-9]{1}[0-9]{7}(?!\\d)"),
+    pmcid_link = str_count(link, "PMC[0-9]{7}")
+  ) %>%
+  filter(if_any(starts_with(c("doi", "pmid")), ~ . > 1))
+
+# Expect >1 for DRKS00004841 (2 dois in citation: "10.1186/1471-2261-13-60", "10.1016/j.pec.2016.02.010") and DRKS00006162 (same doi twice in citation)
+expected_drks_references_multi <- c("DRKS00004841", "DRKS00006162")
+
+# Error if any additional with >1
+if (nrow(filter(drks_references_multi, !drks_id %in% expected_drks_references_multi)) > 0) {
+  stop("There are drks references with multiple doi/pmid! Inspect `drks_references_multi`")
+}
+
+drks_references <-
+  drks_references_parsed %>%
 
   # Extract dois and pmids, from both `citation` and `link`
   # Note: regexes adapted for edge cases as described in comments
   mutate(
 
-    # Some (e.g., DRKS00004841) have >1 doi --> extract all and unnest)
     # One (i.e., DRKS00000005) has has extra space in doi --> extract and clean
     # One (i.e., DRKS00006162) has doi w & wo "." --> ignore duplicate
     # One (i.e., DRKS00010037) has "‑" instead of "-" --> extract and clean
-    doi_citation = str_extract_all(citation, "10\\.\\d{4,9}/\\s?[-‑.;()/:\\w\\d]+"),
+    doi_citation = str_extract(citation, "10\\.\\d{4,9}/\\s?[-‑.;()/:\\w\\d]+"),
 
     # Some (e.g., DRKS00000639, DRKS00000525) have dois with pmid matches surrounded by numbers --> disallow preceding/following numbers
     # Some (e.g., DRKS00005594, DRKS00008054) have  dois with pmid matches preceded by "/" --> disallow preceding "/"
@@ -79,25 +103,28 @@ drks_references <-
     # Some (e.g., DRKS00004097) have old (i.e., from 1990s) 7-digit pmids --> ignore since not trial results publications
     # Some (e.g., DRKS00004675, DRKS00008023) have DRKS id in citation --> disallow preceding "DRKS" on pmid
     # Some (e.g., DRKS00006958) starting with 0 --> disallow starting with 0 in pmid
-    # Note: none with >1 pmid but extract all and unnest in case
-    pmid_citation = str_extract_all(citation, "(?<!\\d|DRKS|(?<!pubmed)/)[1-9]{1}[0-9]{7}(?!\\d)"),
+    pmid_citation = str_extract(citation, "(?<!\\d|DRKS|(?<!pubmed)/)[1-9]{1}[0-9]{7}(?!\\d)"),
 
     pmcid_citation = str_extract(citation, "PMC[0-9]{7}"),
 
-    doi_link = str_extract_all(link, "10\\.\\d{4,9}/\\s?[-‑.;()/:\\w\\d]+"),
-    pmid_link = str_extract_all(link, "(?<!\\d|DRKS|(?<!pubmed)/)[1-9]{1}[0-9]{7}(?!\\d)"),
+    doi_link = str_extract(link, "10\\.\\d{4,9}/\\s?[-‑.;()/:\\w\\d]+"),
+    pmid_link = str_extract(link, "(?<!\\d|DRKS|(?<!pubmed)/)[1-9]{1}[0-9]{7}(?!\\d)"),
     pmcid_link = str_extract(link, "PMC[0-9]{7}")
   ) %>%
-  tidyr::unnest_longer(doi_citation) %>%
-  tidyr::unnest_longer(pmid_citation) %>%
-  tidyr::unnest_longer(doi_link) %>%
-  tidyr::unnest_longer(pmid_link) %>%
+  # Manually add row for trial with >1 doi in citation
+  add_row(
+    drks_id = "DRKS00004841",
+    reference_type = "Paper",
+    citation = "Meng, K., Musekamp, G., Seekatz, B., Glatz, J., Karger, G., Kiwus, U., Knoglinger, E., Schubmann, R., Westphal, R. & Faller, H. (2013). Evaluation of a self-management patient education program for patients with chronic heart failure undergoing inpatient cardiac rehabilitation: Study protocol of a cluster randomized controlled trial. BMC Cardiovascular Disorders, 13:60. DOI: 10.1186/1471-2261-13-60 Meng, K., Musekamp, G., Schuler, M., Seekatz, B., Glatz, J., Karger, G., Kiwus, U., Knoglinger, E., Schubmann, R., Westphal, R. & Faller, H. (2016).The impact of a self-management patient education program for patients with chronic heart failure undergoing inpatient cardiac rehabilitation. Patient Education and Counseling DOI: http://dx.doi.org/10.1016/j.pec.2016.02.010",
+    doi_citation = "10.1016/j.pec.2016.02.010"
+  ) %>%
 
   # Clean up doi
   mutate(
     doi_citation = str_replace_all(doi_citation, "\\s", ""), # extra spaces
     doi_citation = str_replace_all(doi_citation, "‑", "-"),  # incorrect dashes
-    doi_citation = str_remove(doi_citation, "\\.$"),         # trailing periods
+    doi_citation = str_remove(doi_citation, "\\.;?$"),         # trailing periods, possibly followed by semicolon
+    doi_citation = str_remove(doi_citation, "\\)$"),         # trailing parentheses
     doi_citation = str_remove(doi_citation, "/epdf$"),        # trailing "/epdf"
 
     doi_link = str_replace_all(doi_link, "\\s", ""), # extra spaces
@@ -124,7 +151,6 @@ drks_references <-
   )
 
 # Inform about discrepancies
-
 doi_discrepancies <-
   drks_references %>%
   filter(!is.na(doi_link) & !is.na(doi_citation)) %>%

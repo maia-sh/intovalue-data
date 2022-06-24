@@ -83,7 +83,11 @@ drks_references <-
     pmid,
     reference_type,
     reference_derived
-  )
+  ) %>%
+
+  # Remove trials with no references with doi/pmid
+  filter(!if_all(c(doi, pmid), is.na)) %>%
+  distinct()
 
 ctgov_references <-
   ctgov_references %>%

@@ -62,4 +62,24 @@ trials %>%
   pointblank::col_vals_not_null(
     vars(publication_date),
     preconditions = ~ . %>% filter(publication_type == "journal article")
+  ) %>%
+
+  # Check that trial has summary results if summary results date, and vice versa
+  pointblank::col_vals_equal(
+    vars(has_summary_results),
+    TRUE,
+    preconditions = ~ . %>% filter(!is.na(summary_results_date))
+  ) %>%
+  pointblank::col_vals_equal(
+    vars(has_summary_results),
+    FALSE,
+    preconditions = ~ . %>% filter(is.na(summary_results_date))
+  ) %>%
+  pointblank::col_vals_null(
+    vars(summary_results_date),
+    preconditions = ~ . %>% filter(!has_summary_results)
+  ) %>%
+  pointblank::col_vals_not_null(
+    vars(summary_results_date),
+    preconditions = ~ . %>% filter(has_summary_results)
   )

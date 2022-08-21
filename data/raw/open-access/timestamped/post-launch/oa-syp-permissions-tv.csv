@@ -1,0 +1,3 @@
+doi,syp_response,can_archive,archiving_locations,inst_repository,versions,submitted_version,accepted_version,published_version,licenses_required,permission_issuer,embargo,date_embargo_elapsed,is_embargo_elapsed,permission_accepted,permission_published
+10.1016/j.euroneuro.2015.04.002,response,True,"['Institutional Repository', 'Non-commercial Subject Repository']",True,"['acceptedVersion', 'submittedVersion']",True,True,False,[{'type': 'cc-by-nc-nd'}],journal,12,2016-08-01,True,True,False
+10.1038/nature24628,response,True,"['Institutional Repository', 'Non-commercial Subject Repository', ' Preprint Server']",True,['acceptedVersion'],False,True,False,[{'type': 'other (non-commercial)'}],Publisher,12,2018-11-01,True,True,False

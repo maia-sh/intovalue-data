@@ -5,8 +5,8 @@ library(readr)
 library(here)
 library(fs)
 library(lubridate)
+library(aactr)
 
-source(here::here("scripts", "functions", "aact-functions.R"))
 source(here::here("scripts", "functions", "duration_days.R"))
 
 dir_main <- here("data", "ctgov-2018")

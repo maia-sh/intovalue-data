@@ -148,6 +148,13 @@ trials <-
       id == "DRKS00006734" ~ as.Date("2017-05-20"),
       id == "DRKS00006766" ~ as.Date("2019-06-06"),
       id == "DRKS00007163" ~ as.Date("2019-05-17"),
+
+      # 2022-11-03: Added results
+      id == "DRKS00000580" ~ as.Date("2022-09-08"),
+      id == "DRKS00000583" ~ as.Date("2022-09-08"),
+      id == "DRKS00005346" ~ as.Date("2022-09-01"),
+      id == "DRKS00005455" ~ as.Date("2022-09-16"),
+      id == "DRKS00006178" ~ as.Date("2022-09-12"),
       TRUE ~ summary_results_date
     )
   ) %>%

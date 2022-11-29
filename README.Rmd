@@ -288,3 +288,7 @@ as_kable(tbl_euctr)
 ```
 
 Of the `r n_iv_trials` unique trials completed between 2009 and 2017 and meeting the IntoValue inclusion criteria, we found that `r inline_text(tbl_euctr, row_level = "TRUE", col_level = "Total")` include an EUCTR id in their registration, and are presumably cross-registered in EUCTR. This includes `r inline_text(tbl_euctr, row_level = "TRUE", col_level = "ClinicalTrials.gov")` from ClinicalTrials.gov and `r inline_text(tbl_euctr, row_level = "TRUE", col_level = "DRKS")` from DRKS.
+
+## Documentation TODOs
+- Update data dictionary
+- Add information about categories of data changes from IV1/2 dataset

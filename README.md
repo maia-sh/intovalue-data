@@ -42,8 +42,8 @@ for full-text), is shared in either this repository or in
 | DRKS                              | Registry                      | 2022-05-19 | [Zenodo](https://zenodo.org/record/5506434/files/drks.zip?download=1) \[last update: 2021-08-15\]                         | [get-drks.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/08_get-drks.R)                           |
 | Unpaywall/ institutional licenses | Full-text PDF                 | NA         | NA, available only on local server `/data01/responsible_metrics/intovalue-data/fulltext`                                  | [get-ft-pdf.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/03_get-ft-pdf.R)                       |
 | GROBID                            | Full-text XML                 | NA         | NA, available only on local server `/data01/responsible_metrics/intovalue-data/fulltext`                                  | PDF-to-XML conversion done in Python                                                                              |
-| Unpaywall                         | Open access status            | 2022-04-13 | [oa-unpaywall.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-unpaywall.csv)             | [get-oa-unpaywall-data.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/13_get-oa-unpaywall-data.R) |
-| ShareYourPaper                    | Green open access permissions | 2022-04-13 | [oa-syp-permissions.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-syp-permissions.csv) | [get-oa-permissions.py](https://github.com/maia-sh/intovalue-data/blob/main/scripts/14_get-oa-permissions.py)     |
+| Unpaywall                         | Open access status            | 2022-08-20 | [oa-unpaywall.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-unpaywall.csv)             | [get-oa-unpaywall-data.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/13_get-oa-unpaywall-data.R) |
+| ShareYourPaper                    | Green open access permissions | 2022-08-20 | [oa-syp-permissions.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-syp-permissions.csv) | [get-oa-permissions.py](https://github.com/maia-sh/intovalue-data/blob/main/scripts/14_get-oa-permissions.py)     |
 
 ## Data directories
 
@@ -143,7 +143,7 @@ trials <-
 n_iv_trials <- nrow(trials)
 ```
 
-**Number of included trials**: 2909
+**Number of included trials**: 2895
 
 For analyses by UMC, split trials by UMC lead city:
 
@@ -160,6 +160,7 @@ abstracts) with a PMID that resolves to a PubMed record and for which we
 could acquire the full-text as a PDF.
 
 ``` r
+
 trials_pubs <-
   trials %>% 
   filter(
@@ -175,7 +176,7 @@ n_pmids_same_trial <- n_distinct(trials_same_pmid$pmid)
 n_pmids_dupes <- unique(range(trials_same_pmid$dupe_count))
 ```
 
-**Number of trials with results publications**: 1896
+**Number of trials with results publications**: 1895
 
 In general, there is max 1 publication per trial and max 1 trial per
 publication. However, there are 68 trials associated with the same 34
@@ -198,7 +199,7 @@ TRN in abstract
 **Denominator**: Number of trials with PubMed publications available as
 PDF full-text
 
-38% (715/1896) of trials report a TRN in the abstract of their results
+38% (714/1895) of trials report a TRN in the abstract of their results
 publication.
 
 ## TRN reporting in full-text
@@ -215,12 +216,13 @@ TRN in PDF full-text
 **Denominator**: Number of trials with PubMed publications available as
 PDF full-text
 
-60% (1137/1896) of trials report a TRN in the full-text (PDF) of their
+60% (1136/1895) of trials report a TRN in the full-text (PDF) of their
 results publication.
 
 ## Linked publication in registry
 
 ``` r
+
 # ClinicalTrials.gov
 trials_ctgov <- filter(trials_pubs, registry == "ClinicalTrials.gov")
 
@@ -261,14 +263,14 @@ DOIs linked in trial registration
 **Denominator**: Number of trials with PubMed publications available as
 PDF full-text
 
-59% (856/1449) of trials on clinicaltrials.gov include a link (i.e.,
+59% (859/1448) of trials on clinicaltrials.gov include a link (i.e.,
 PMID, DOI) to their PubMed publication (as available in the IntoValue
-dataset). This includes 667 (78%) trials with automatically indexed
+dataset). This includes 660 (77%) trials with automatically indexed
 publications (i.e., using TRN in PubMed’s secondary identifier field)
-and 667 (78%) trials with manually added publications.
+and 660 (77%) trials with manually added publications.
 
-1% (3/447) of trials on DRKS include a link (i.e., PMID, DOI) to their
-PubMed publication (as available in the IntoValue dataset).
+23% (104/447) of trials on DRKS include a link (i.e., PMID, DOI) to
+their PubMed publication (as available in the IntoValue dataset).
 
 ## Registry summary results
 
@@ -280,9 +282,10 @@ trials_pubs %>%
 
 | registry           | has_summary_results |    n |
 |:-------------------|:--------------------|-----:|
-| ClinicalTrials.gov | FALSE               | 1294 |
-| ClinicalTrials.gov | TRUE                |  155 |
-| DRKS               | FALSE               |  447 |
+| ClinicalTrials.gov | FALSE               | 1292 |
+| ClinicalTrials.gov | TRUE                |  156 |
+| DRKS               | FALSE               |  442 |
+| DRKS               | TRUE                |    5 |
 
 *Registry Limitations*: ClinicalTrials.gov includes a structured summary
 results field. In contrast, DRKS includes summary results with other
@@ -292,6 +295,7 @@ Ergebnisbericht or Abschlussbericht, in the reference title.
 ## EUCTR Cross-registrations
 
 ``` r
+
 tbl_euctr <-
   trials %>% 
   tbl_cross(
@@ -308,14 +312,19 @@ tbl_euctr <-
 as_kable(tbl_euctr)
 ```
 
-| **Characteristic**            | ClinicalTrials.gov |   DRKS    |  **Total**  |
-|:------------------------------|:------------------:|:---------:|:-----------:|
-| **EUCTR TRN in Registration** |                    |           |             |
-| FALSE                         |    1,921 (85%)     | 556 (87%) | 2,477 (85%) |
-| TRUE                          |     346 (15%)      | 86 (13%)  |  432 (15%)  |
+|                           | ClinicalTrials.gov |   DRKS    |    Total    |
+|:--------------------------|:------------------:|:---------:|:-----------:|
+| EUCTR TRN in Registration |                    |           |             |
+| FALSE                     |    1,908 (85%)     | 556 (87%) | 2,464 (85%) |
+| TRUE                      |     345 (15%)      | 86 (13%)  |  431 (15%)  |
 
-Of the 2909 unique trials completed between 2009 and 2017 and meeting
-the IntoValue inclusion criteria, we found that 432 (15%) include an
+Of the 2895 unique trials completed between 2009 and 2017 and meeting
+the IntoValue inclusion criteria, we found that 431 (15%) include an
 EUCTR id in their registration, and are presumably cross-registered in
-EUCTR. This includes 346 (15%) from ClinicalTrials.gov and 86 (13%) from
+EUCTR. This includes 345 (15%) from ClinicalTrials.gov and 86 (13%) from
 DRKS.
+
+## Documentation TODOs
+
+- Update data dictionary
+- Add information about categories of data changes from IV1/2 dataset

@@ -10,14 +10,16 @@
 #' @examples
 #' fetch_drks(drks_id)
 
-fetch_drks <- function(drks_id, quiet = FALSE){
+# drks_id <- "DRKS00000014"
+# doc <- fetch_drks("DRKS00004841")
+fetch_drks <- function(drks_id, quiet = FALSE) {
 
   drks_url <- "https://drks.de/search/en/trial/"
 
   doc <-
     rvest::read_html(glue::glue("{drks_url}{drks_id}"))
 
-  doc_id <- get_drks_element(doc, "div.card-body:first-child")
+  doc_id <- get_drks_org_data(doc)$`DRKS-ID`
 
   # If drks_id does not resolve to valid record with same id, inform and return early
   if (rlang::is_empty(doc_id) || doc_id != drks_id) {
@@ -89,7 +91,7 @@ download_drks <- function(drks_id,
 #'
 #' @return Tibble with columns for each detail
 
-parse_drks_study <- function(filepath = NULL, drks_id = NULL){
+parse_drks_study <- function(filepath = NULL, drks_id = NULL) {
 
   # Check parameters
   if (rlang::is_null(filepath) & rlang::is_null(drks_id)){
@@ -110,25 +112,34 @@ parse_drks_study <- function(filepath = NULL, drks_id = NULL){
     doc <- rvest::read_html(filepath)
   }
 
+  drks_org_data <- get_drks_org_data(doc)
+  drks_recruitment <- get_drks_recruitment(doc)
+  drks_study_design <- get_drks_study_design(doc)
+
   out <- list()
-  out$drks_id <- get_drks_element(doc, ".drks_id p")
-  out$title <- stringr::str_c(get_drks_element(doc, "p.title"), collapse = " ")
-  out$registration_date <- get_drks_date(doc, ".firstDrksPublishDate")
-  out$start_date <- get_drks_date(doc, ".schedule")
-  out$completion_date <- get_drks_date(doc, ".deadline")
-  out$allocation <- get_drks_element(doc, ".allocation")
-  out$study_type <- get_drks_element(doc, ".type")
-  out$study_type_non_interventional <- get_drks_element(doc, ".typeNotInterventional")
-  out$masking <- get_drks_element(doc, ".maskingType")
-  out$masking_who <- get_drks_element(doc, ".maskingWho")
-  out$phase <- get_drks_element(doc, ".phase")
-  out$purpose <- get_drks_element(doc, ".purpose")
-  out$running <- get_drks_element(doc, ".running")
-  out$enrollment <- get_drks_element(doc, ".targetSize")
-  out$centers <- get_drks_element(doc, ".monocenter")
-  out$national <- get_drks_element(doc, ".national")
-  out$recruitment_status <- get_drks_element(doc, "li.state")
-  out$investigator_initiated <- get_drks_element(doc, ".investorInitiated")
+  out$drks_id <-  drks_org_data$`DRKS-ID`
+  out$title <- get_drks_element(doc, "h3")[1]
+  out$registration_date <- drks_org_data$Date_of_registration_in_DRKS
+  # out$start_date <- get_drks_date(doc, "div.col-md-6.mb-3 div.col-sm-6")
+  out$start_date <- drks_recruitment$Actual_study_start_date
+  # out$completion_date <- get_drks_date(doc, ".deadline")
+  out$completion_date <- drks_recruitment$Actual_Study_Completion_Date
+  out$allocation <- drks_study_design$Allocation
+  out$study_type <- drks_study_design$Study_type
+  # out$study_type_non_interventional <- get_drks_element(doc, ".typeNotInterventional")
+  out$masking <- drks_study_design$Blinding
+  out$masking_who <- drks_study_design$Who_is_blinded
+  out$phase <- drks_study_design$Phase
+  out$purpose <- drks_study_design$Purpose
+  # what is running
+  # out$running <- get_drks_element(doc, ".running")
+  #target vs final sample size
+  out$enrollment <- drks_recruitment$Final_Sample_Size
+  out$centers <- drks_recruitment$Number_of_study_centers
+  # out$national <- get_drks_element(doc, "div.col-md-6.mb-3 div.card.h-100 dd")[1] national vs list of countries
+  out$national <- drks_recruitment$Recruitment_countries # national vs list of countries
+  out$recruitment_status <- drks_org_data$Recruitment_Status
+  out$investigator_initiated <- get_drks_element(doc, "div.card.mb-4:nth-child(10) dd:last-child span.withLineBreak")
 
   tibble::as_tibble(out)
 }
@@ -140,36 +151,36 @@ parse_drks_study <- function(filepath = NULL, drks_id = NULL){
 #'
 #' @return Tibble with `id_type` and `id` columns
 
-# parse_drks_ids <- function(filepath = NULL, drks_id = NULL){
-#
-#   # Check parameters
-#   if (rlang::is_null(filepath) & rlang::is_null(drks_id)){
-#     rlang::abort("Neither `filename` nor `drks_id` provided. Must supply one.")
-#   }
-#   if (!rlang::is_null(filepath) & !rlang::is_null(drks_id)){
-#     rlang::abort("Both `filename` and `drks_id` provided. Supply only one.")
-#   }
-#
-#   # Get drks html, depending on filepath or drks_id
-#   if (!rlang::is_null(drks_id)){
-#     doc <- fetch_drks(drks_id)
-#
-#     # If no valid drks record, return early
-#     if (rlang::is_empty(doc)) {return(NULL)}
-#
-#   } else {
-#     doc <- rvest::read_html(filepath)
-#   }
-#
-#   out <- get_drks_labels_elements(doc, ".secondaryID")
-#
-#   # If no ids, return NULL early
-#   if (rlang::is_null(out)) return(NULL)
-#
-#   out %>%
-#     rename(id_type = label, id = text) %>%
-#     mutate(drks_id = get_drks_element(doc, ".drks_id p"), .before = 1)
-# }
+parse_drks_ids <- function(filepath = NULL, drks_id = NULL){
+
+  # Check parameters
+  if (rlang::is_null(filepath) & rlang::is_null(drks_id)){
+    rlang::abort("Neither `filename` nor `drks_id` provided. Must supply one.")
+  }
+  if (!rlang::is_null(filepath) & !rlang::is_null(drks_id)){
+    rlang::abort("Both `filename` and `drks_id` provided. Supply only one.")
+  }
+
+  # Get drks html, depending on filepath or drks_id
+  if (!rlang::is_null(drks_id)){
+    doc <- fetch_drks(drks_id)
+
+    # If no valid drks record, return early
+    if (rlang::is_empty(doc)) {return(NULL)}
+
+  } else {
+    doc <- rvest::read_html(filepath)
+  }
+
+  id_type <- get_drks_element(doc, "div.mb-3.col-md-6.mb-0 dt")
+  id <- get_drks_element(doc, "div.mb-3.col-md-6.mb-0 dd")
+
+  # If no ids, return NULL early
+  if (rlang::is_null(id_type)) return(NULL)
+
+  tibble::tibble(id_type, id) |>
+    dplyr::filter(!is.na(id))
+}
 
 #' Parse DRKS registration references
 #'
@@ -178,36 +189,41 @@ parse_drks_study <- function(filepath = NULL, drks_id = NULL){
 #'
 #' @return Tibble with `reference_type` and `citation` columns
 
-# parse_drks_references <- function(filepath = NULL, drks_id = NULL){
-#
-#   # Check parameters
-#   if (rlang::is_null(filepath) & rlang::is_null(drks_id)){
-#     rlang::abort("Neither `filename` nor `drks_id` provided. Must supply one.")
-#   }
-#   if (!rlang::is_null(filepath) & !rlang::is_null(drks_id)){
-#     rlang::abort("Both `filename` and `drks_id` provided. Supply only one.")
-#   }
-#
-#   # Get drks html, depending on filepath or drks_id
-#   if (!rlang::is_null(drks_id)){
-#     doc <- fetch_drks(drks_id)
-#
-#     # If no valid drks record, return early
-#     if (rlang::is_empty(doc)) {return(NULL)}
-#
-#   } else {
-#     doc <- rvest::read_html(filepath)
-#   }
-#
-#   out <- get_drks_labels_elements_links(doc, ".publication")
-#
-#   # If no ids, return NULL early
-#   if (rlang::is_null(out)) return(NULL)
-#
-#   out %>%
-#     rename(reference_type = label, citation = text) %>%
-#     mutate(drks_id = get_drks_element(doc, ".drks_id p"), .before = 1)
-# }
+parse_drks_references <- function(filepath = NULL, drks_id = NULL){
+
+  # Check parameters
+  if (rlang::is_null(filepath) & rlang::is_null(drks_id)){
+    rlang::abort("Neither `filename` nor `drks_id` provided. Must supply one.")
+  }
+  if (!rlang::is_null(filepath) & !rlang::is_null(drks_id)){
+    rlang::abort("Both `filename` and `drks_id` provided. Supply only one.")
+  }
+
+  # Get drks html, depending on filepath or drks_id
+  if (!rlang::is_null(drks_id)){
+    doc <- fetch_drks(drks_id)
+
+    # If no valid drks record, return early
+    if (rlang::is_empty(doc)) {return(NULL)}
+
+  } else {
+    doc <- rvest::read_html(filepath)
+  }
+
+  out <- get_drks_labels_elements_links(doc, "#studyResults ~ div.card-body")
+  out <- dplyr::bind_rows(out, get_drks_labels_elements_links(doc, "#studyProtocols ~ div.card-body"))
+
+  out <- out |>
+    dplyr::filter(!(is.na(text) & is.na(link)),
+                  !stringr::str_detect(text, "^\\d{4}-\\d{2}-\\d{2}"))
+
+  # If no ids, return NULL early
+  if (rlang::is_null(out)) return(NULL)
+
+  out |>
+    dplyr::rename(reference_type = label, citation = text)  |>
+    dplyr::mutate(drks_id = get_drks_org_data(doc)$`DRKS-ID`, .before = 1)
+}
 
 
 #' Parse DRKS affiliations
@@ -218,37 +234,40 @@ parse_drks_study <- function(filepath = NULL, drks_id = NULL){
 #' @return Tibble with `affiliation_type` and `affiliation` columns
 
 
-# parse_drks_affiliations <- function(filepath = NULL, drks_id = NULL){
-#
-#   # Check parameters
-#   if (rlang::is_null(filepath) & rlang::is_null(drks_id)){
-#     rlang::abort("Neither `filename` nor `drks_id` provided. Must supply one.")
-#   }
-#   if (!rlang::is_null(filepath) & !rlang::is_null(drks_id)){
-#     rlang::abort("Both `filename` and `drks_id` provided. Supply only one.")
-#   }
-#
-#   # Get drks html, depending on filepath or drks_id
-#   if (!rlang::is_null(drks_id)){
-#     doc <- fetch_drks(drks_id)
-#
-#     # If no valid drks record, return early
-#     if (rlang::is_empty(doc)) {return(NULL)}
-#
-#   } else {
-#     doc <- rvest::read_html(filepath)
-#   }
-#
-#   out <- get_drks_labels_elements_child(doc, "ul.addresses", "li.address-affiliation")
-#
-#   # If no affiliations, return NULL early
-#   # if (rlang::is_null(out)) return(NULL)
-#
-#   out %>%
-#     rename(affiliation_type = label, lead_affiliation = text) %>%
-#     mutate(drks_id = get_drks_element(doc, ".drks_id p"), .before = 1)
-#
-# }
+parse_drks_affiliations <- function(filepath = NULL, drks_id = NULL){
+
+  # Check parameters
+  if (rlang::is_null(filepath) & rlang::is_null(drks_id)){
+    rlang::abort("Neither `filename` nor `drks_id` provided. Must supply one.")
+  }
+  if (!rlang::is_null(filepath) & !rlang::is_null(drks_id)){
+    rlang::abort("Both `filename` and `drks_id` provided. Supply only one.")
+  }
+
+  # Get drks html, depending on filepath or drks_id
+  if (!rlang::is_null(drks_id)){
+    doc <- fetch_drks(drks_id)
+
+    # If no valid drks record, return early
+    if (rlang::is_empty(doc)) {return(NULL)}
+
+  } else {
+    doc <- rvest::read_html(filepath)
+  }
+
+    labels <- get_drks_element(doc, "div.col-md.mb-3 h4")
+    # If no affiliations, return NULL early
+    if (rlang::is_null(labels)) return(NULL)
+    labels <- labels[!stringr::str_detect(labels, "Vote")]
+
+    institutions <- get_drks_element(doc, "div.col-md.mb-3 div.card-body dd div:first-child")
+
+  out <- tibble::tibble(affiliatoin_type = labels, lead_affiliation = institutions)
+
+  out |>
+    dplyr::mutate(drks_id =  get_drks_org_data(doc)$`DRKS-ID`, .before = 1)
+
+}
 
 
 #' Parse DRKS registration facilities
@@ -282,8 +301,8 @@ parse_drks_facilities <- function(filepath = NULL, drks_id = NULL){
   }
 
   out <- list()
-  out$drks_id <- get_drks_element(doc, ".drks_id p")
-  out$facility_affiliation <- get_drks_labels(doc, "ul.recruitmentLocations")
+  out$drks_id <- get_drks_org_data(doc)$`DRKS-ID`
+  out$facility_affiliation <- get_drks_recruitment(doc)$`Recruitment_location(s)`
 
   # If no facilities, return NULL early
   if (length(out$facility_affiliation) == 1 && is.na(out$facility_affiliation)) return(NULL)
@@ -301,14 +320,71 @@ parse_drks_facilities <- function(filepath = NULL, drks_id = NULL){
 #'
 #' @return Character string
 
+get_drks_element <- function(doc, element) {
+  doc |>
+    rvest::html_elements(xpath=paste(selectr::css_to_xpath(element)))  |>
+    rvest::html_text(trim = TRUE) |>
+    stringi::stri_remove_empty() |>
+    dplyr::na_if("No Entry")
+}
 
-# get_drks_element <- function(doc, element) {
-#   doc |>
-#     rvest::html_elements(xpath=paste(selectr::css_to_xpath(element))) %>%
-#     rvest::html_text(trim = TRUE) |>
-#     stringi::stri_remove_empty() |>
-#     dplyr::na_if("[---]*")
-# }
+#' Extract DRKS Organisational Data
+#'
+#' @param doc DRKS html_document, generally from \code{fetch_drks()}
+#'
+#' @return Named list
+
+get_drks_org_data <- function(doc) {
+  get_drks_element(doc, "div.card.trial-details-float.mb-4") |>
+    string_to_named_list()
+}
+
+#' Extract DRKS Recruitment Locations and Period and Number of Participants
+#'
+#' @param doc DRKS html_document, generally from \code{fetch_drks()}
+#'
+#' @return Named list
+
+get_drks_recruitment <- function(doc) {
+  get_drks_element(doc, "div.col-md-6.mb-3 div.card.h-100 div.card-body") |>
+    string_to_named_list()
+}
+
+
+#' Extract DRKS Study design
+#'
+#' @param doc DRKS html_document, generally from \code{fetch_drks()}
+#'
+#' @return Named list
+
+get_drks_study_design <- function(doc) {
+  get_drks_element(doc, "div.mb-3.col-md-4.mb-0") |>
+    string_to_named_list()
+}
+
+# str_in <- get_drks_element(doc, "div.col-md-6.mb-3 div.col-sm-6")
+string_to_named_list <- function(str_in, remove_title = TRUE) {
+  vec <- str_in |>
+    stringr::str_remove_all("\t") |>
+    stringr::str_remove_all("(?<=\n)\n") |>
+    stringr::str_split("\n") |>
+    unlist()
+  if (remove_title == TRUE) {
+    if (!stringr::str_detect(vec[1], ":")) vec <- vec[-1]
+  }
+
+  vec_names <- vec[stringr::str_detect(vec, ":")] |>
+    stringr::str_remove(":") |>
+    stringr::str_replace_all(" ", "_")
+  vec_values <- vec[!stringr::str_detect(vec, ":")] |>
+    dplyr::na_if("No Entry")
+
+  out <- list()
+  for (i in 1:length(vec_names)) {
+    out[[vec_names[i]]] <- vec_values[i]
+  }
+ out
+}
 
 #' Extract DRKS date
 #'
@@ -350,27 +426,30 @@ parse_drks_facilities <- function(filepath = NULL, drks_id = NULL){
 #' @param doc DRKS hmtl_document, generally from \code{fetch_drks()}
 #'
 #' @return Tibble with `label` and `text` columns
-
-get_drks_labels_elements <- function(doc){
-  labels <-
-    doc |>
-    rvest::html_elements("div.card-body > dl > dt") |>
-    rvest::html_text2()
-
-  labels <- tibble::tibble(label = labels) |>
-    filter(stringr::str_detect(label, ":"))
-
-  # If no elements, return NULL early
-  if (nrow(labels) == 1) return(NULL)
-
-  text <-
-    doc |>
-    rvest::html_elements("div.card-body > dl > dd") |>
-    rvest::html_text2()
-
-  bind_cols(labels, text = text)
-
-}
+#
+# get_drks_id_tib <- function(doc){
+#   labels <-
+#     doc |>
+#     rvest::html_elements("div.card-body  dl  dt") |>
+#     rvest::html_text2()
+#
+#   labels <- tibble::tibble(label = labels) |>
+#     filter(stringr::str_detect(label, ":"))
+#
+#   # If no elements, return NULL early
+#   if (nrow(labels) == 1) return(NULL)
+#
+#   text <-
+#     doc |>
+#     rvest::html_elements("div.card-body > dl > dd") |>
+#     rvest::html_text2()
+#
+#   text <- tibble::tibble(text = text) |>
+#     filter(!stringr::str_detect(text, ":$"))
+#
+#   bind_cols(labels, text)
+#
+# }
 
 
 #' Extract DRKS elements with labels
@@ -379,21 +458,39 @@ get_drks_labels_elements <- function(doc){
 #' @param element css/xpath to element
 #'
 #' @return Tibble with `label` and `text` columns
-
-# get_drks_labels_elements <- function(doc, element){
+# element <- "#studyProtocols ~ div.card-body"
+# element <- "div.col-md-6.mb-3 div.card.h-100"
+# get_drks_labels_elements <- function(doc, element, nested = FALSE){
+#
+#   if (nested == FALSE) {
+#     labels <- doc |>
+#       rvest::html_elements(paste(element, "dt")) |>
+#       rvest::html_text2()
+#     # If no elements, return NULL early
+#     if (length(labels) == 1 && is.na(labels)) return(NULL)
+#
+#     texts <- doc |>
+#       rvest::html_elements(paste(element, "dd")) |>
+#       rvest::html_text2()
+#
+#     out <- dplyr::bind_cols(label = labels, text = texts) |>
+#       dplyr::mutate(text = dplyr::na_if(text, "No Entry"))
+#     return( )
+#
+#   } else {
+#
+#   }
 #   out <-
-#     doc %>%
-#     rvest::html_elements(element) %>%
-#     rvest::html_text2() %>%
+#
 #     # rvest::html_text(trim = TRUE) %>%
 #     # stringr::str_squish() %>%
-#     dplyr::na_if("[---]*")
+#     # dplyr::na_if("No Entry")
 #
 #   # If no elements, return NULL early
-#   if (length(out) == 1 && is.na(out)) return(NULL)
+#   if (length(labels) == 1 && is.na(labels)) return(NULL)
 #
-#   out %>%
-#     stringr::str_split(": ", simplify = TRUE, n = 2) %>%
+#   out |>
+#     stringr::str_split("\n", simplify = TRUE) |>
 #     tibble::as_tibble(.name_repair = ~c("label", "text")) %>%
 #     filter(text != "[---]*")
 # }
@@ -404,67 +501,77 @@ get_drks_labels_elements <- function(doc){
 #' @param element css/xpath to element
 #'
 #' @return Tibble with `label`, `text`, and `link` columns
+element <- "#studyResults ~ div.card-body"
+element <- "#studyProtocols ~ div.card-body"
+get_drks_labels_elements_links(doc, element)
+get_drks_labels_elements_links <- function(doc, element){
 
-# get_drks_labels_elements_links <- function(doc, element){
-#
-#   out <- rvest::html_elements(doc, element) %>%
-#     purrr::map_dfr(get_drks_label_element_link)
-#
-#   # If no elements, return NULL early
-#   if (rlang::is_empty(out)) return(NULL)
-#
-#   out
-# }
+  labels <- rvest::html_elements(doc, element) |>
+    rvest::html_elements("dt") |>
+    rvest::html_text2() |>
+    stringr::str_remove_all(":")
 
-#' Extract single DRKS element with labels and hyperlinks
+  # text_links <-
+  out <- rvest::html_elements(doc, element) |>
+    rvest::html_elements("dd") |>
+    purrr::map(get_drks_element_link) |>
+    purrr::map(tibble::as_tibble) |>
+    purrr::list_rbind()
+
+  # If no elements, return NULL early
+  if (rlang::is_empty(out)) return(NULL)
+
+  dplyr::bind_cols(label = labels, out)
+}
+
+#' Extract single DRKS element with hyperlinks
 #' Helper function for \code{get_drks_labels_elements_links}
 #'
 #' @param e single node of element
 #'
-#' @return List of `label`, `text`, and `link`
+#' @return List of `text`, and `link`
 
-# get_drks_label_element_link <- function(e){
+get_drks_element_link <- function(e) {
+
+  out <- list()
+  # e <- doc |>
+  #   rvest::html_elements("#studyResults ~ div.card-body dd")
+
+  out$text <-
+    e |>
+    rvest::html_text2() |>
+    dplyr::na_if("No Entry")
+
+  # If no text, no reference, return NULL early
 #
-#   out <- list()
-#
-#   # Get label
-#   out$label <- e %>%
-#     rvest::html_elements('label') %>%
-#     rvest::html_text2() %>%
-#     stringr::str_remove(":$")
-#
-#   # If no label, no reference (only drks placeholder: "[---]*"), return NULL early
-#   if (rlang::is_empty(out$label)) return(NULL)
-#
-#   # Get link element (with text and link)
-#   link_element <-  rvest::html_elements(e, 'a')
-#
-#   # If reference has no link, get element only
-#   if (rlang::is_empty(link_element)){
-#
-#     out$text <-
-#       e %>%
-#       rvest::html_text2() %>%
-#
-#       # Remove label
-#       stringr::str_remove("^.*?: ") %>%
-#
-#       # Some empty references have a label
-#       dplyr::na_if("[---]*")
-#
-#     # If no reference, return NULL early
-#     if (is.na(out$text)) return(NULL)
-#
-#     out$link <- NA_character_
-#
-#     # If reference has link, get element and link
-#   } else {
-#     out$text <- rvest::html_text2(link_element)
-#     out$link <- rvest::html_attr(link_element, 'href')
-#   }
-#
-#   out
-# }
+#   if (rlang::is_empty(out$text) | is.na(out$text)) return(NULL)
+
+  # Get link element (with text and link)
+  link_element <- e |>
+    rvest::html_element("a")
+
+  # If reference has no link, get element only
+  if (rlang::is_empty(link_element)) {
+
+      # Remove label
+      # stringr::str_remove("^.*?: ") |>
+
+      # Some empty references have a label
+      # dplyr::na_if("[---]*")
+
+    # If no reference, return NULL early
+    # if (is.na(out$text)) return(NULL)
+
+    out$link <- NA_character_
+
+    # If reference has link, get element and link
+  } else {
+    # out$text <- rvest::html_text2(link_element)
+    out$link <- rvest::html_attr(link_element, "href")
+  }
+
+  out
+}
 
 
 #' Extract DRKS label of given element and text of child element
@@ -474,12 +581,15 @@ get_drks_labels_elements <- function(doc){
 #' @param child_element css/xpath to child element
 #'
 #' @return Tibble with `label` and `text` columns
-
+# element <-
+# child_element <-
 # get_drks_labels_elements_child <- function(doc, element, child_element){
-#   doc %>%
-#     rvest::html_elements(element) %>%
-#     rvest::html_children() %>%
-#     purrr::map_dfr(get_drks_label_element_child, child_element)
+#   doc |>
+#     rvest::html_elements(element)  |>
+#     # rvest::html_children()  |>
+#     rvest::html_text2() |>
+#     purrr::map(get_drks_label_element_child, child_element) |>
+#     purrr::list_rbind()
 # }
 
 

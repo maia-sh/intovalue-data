@@ -1,5 +1,9 @@
 # Create codebook based on IntoValue codebook
-# Codebook structure created in code and descriptions (based on original intovalue, where available) added in google sheets and read in
+#
+# 1. Check whether the codebook already exists with same variables and, if so, allow the user to skip codebook creation.
+# 2. Create the codebook structure using the trials data as well as `definition` from the original intovalue codebook, where available, and save `codebook-structure.csv`.
+# 3. Manually upload `codebook-structure.csv` to google spreadsheet to collaboratively add and edit `definition`, as well as add each variable's `source` and whether it `is_derived`.
+# 4. Download the manually-edited codebook and use `description`, `source`, and `is_derived` from this new version.
 
 library(dplyr)
 library(readr)
@@ -8,13 +12,41 @@ library(stringr)
 
 trials <- read_rds(here("data", "processed", "trials.rds"))
 
+codebook_structure_path <- here("data", "processed", "codebook-structure.csv")
+codebook_path <- here("data", "processed", "codebook.csv")
 
-# 1. Prepare codebook structure -------------------------------------------
+
+# 1. Determine whether to build codebook ----------------------------------
+# Build codebook if (1) codebook does not yet exist, OR (2) codebook exists but different variables, OR (3) codebook exists and user specifies to rebuild
+
+if (!fs::file_exists(codebook_path)){
+  create_codebook <- TRUE
+} else {
+  codebook <- read_csv(codebook_path, show_col_types = FALSE)
+
+  if (!identical(colnames(trials), codebook$name)) {
+    create_codebook <- TRUE
+  } else {
+    rebuild_codebook <- utils::menu(c("yes", "no"), title = glue::glue("Codebook already available at `{fs::path_rel(codebook_path)}`\nWould you like to rebuild the codebook? (default = no)"))
+    if (rebuild_codebook == 1) {
+      create_codebook <- TRUE
+    } else {
+      message("Exiting script and not rebuilding codebook")
+      create_codebook <- FALSE
+    }
+  }
+}
+
+
+# START CODEBOOK CREATION
+if (create_codebook){
+
+# 2. Prepare codebook structure with original intovalue definitions -------
 
 # Get intovalue codebook for descriptions
 iv_codebook <-
 
-  read_csv("https://zenodo.org/record/5141343/files/iv_data_dictionary.csv?download=1") |>
+  read_csv("https://zenodo.org/record/5141343/files/iv_data_dictionary.csv?download=1", show_col_types = FALSE) |>
 
   # Update publication identifier names
   mutate(name = recode(name,
@@ -27,7 +59,6 @@ iv_codebook <-
   filter(name != "has_publication") |>
 
   select(name, description)
-
 
 # Check whether any unused variables in modified intovalue codebook
 iv_unused_vars <- setdiff(iv_codebook$name, colnames(trials))
@@ -114,37 +145,16 @@ codebook_structure <-
   )) |>
 
   # Add original iv descriptions
-  tidylog::left_join(iv_codebook, by = "name")
+  left_join(iv_codebook, by = "name")
 
-write_csv(codebook_structure, here("data", "processed", "codebook-structure.csv"))
-
-# `codebook_structure` then manually added and edited in google sheets
+write_csv(codebook_structure, codebook_structure_path)
 
 
-# 2. Build codebook with descriptions -------------------------------------
-# Retrieve codebook from google sheet unless already retrieved
+# 3. Manually edit codebook -----------------------------------------------
+# Manually upload `codebook-structure.csv` to google spreadsheet to collaboratively add and edit `definition`, as well as add each variable's `source` and whether it `is_derived`.
 
-codebook_path <- here("data", "processed", "codebook.csv")
 
-# If codebook already built, allow user to skip download and build
-if (fs::file_exists(codebook_path)){
-
-  codebook <- read_csv(codebook_path, show_col_types = FALSE)
-
-  # Check whether all variables included
-  if (identical(codebook_structure$name, codebook$name)){
-    rebuild_codebook <- askYesNo(glue::glue(
-      "Codebook already available at
-      `{fs::path_rel(codebook_path)}`
-      Are you sure you want to re-download from Google Sheets and rebuild?",
-    ), default = FALSE
-    )
-  }
-
-  if (!rebuild_codebook){
-    stop("Exiting script and not rebuilding codebook", call. = FALSE)
-  }
-}
+# 4. Build codebook with descriptions -------------------------------------
 
 # Use google identity (i.e., gmail) to access for google sheets
 # Get google identity if locally stored as "google", if available
@@ -175,3 +185,5 @@ codebook <-
 assertr::assert(codebook, assertr::not_na, name, type, description, source, is_derived)
 
 write_csv(codebook, codebook_path)
+
+} # END CODEBOOK CREATION

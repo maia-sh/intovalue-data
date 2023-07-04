@@ -174,4 +174,4 @@ codebook <-
 # Check that codebook is complete, i.e., no NAs aside from levels
 assertr::assert(codebook, assertr::not_na, name, type, description, source, is_derived)
 
-write_csv(codebook_structure, codebook_path)
+write_csv(codebook, codebook_path)

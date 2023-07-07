@@ -1,4 +1,9 @@
 # Create codebook based on IntoValue codebook
+#
+# 1. Check whether the codebook already exists with same variables and, if so, allow the user to skip codebook creation.
+# 2. Create the codebook structure using the trials data as well as `definition` from the original intovalue codebook, where available, and save `codebook-structure.csv`.
+# 3. Manually upload `codebook-structure.csv` to google spreadsheet to collaboratively add and edit `definition`, as well as add each variable's `source` and whether it `is_derived`.
+# 4. Download the manually-edited codebook and use `description`, `source`, and `is_derived` from this new version.
 
 library(dplyr)
 library(readr)
@@ -7,10 +12,41 @@ library(stringr)
 
 trials <- read_rds(here("data", "processed", "trials.rds"))
 
+codebook_structure_path <- here("data", "processed", "codebook-structure.csv")
+codebook_path <- here("data", "processed", "codebook.csv")
+
+
+# 1. Determine whether to build codebook ----------------------------------
+# Build codebook if (1) codebook does not yet exist, OR (2) codebook exists but different variables, OR (3) codebook exists and user specifies to rebuild
+
+if (!fs::file_exists(codebook_path)){
+  create_codebook <- TRUE
+} else {
+  codebook <- read_csv(codebook_path, show_col_types = FALSE)
+
+  if (!identical(colnames(trials), codebook$name)) {
+    create_codebook <- TRUE
+  } else {
+    rebuild_codebook <- utils::menu(c("yes", "no"), title = glue::glue("Codebook already available at `{fs::path_rel(codebook_path)}`\nWould you like to rebuild the codebook? (default = no)"))
+    if (rebuild_codebook == 1) {
+      create_codebook <- TRUE
+    } else {
+      message("Exiting script and not rebuilding codebook")
+      create_codebook <- FALSE
+    }
+  }
+}
+
+
+# START CODEBOOK CREATION
+if (create_codebook){
+
+# 2. Prepare codebook structure with original intovalue definitions -------
+
 # Get intovalue codebook for descriptions
 iv_codebook <-
 
-  read_csv("https://zenodo.org/record/5141343/files/iv_data_dictionary.csv?download=1") |>
+  read_csv("https://zenodo.org/record/5141343/files/iv_data_dictionary.csv?download=1", show_col_types = FALSE) |>
 
   # Update publication identifier names
   mutate(name = recode(name,
@@ -23,7 +59,6 @@ iv_codebook <-
   filter(name != "has_publication") |>
 
   select(name, description)
-
 
 # Check whether any unused variables in modified intovalue codebook
 iv_unused_vars <- setdiff(iv_codebook$name, colnames(trials))
@@ -65,11 +100,6 @@ facility_cities_levels <-
   pull() |>
   str_c(collapse = "; ")
 
-# Get new columns and limit trials to new columns
-# trials_new_vars <-
-#   trials |>
-#   select(-all_of(iv_codebook$name))
-
 # Get variable types
 variable_types <-
   trials |>
@@ -79,14 +109,16 @@ variable_types <-
   purrr::map_chr(class) |>
   tolower()
 
-# Build codebook for new variables
-codebook <-
+# Build codebook structure
+codebook_structure <-
 
+  # Add types
   tibble(
     name = colnames(trials),
-    type = tolower(variable_types)
+    type = variable_types
   ) |>
 
+  # Add levels
   mutate(levels = case_when(
     name == "registry" ~ get_levels(registry),
     name == "identification_step" ~ get_levels(identification_step),
@@ -109,225 +141,49 @@ codebook <-
     name == "archiving_locations" ~ get_levels(archiving_locations),
     name == "versions" ~ get_levels(versions),
     name == "licenses_required" ~ get_levels(licenses_required),
-    name == "permission_issuer " ~ get_levels(permission_issuer )
-  ))
+    name == "permission_issuer" ~ get_levels(permission_issuer)
+  )) |>
 
-# Prepare variable descriptions for new variables
-# cat(colnames(trials_new_vars), sep = '",\n"",\n\n"')
-# description <- tribble(
-#   ~name, ~description,
-#
-#   "is_resolved",
-#   "",
-#
-#   "iv_completion",
-#   "",
-#
-#   "iv_status",
-#   "",
-#
-#   "iv_interventional",
-#   "",
-#
-#   "title",
-#   "",
-#
-#   "study_type",
-#   "",
-#
-#   "results_search_start_date",
-#   "",
-#
-#   "results_search_end_date",
-#   "",
-#
-#   "has_pubmed",
-#   "",
-#
-#   "has_ft",
-#   "",
-#
-#   "ft_source",
-#   "",
-#
-#   "pub_title",
-#   "",
-#
-#   "journal_pubmed",
-#   "",
-#
-#   "ppub_date",
-#   "",
-#
-#   "epub_date",
-#   "",
-#
-#   "has_iv_trn_abstract",
-#   "",
-#
-#   "has_iv_trn_secondary_id",
-#   "",
-#
-#   "has_iv_trn_ft",
-#   "",
-#
-#   "has_reg_pub_link",
-#   "",
-#
-#   "pmid_link",
-#   "",
-#
-#   "doi_link",
-#   "",
-#
-#   "reference_derived",
-#   "",
-#
-#   "has_crossreg_clinicaltrials.gov",
-#   "",
-#
-#   "has_crossreg_isrctn",
-#   "",
-#
-#   "has_crossreg_eudract",
-#   "",
-#
-#   "has_crossreg_drks",
-#   "",
-#
-#   "has_crossreg_anzctr",
-#   "",
-#
-#   "has_crossreg_ntr",
-#   "",
-#
-#   "n_crossreg_secondary_id",
-#   "",
-#
-#   "n_crossreg_abstract",
-#   "",
-#
-#   "n_crossreg_ft",
-#   "",
-#
-#   "n_crossreg_reg",
-#   "",
-#
-#   "n_reg_pub_any",
-#   "",
-#
-#   "n_reg_pub_doi_or_pmid",
-#   "",
-#
-#   "results_followup",
-#   "",
-#
-#   "has_followup_2y",
-#   "",
-#
-#   "has_followup_5y",
-#   "",
-#
-#   "is_summary_results_1y",
-#   "",
-#
-#   "is_summary_results_2y",
-#   "",
-#
-#   "is_summary_results_5y",
-#   "",
-#
-#   "is_publication_2y",
-#   "",
-#
-#   "is_publication_5y",
-#   "",
-#
-#   "color_green_only",
-#   "",
-#
-#   "color",
-#   "",
-#
-#   "issn",
-#   "",
-#
-#   "journal_unpaywall",
-#   "",
-#
-#   "publisher",
-#   "",
-#
-#   "publication_date_unpaywall",
-#   "",
-#
-#   "syp_response",
-#   "",
-#
-#   "can_archive",
-#   "",
-#
-#   "archiving_locations",
-#   "",
-#
-#   "inst_repository",
-#   "",
-#
-#   "versions",
-#   "",
-#
-#   "submitted_version",
-#   "",
-#
-#   "accepted_version",
-#   "",
-#
-#   "published_version",
-#   "",
-#
-#   "licenses_required",
-#   "",
-#
-#   "permission_issuer",
-#   "",
-#
-#   "embargo",
-#   "",
-#
-#   "date_embargo_elapsed",
-#   "",
-#
-#   "is_embargo_elapsed",
-#   "",
-#
-#   "permission_accepted",
-#   "",
-#
-#   "permission_published",
-#   "",
-#
-#   "is_oa",
-#   "",
-#
-#   "is_archivable",
-#   "",
-#
-#   "is_closed_archivable",
-#   ""
-# ) |>
-#
-#   # Add intovalue descriptions
-#   bind_rows(iv_codebook)
-#
-# # Check that all described variables are in the dataset and vice-versa
-# if (!all(colnames(trials) %in% description$name)| !all(description$name %in% colnames(trials))){
-#   rlang::warn("There are missing or additional variables for codebook!")
-# }
+  # Add original iv descriptions
+  left_join(iv_codebook, by = "name")
 
+write_csv(codebook_structure, codebook_structure_path)
+
+
+# 3. Manually edit codebook -----------------------------------------------
+# Manually upload `codebook-structure.csv` to google spreadsheet to collaboratively add and edit `definition`, as well as add each variable's `source` and whether it `is_derived`.
+
+
+# 4. Build codebook with descriptions -------------------------------------
+
+# Use google identity (i.e., gmail) to access for google sheets
+# Get google identity if locally stored as "google", if available
+# Else ask user and store
+google_id <-
+  ifelse(
+    nrow(keyring::key_list("google")) == 1,
+    keyring::key_get("google"),
+    keyring::key_set("google")
+  )
+
+message("Accessing googlesheets via: ", google_id)
+
+# If new google identity, prompt user in web browser to authenticate
+googlesheets4::gs4_auth(google_id)
+
+codebook_descriptions <-
+  googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1h9MyoeaP4owH4-5ySLob0RMEuud5omKOLMeIY8C4-UE/edit#gid=807502810", sheet = "codebook", na = "NA")
+
+# Combine codebook structure and descriptions
 codebook <-
-  codebook |>
-  # left_join(description, by = "name") |>
-  left_join(iv_codebook, by = "name") |>
-  relocate(description, .after = "type")
+  left_join(
+    select(codebook_structure, -description),
+    select(codebook_descriptions, name, description, source, is_derived)
+  )
 
-write_csv(codebook, here("data", "processed", "codebook.csv"))
+# Check that codebook is complete, i.e., no NAs aside from levels
+assertr::assert(codebook, assertr::not_na, name, type, description, source, is_derived)
+
+write_csv(codebook, codebook_path)
+
+} # END CODEBOOK CREATION

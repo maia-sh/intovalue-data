@@ -115,7 +115,7 @@ codebook_structure <-
   # Add types
   tibble(
     name = colnames(trials),
-    type = tolower(variable_types)
+    type = variable_types
   ) |>
 
   # Add levels
@@ -172,7 +172,7 @@ message("Accessing googlesheets via: ", google_id)
 googlesheets4::gs4_auth(google_id)
 
 codebook_descriptions <-
-  googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1h9MyoeaP4owH4-5ySLob0RMEuud5omKOLMeIY8C4-UE/edit#gid=807502810", sheet = "codebook")
+  googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1h9MyoeaP4owH4-5ySLob0RMEuud5omKOLMeIY8C4-UE/edit#gid=807502810", sheet = "codebook", na = "NA")
 
 # Combine codebook structure and descriptions
 codebook <-

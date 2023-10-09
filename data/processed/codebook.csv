@@ -1,107 +1,113 @@
-name,type,description,levels
-id,character,"Trial registration number, either a ClinicalTrials.gov NCT id or DRKS id",NA
-registry,character,"Trial registry, either ClinicalTrials.gov or DRKS",ClinicalTrials.gov; DRKS
-is_resolved,logical,,NA
-iv_version,numeric,"IntoValue version, either 1 or 2.",1; 2
-identification_step,character,"Manual publication search identification steps. Both versions include: No publ; Registry linked. Version 1 also includes: Pubmed; Hand search (= Publication found via Google search); Abstract only; Dissertation. Version 2 also includes: Publ found in Google ID search; Publ found in Google search (no ID). In version 2, abstracts only were not included, whereas dissertations were included.",Abstract only; Dissertation; Hand search; No publ; Publ found in Google ID search; Publ found in Google search (no ID); Pubmed; Registry linked
-is_dupe,logical,"Whether trial is duplicated in version 1 and 2. If so, both are marked as duplicates and can be filtered out in combination with `iv_version`.",NA
-iv_completion,logical,,NA
-iv_status,logical,,NA
-iv_interventional,logical,,NA
-has_german_umc_lead,logical,"Whether German UMC in trial `lead_cities` (sponsor, PI, or responsible party) or only in `facility_cities`. Version 2 includes only trials with German UMC lead.",NA
-lead_cities,character,"City or names of lead German university medical centers based on `affiliation` in registries. Derived from `sponsors`, `overall officials`, and `responsible parties` from ClinicalTrials.gov, and any `addresses` from DRKS. Multiple UMCs (e.g., if study PI and sponsor organization have different affiliations) are separated by a single whitespace.",Aachen; Berlin; Bochum; Bonn; Dresden; Duisburg; Düsseldorf; Erlangen; Frankfurt; Freiburg; Giessen; Göttingen; Greifswald; Halle; Hamburg; Hannover; Heidelberg; Homburg; Jena; Köln; Leipzig; LMU_München; Magdeburg; Mainz; Mannheim; Marburg; Münster; Regensburg; Rostock; Schleswig-Holstein; TU_München; Tübingen; Ulm; Witten-Herdecke; Würzburg
-facility_cities,character,"City or names of facility German university medical centers based on `affiliation` in registries. Derived from 'facilities' from ClinicalTrials.gov, and 'recruitmentLocation' from DRKS. Multiple UMCs (i.e., if one trial lists multiple facilities) are separated by a single whitespace. Only used in version 1; in version 2, all NA.",Aachen; Berlin; Bochum; Bonn; Dresden; Duisburg; Düsseldorf; Erlangen; Frankfurt; Freiburg; Giessen; Göttingen; Greifswald; Halle; Hamburg; Hannover; Heidelberg; Homburg; Jena; Köln; Leipzig; LMU_München; Magdeburg; Mainz; Mannheim; Marburg; Münster; Regensburg; Rostock; Schleswig-Holstein; TU_München; Tübingen; Ulm; Witten-Herdecke; Würzburg
-title,character,,NA
-center_size,character,"UMC classified as 'large' or 'small' depending on the number of trials led per `lead_cities`. A UMC was classified as 'large' if it conducted more trials than the median trial number per UMC across all UMCs included in the IntoValue1 or Intovalue2 studies, respectively. If trial has no German UMC lead, 'No lead center'.",large; No lead center; small
-main_sponsor,character,"Whether main sponsor is industry or other, as given on registry. For ClinicalTrials.gov, sourced from `agency_class` in `sponsors` datatable , and `Other` includes NIH. For DRKS, sourced from `investigator initiated`.",Industry; Other
-study_type,character,,Interventional; Observational
-intervention_type,character,"Trial intervention, as given on registry. ClinicalTrials.gov only.",Behavioral; Biological; Combination Product; Device; Diagnostic Test; Dietary Supplement; Drug; Genetic; Not given; Other; Procedure; Radiation
-phase,character,"Trial phase, as given on registry. Different levels for ClinicalTrials.gov and DRKS.",Early Phase 1; I; I-II; II; II-III; IIa; IIb; III; IIIb; IV; Phase 1; Phase 1/Phase 2; Phase 2; Phase 2/Phase 3; Phase 3; Phase 4
-enrollment,numeric,"Number of trial participants, as given on registry. May be anticipated or actual number.",NA
-recruitment_status,character,"Recruitment status, as given on registry. Different levels for ClinicalTrials.gov and DRKS.","Active, not recruiting; Completed; Enrolling by invitation; Recruiting; Recruiting complete, follow-up complete; Recruiting stopped after recruiting started; Recruiting suspended on temporary hold; Suspended; Terminated; Unknown status; Withdrawn"
-masking,character,"Trial masking, as given on registry. Different levels for ClinicalTrials.gov (Version 1: No masking, Open Label, Single Blind, Double Blind, Participant, Care Provider, Investigator, Outcomes Assessor; Version 2: None (Open Label), Single, Double, Triple, Quadruple) and DRKS (Open (masking not used), Single blind, Blinded, Double or multiple blind).",Blinded; Double; Double or multiple blind; None (Open Label); Open (masking not used); Quadruple; Single; Single blind; Triple
-allocation,character,"Trial allocation and randomization, as given on registry. Different levels for ClinicalTrials.gov and DRKS.",Non-Randomized; Non-randomized controlled trial; Other; Randomized; Randomized controlled trial; Single arm study
-is_randomized,logical,"Whether trial was randomized. Based on the 'allocation' variable. 'Randomized' or 'Randomized controlled trial' was counted as TRUE, while 'Non-Randomized, 'Non-randomized controlled trial', 'Other', and 'Single arm study' was counted as FALSE",NA
-is_multicentric,logical,"Whether multiple study centers are involved, as given on registry. Derived from `has_single_facility` (CT.gov) and `monoMultiCentric` (DRKS).",NA
-is_prospective,logical,Whether trial was prospectively registered. Derived from `registration_date` and `start_date`. Trial is considered prospectively registered if registered in the same or previous months to start date.,NA
-has_summary_results,logical,"Whether summary results were posted on registry. ClinicalTrials.gov includes a structured summary results field. DRKS includes summary results with other references, and summary results were determined based on manual inspection with names such as Ergebnisbericht or Abschlussbericht.",NA
-registration_date,date,"Date of study submission to registry, as given on registry.",NA
-start_date,date,"Date of the study start, as given on registry. ClinicalTrials.gov previously allowed start dates without day, in which case date is defaulted to first of the month.",NA
-completion_date,date,"Date of the study completion, as given on registry. ClinicalTrials.gov previously allowed completion dates without day, in which case date is defaulted to first of the month. Indicated as `study end date` on DRKS.",NA
-completion_year,numeric,Year of the study completion. Derived from `completion_date`.,NA
-primary_completion_date,date,"Date of the study primary completion, as given on registry. ClinicalTrials.gov only. ClinicalTrials.gov previously allowed primary completion dates without day, in which case date is defaulted to first of the month.",NA
-primary_completion_year,numeric,Year of the study primary completion. Derived from `primary_completion_date`. ClinicalTrials.gov only.,NA
-summary_results_date,date,"Date of summary results. For ClinicalTrials.gov only, date of submission to registry, derived from `results_first_submitted_date` (field previously called `first_received_results_date`). For DRKS, date included on posted summary result document.",NA
-days_cd_to_summary,numeric,Number of days from `completion_date` to `summary_results_date`. Derived. ClinicalTrials.gov only.,NA
-days_pcd_to_summary,numeric,Number of days from `primary_completion_date` to `summary_results_date`. Derived. ClinicalTrials.gov only.,NA
-days_reg_to_start,numeric,Number of days from `registration_date` to `start_date`. Derived.,NA
-days_reg_to_cd,numeric,Number of days from `registration_date` to `completion_date`. Derived.,NA
-days_reg_to_pcd,numeric,Number of days from `registration_date` to `primary_completion_date`. Derived. ClinicalTrials.gov only.,NA
-days_cd_to_publication,numeric,Number of days from `completion_date` to `publication_date`. Derived.,NA
-days_pcd_to_publication,numeric,Number of days from `primary_completion_date` to `publication_date`. Derived. ClinicalTrials.gov only.,NA
-days_reg_to_publication,numeric,Number of days from `registration_date` to `publication_date`. Derived.,NA
-results_search_start_date,date,,NA
-results_search_end_date,date,,NA
-doi,character,Publication DOI. Manually entered during publication search or derived from PMID via FatCat.,NA
-pmid,numeric,Publication PMID. Manually entered during publication search or derived from DOI via FatCat.,NA
-url,character,Publication URL. Manually entered during publication search.,NA
-publication_date,date,"Publication date. Manually entered during publication search. Earliest date used, whether ePub or print pub date.",NA
-publication_type,character,Type of identified publication. Can be journal publication or dissertation.,abstract; dissertation; journal publication
-has_pubmed,logical,,NA
-has_ft,logical,,NA
-ft_source,character,,doi; pmid
-pub_title,character,,NA
-journal_pubmed,character,,NA
-ppub_date,character,,NA
-epub_date,date,,NA
-has_iv_trn_abstract,logical,,NA
-has_iv_trn_secondary_id,logical,,NA
-has_iv_trn_ft,logical,,NA
-has_reg_pub_link,logical,,NA
-pmid_link,logical,,NA
-doi_link,logical,,NA
-reference_derived,logical,,NA
-has_crossreg_clinicaltrials.gov,logical,,NA
-has_crossreg_isrctn,logical,,NA
-has_crossreg_eudract,logical,,NA
-has_crossreg_drks,logical,,NA
-has_crossreg_anzctr,logical,,NA
-has_crossreg_ntr,logical,,NA
-n_crossreg_secondary_id,integer,,NA
-n_crossreg_abstract,integer,,NA
-n_crossreg_ft,integer,,NA
-n_crossreg_reg,integer,,NA
-n_reg_pub_any,integer,,NA
-n_reg_pub_doi_or_pmid,integer,,NA
-results_followup,numeric,,NA
-has_followup_2y,logical,,NA
-has_followup_5y,logical,,NA
-is_summary_results_1y,logical,,NA
-is_summary_results_2y,logical,,NA
-is_summary_results_5y,logical,,NA
-is_publication_2y,logical,,NA
-is_publication_5y,logical,,NA
-color_green_only,character,,bronze; closed; gold; green; hybrid
-color,character,,bronze; closed; gold; green; hybrid
-issn,character,,NA
-journal_unpaywall,character,,NA
-publisher,character,,NA
-publication_date_unpaywall,date,,NA
-syp_response,character,,no_best_permission; response; unresolved
-can_archive,logical,,NA
-archiving_locations,character,,['institutional repository']; ['pmc']
-inst_repository,logical,,NA
-versions,character,,"['acceptedVersion', 'submittedVersion']; ['acceptedVersion']; ['publishedVersion', 'acceptedVersion']; ['publishedVersion']; ['submittedVersion', 'acceptedVersion', 'publishedVersion']; ['submittedVersion', 'acceptedVersion']; ['submittedVersion']; []"
-submitted_version,logical,,NA
-accepted_version,logical,,NA
-published_version,logical,,NA
-licenses_required,character,,"[]; [{'type': 'cc-by-nc-nd', 'terms': ''}]; [{'type': 'cc-by-nc-nd'}]; [{'type': 'cc-by-nc-sa', 'terms': ''}]; [{'type': 'cc-by-nc', 'terms': ''}]; [{'type': 'cc-by-nc'}]; [{'type': 'cc-by', 'terms': ''}]; [{'type': 'cc-by'}]; [{'type': 'other (non-commercial)', 'terms': 'https://perma.cc/52DS-NZFF'}]; [{'type': 'other (non-commercial)', 'terms': 'https://perma.cc/6S5D-XMF4'}]; [{'type': 'other (non-commercial)'}]; [{'type': 'other-closed', 'terms': 'Personal use of this material is permitted.  Permission from IEEE must be obtained for all other uses'}]; [{'type': 'other-closed', 'terms': 'personal use only'}]; [{'type': 'other-closed', 'terms': 'personal use'}]; [{'type': 'other-closed'}]"
-permission_issuer,character,,NA
-embargo,numeric,,NA
-date_embargo_elapsed,date,,NA
-is_embargo_elapsed,logical,,NA
-permission_accepted,logical,,NA
-permission_published,logical,,NA
-is_oa,logical,,NA
-is_archivable,logical,,NA
-is_closed_archivable,logical,,NA
+name,type,levels,description,source,is_derived
+id,character,NA,"Trial registration number, either a ClinicalTrials.gov NCT id or DRKS id.",registry,FALSE
+registry,character,ClinicalTrials.gov; DRKS,Trial registry.,registry,FALSE
+is_resolved,logical,NA,"Whether trial registration number resolves to registration, at time of trial searches.",registry,FALSE
+iv_version,numeric,1; 2,IntoValue version.,registry_original,TRUE
+identification_step,character,Abstract only; Cleaning; Dissertation; Hand search; No publ; Publ found in Google ID search; Publ found in Google search (no ID); Pubmed; Registry linked,"Manual publication search identification steps. Both versions include: No publ; Registry linked. Version 1 also includes: Pubmed; Hand search (= Publication found via Google search); Abstract only; Dissertation. Version 2 also includes: Publ found in Google ID search; Publ found in Google search (no ID). In version 2, abstracts only were not included, whereas dissertations were included. Publications found after IntoValue 1 and 2 marked as ""Cleaning"".",manual,FALSE
+is_dupe,logical,NA,"Whether trial is duplicated in version 1 and 2. If so, both are marked as duplicates and can be filtered out in combination with `iv_version`.",manual,TRUE
+iv_completion,logical,NA,"Whether trial completion year meets IntoValue criteria, i.e., is between 2009 and 2017, inclusive. Trials with only a primary completion date and no completion date are FALSE.",registry,TRUE
+iv_status,logical,NA,"Whether trial recruitment status meets IntoValue criteria, i.e., ""Completed"" , ""Terminated"" , ""Suspended"", ""Unknown status"" on ClinicalTrials.gov, and ""Recruiting complete, follow-up complete"", ""Recruiting stopped after recruiting started"", ""Recruiting suspended on temporary hold"" on DRKS.",registry,TRUE
+iv_interventional,logical,NA,"Whether study type meets IntoValue criteria, i.e., ""Interventional"".",registry,TRUE
+has_german_umc_lead,logical,NA,"Whether German UMC in trial `lead_cities` (sponsor, PI, or responsible party) or only in `facility_cities`. Version 2 includes only trials with German UMC lead.",registry,TRUE
+lead_cities,character,Aachen; Berlin; Bochum; Bonn; Dresden; Duisburg-Essen; Düsseldorf; Erlangen; Frankfurt; Freiburg; Giessen; Greifswald; Göttingen; Halle-Wittenberg; Hamburg; Hannover; Heidelberg; Homburg; Jena; Köln; LMU-München; Leipzig; Magdeburg; Mainz; Mannheim; Marburg; Münster; Regensburg; Rostock; Schleswig-Holstein; TU-München; Tübingen; Ulm; Witten/Herdecke; Würzburg,"City or names of lead German university medical centers based on `affiliation` in registries. Manually validated based on registry data at original query data. Derived from `sponsors`, `overall officials`, and `responsible parties` from ClinicalTrials.gov, and any `addresses` from DRKS. Multiple UMCs (e.g., if study PI and sponsor organization have different affiliations) are separated by a single whitespace.","registry_original, manual",FALSE
+facility_cities,character,Aachen; Berlin; Bochum; Bonn; Dresden; Duisburg-Essen; Düsseldorf; Erlangen; Frankfurt; Freiburg; Giessen; Greifswald; Göttingen; Halle-Wittenberg; Hamburg; Hannover; Heidelberg; Homburg; Jena; Köln; LMU-München; Leipzig; Magdeburg; Mainz; Mannheim; Marburg; Münster; Regensburg; Rostock; Schleswig-Holstein; TU-München; Tübingen; Ulm; Witten/Herdecke; Würzburg,"City or names of facility German university medical centers based on `affiliation` in registries. Manually validated based on registry data at original query data. Derived from 'facilities' from ClinicalTrials.gov, and 'recruitmentLocation' from DRKS. Multiple UMCs (i.e., if one trial lists multiple facilities) are separated by a single whitespace. Only used in version 1; in version 2, all NA.","registry_original, manual",FALSE
+title,character,NA,"Title of the trial, as given on registry on `registry_download_date`. `brief_title` on ClinicalTrials.gov",registry,FALSE
+center_size,character,No lead center; large; small,"UMC classified as 'large' or 'small' depending on the number of trials led per `lead_cities`. A UMC was classified as 'large' if it conducted more trials than the median trial number per UMC across all UMCs included in the IntoValue1 or Intovalue2 studies, respectively. If trial has no German UMC lead, 'No lead center'.",registry_original,TRUE
+main_sponsor,character,INDIV; INDUSTRY; Industry; NETWORK; OTHER; OTHER_GOV; Other,"Whether main sponsor is industry or other, as given on registry on `registry_download_date`. For ClinicalTrials.gov, sourced from `agency_class` in `sponsors` datatable , and `Other` includes NIH. For DRKS, sourced from `investor_initiated`.",registry,FALSE
+study_type,character,Interventional; Observational,"Trial study type, as given on registry on `registry_download_date`.",registry,FALSE
+intervention_type,character,Behavioral; Biological; Combination Product; Device; Diagnostic Test; Dietary Supplement; Drug; Genetic; Not given; Other; Procedure; Radiation,"Trial intervention, as given on registry. ClinicalTrials.gov only.",registry_original,FALSE
+phase,character,Early Phase 1; I; I-II; II; II-III; III; IIIb; IIa; IIb; IV; Not Applicable; Phase 1; Phase 1/Phase 2; Phase 2; Phase 2/Phase 3; Phase 3; Phase 4,"Trial phase, as given on registry. Different levels for ClinicalTrials.gov and DRKS.",registry,FALSE
+enrollment,numeric,NA,"Number of trial participants, as given on registry. May be anticipated or actual number.",registry,FALSE
+recruitment_status,character,"Active, not recruiting; Completed; Recruiting; Recruiting complete, follow-up complete; Recruiting stopped after recruiting started; Recruiting suspended on temporary hold; Suspended; Terminated; Unknown status; Withdrawn","Recruitment status, as given on registry. Different levels for ClinicalTrials.gov and DRKS.",registry,FALSE
+masking,character,Blinded; Double; Double or multiple blind; None (Open Label); Open (masking not used); Quadruple; Single; Single blind; Triple,"Trial masking, as given on registry. Different levels for ClinicalTrials.gov (Version 1: No masking, Open Label, Single Blind, Double Blind, Participant, Care Provider, Investigator, Outcomes Assessor; Version 2: None (Open Label), Single, Double, Triple, Quadruple) and DRKS (Open (masking not used), Single blind, Blinded, Double or multiple blind).",registry,FALSE
+allocation,character,Non-Randomized; Non-randomized controlled trial; Other; Randomized; Randomized controlled trial; Single arm study,"Trial allocation and randomization, as given on registry. Different levels for ClinicalTrials.gov and DRKS.",registry,FALSE
+is_randomized,logical,NA,"Whether trial was randomized. Based on the 'allocation' variable. 'Randomized' or 'Randomized controlled trial' was counted as TRUE, while 'Non-Randomized, 'Non-randomized controlled trial', 'Other', and 'Single arm study' was counted as FALSE",registry,TRUE
+is_multicentric,logical,NA,"Whether multiple study centers are involved, as given on registry. Derived from `has_single_facility` (CT.gov) and `monoMultiCentric` (DRKS).",registry,FALSE
+is_prospective,logical,NA,Whether trial was prospectively registered. Derived from `registration_date` and `start_date`. Trial is considered prospectively registered if registered in the same or previous months to start date.,registry,TRUE
+has_summary_results,logical,NA,"Whether summary results were posted on registry. ClinicalTrials.gov includes a structured summary results field. DRKS includes summary results with other references, and summary results were determined based on manual inspection with names such as Ergebnisbericht or Abschlussbericht.",registry,FALSE
+registration_date,date,NA,"Date of study submission to registry, as given on registry.",registry,FALSE
+start_date,date,NA,"Date of the study start, as given on registry. ClinicalTrials.gov previously allowed start dates without day, in which case date is defaulted to first of the month.",registry,FALSE
+completion_date,date,NA,"Date of the study completion, as given on registry. ClinicalTrials.gov previously allowed completion dates without day, in which case date is defaulted to first of the month. Indicated as `study end date` on DRKS.",registry,FALSE
+completion_year,numeric,NA,Year of the study completion. Derived from `completion_date`.,registry,TRUE
+primary_completion_date,date,NA,"Date of the study primary completion, as given on registry. ClinicalTrials.gov only. ClinicalTrials.gov previously allowed primary completion dates without day, in which case date is defaulted to first of the month.",registry,FALSE
+primary_completion_year,numeric,NA,Year of the study primary completion. Derived from `primary_completion_date`. ClinicalTrials.gov only.,registry,TRUE
+summary_results_date,date,NA,"Date of summary results. For ClinicalTrials.gov only, date of submission to registry, derived from `results_first_submitted_date` (field previously called `first_received_results_date`). For DRKS, date included on posted summary result document.","registry, manual",FALSE
+days_cd_to_summary,numeric,NA,Number of days from `completion_date` to `summary_results_date`.,registry,TRUE
+days_pcd_to_summary,numeric,NA,Number of days from `primary_completion_date` to `summary_results_date`. ClinicalTrials.gov only.,registry,TRUE
+days_reg_to_start,numeric,NA,Number of days from `registration_date` to `start_date`.,registry,TRUE
+days_reg_to_cd,numeric,NA,Number of days from `registration_date` to `completion_date`.,registry,TRUE
+days_reg_to_pcd,numeric,NA,Number of days from `registration_date` to `primary_completion_date`. ClinicalTrials.gov only.,registry,TRUE
+days_cd_to_publication,numeric,NA,Number of days from `completion_date` to `publication_date`.,"registry, manual",TRUE
+days_pcd_to_publication,numeric,NA,Number of days from `primary_completion_date` to `publication_date`. ClinicalTrials.gov only.,"registry, manual",TRUE
+days_reg_to_publication,numeric,NA,Number of days from `registration_date` to `publication_date`.,"registry, manual",TRUE
+results_search_start_date,date,NA,Date when results publication search began.,manual,FALSE
+results_search_end_date,date,NA,Date when results publication search stopped.,manual,FALSE
+registry_download_date,date,NA,Date when trial data was most recently retrieved from registry.,manual,FALSE
+doi,character,NA,Publication DOI. Manually entered during publication search or derived from PMID via FatCat.,manual,FALSE
+pmid,numeric,NA,Publication PMID. Manually entered during publication search or derived from DOI via FatCat.,manual,FALSE
+url,character,NA,Publication URL. Manually entered during publication search.,manual,FALSE
+publication_date,date,NA,"Publication date. Manually entered during publication search. Earliest date used, whether ePub or print pub date.",manual,FALSE
+publication_type,character,abstract; dissertation; journal publication,Type of identified publication.,manual,FALSE
+has_publication,logical,NA,"Whether results publication was found for trial. TRUE only if `publication_type` is ""journal article"".",manual,TRUE
+has_pubmed,logical,NA,Whether results publication found for trial is indexed in PubMed with PubMedID (PMID). NA if no PMID. FALSE if PMID but no PubMed record.,pubmed,TRUE
+has_ft,logical,NA,"Whether results publication has full text available, in our analysis. TRUE or FALSE if publication `has_pubmed`; NA if `has_pubmed` is NA.",manual,TRUE
+ft_source,character,doi; pmid,Which publication identifier was used to get the full text.,manual,TRUE
+pub_title,character,NA,"Title of results publication, from PubMed",pubmed,FALSE
+journal_pubmed,character,NA,"Journal of results publication, from PubMed.",pubmed,FALSE
+ppub_date,character,NA,"Publication date on which the issue of the journal was published, from PubMed. Character as format varies.",pubmed,FALSE
+epub_date,date,NA,"Electronic publication date of the results publication, from PubMed. Date the publisher made an electronic version of the article available.",pubmed,FALSE
+citation,character,NA,"Formatted citation of results publication: ""author et al. (year) title"". Constructed from PubMed.",pubmed,TRUE
+has_iv_trn_abstract,logical,NA,Whether `id` appears in PubMed abstract. NA if `has_pubmed` not TRUE.,pubmed,TRUE
+has_iv_trn_secondary_id,logical,NA,Whether `id` appears in PubMed secondary id. NA if `has_pubmed` not TRUE.,pubmed,TRUE
+has_iv_trn_ft,logical,NA,"Whether `id` appears in full text of results publication. Limited to publication ""body"" per PDF-to-XML extraction by GeneRation Of BIbliographic Data (GROBID).",publication,TRUE
+has_reg_pub_link,logical,NA,"Whether `doi` and/or `pmid` of results publication appear in registry references data. For ClinicalTrials.gov, ""study_references"" table on AACT, which includes references on website under ""More Information"" (""Publications"", ""Publications of Results"", ""Publications automatically indexed to this study by ClinicalTrials.gov Identifier (NCT Number)""). For DRKS, ""Publication of study results"". Note that references that include a results publication title but no persistent identifier are FALSE. NA if `has_pubmed` is NA.",registry,TRUE
+pmid_link,logical,NA,Whether `pmid` of results publication appears in registry references data. See `has_reg_pub_link`.,registry,TRUE
+doi_link,logical,NA,Whether `doi` of results publication appears in registry references data. See `has_reg_pub_link`.,registry,TRUE
+reference_derived,logical,NA,"Whether results publication automatically added for registration, instead of manually by trialist. Possible only in ClinicalTrials.gov and includes publications listed under ""Publications automatically indexed to this study by ClinicalTrials.gov Identifier (NCT Number)"". NA if `has_reg_pub_link` is FALSE or NA.",registry,TRUE
+has_crossreg_clinicaltrials.gov,logical,NA,"Whether a ClinicalTrials.gov registration number, beyond `id`, appears in `id` registration. For ClinicalTrials.gov, ""id_information"" table on AACT, which includes references on website under ""Other Study ID Numbers"". For DRKS, ""Further identification numbers"".",registry,TRUE
+has_crossreg_isrctn,logical,NA,"Whether a ISRCTN registration number, beyond `id`, appears in `id` registration. For ClinicalTrials.gov, ""id_information"" table on AACT, which includes references on website under ""Other Study ID Numbers"". For DRKS, ""Further identification numbers"".",registry,TRUE
+has_crossreg_eudract,logical,NA,"Whether a EudraCT registration number, beyond `id`, appears in `id` registration. For ClinicalTrials.gov, ""id_information"" table on AACT, which includes references on website under ""Other Study ID Numbers"". For DRKS, ""Further identification numbers"".",registry,TRUE
+has_crossreg_drks,logical,NA,"Whether a DRKS registration number, beyond `id`, appears in `id` registration. For ClinicalTrials.gov, ""id_information"" table on AACT, which includes references on website under ""Other Study ID Numbers"". For DRKS, ""Further identification numbers"".",registry,TRUE
+has_crossreg_anzctr,logical,NA,"Whether a ANZTR registration number, beyond `id`, appears in `id` registration. For ClinicalTrials.gov, ""id_information"" table on AACT, which includes references on website under ""Other Study ID Numbers"". For DRKS, ""Further identification numbers"".",registry,TRUE
+has_crossreg_ntr,logical,NA,"Whether a NTR registration number, beyond `id`, appears in `id` registration. For ClinicalTrials.gov, ""id_information"" table on AACT, which includes references on website under ""Other Study ID Numbers"". For DRKS, ""Further identification numbers"".",registry,TRUE
+n_crossreg_secondary_id,integer,NA,Number of cross-registrations that appear in PubMed secondary id of results publication. Generally NA if `has_pubmed` not TRUE.,pubmed,TRUE
+n_crossreg_abstract,integer,NA,Number of cross-registrations that appear in PubMed abstract of results publication. Generally NA if `has_pubmed` not TRUE.,pubmed,TRUE
+n_crossreg_ft,integer,NA,Number of cross-registrations that appear in full text of results publication. Generally NA if `has_ft` not TRUE.,publication,TRUE
+n_crossreg_reg,integer,NA,Number of cross-registrations that appear in `id` registration.,registry,TRUE
+n_reg_pub_any,integer,NA,"Number of ANY references in registry references data. For ClinicalTrials.gov, ""study_references"" table on AACT, which includes references on website under ""More Information"" (""Publications"", ""Publications of Results"", ""Publications automatically indexed to this study by ClinicalTrials.gov Identifier (NCT Number)""). For DRKS, ""Publication of study results"".",registry,TRUE
+n_reg_pub_doi_or_pmid,integer,NA,"Number of references with ANY doi or pmid in registry references data. For ClinicalTrials.gov, ""study_references"" table on AACT, which includes references on website under ""More Information"" (""Publications"", ""Publications of Results"", ""Publications automatically indexed to this study by ClinicalTrials.gov Identifier (NCT Number)""). For DRKS, ""Publication of study results"".",registry,TRUE
+results_followup_pub,numeric,NA,Number of days between `completion_date` and `results_search_end_date`. NA if `completion_date` is NA.,"registry, manual",TRUE
+results_followup_sumres,numeric,NA,Number of days between `completion_date` and `registry_download_date`. NA if `completion_date` is NA.,registry,TRUE
+has_followup_2y_pub,logical,NA,"Whether `results_followup_pub` is at least 2 years. NA if `iv_interventional`, `iv_completion`, or `iv_status` are FALSE.","registry, manual",TRUE
+has_followup_2y_sumres,logical,NA,"Whether `results_followup_sumres` is at least 2 years. NA if `iv_interventional`, `iv_completion`, or `iv_status` are FALSE.",registry,TRUE
+has_followup_5y_pub,logical,NA,"Whether `results_followup_pub` is at least 5 years. NA if `iv_interventional`, `iv_completion`, or `iv_status` are FALSE.","registry, manual",TRUE
+has_followup_5y_sumres,logical,NA,"Whether `results_followup_sumres` is at least 5 years. NA if `iv_interventional`, `iv_completion`, or `iv_status` are FALSE.",registry,TRUE
+is_summary_results_1y,logical,NA,"Whether trial had summary results posted on registry within 1 year of completion. NA if `has_summary_results`, `iv_interventional`, `iv_completion`, or `iv_status` are FALSE.",registry,TRUE
+is_summary_results_2y,logical,NA,"Whether trial had summary results posted on registry within 2 years completion. NA if `has_summary_results`, `iv_interventional`, `iv_completion`, or `iv_status` are FALSE.",registry,TRUE
+is_summary_results_5y,logical,NA,"Whether trial had summary results posted on registry within 5 years of completion. NA if `has_summary_results`, `iv_interventional`, `iv_completion`, or `iv_status` are FALSE.",registry,TRUE
+is_publication_2y,logical,NA,"Whether trial had publication within 2 years completion. NA if `has_publication`, `iv_interventional`, `iv_completion`, or `iv_status` are FALSE.",manual,TRUE
+is_publication_5y,logical,NA,"Whether trial had publication within 5 years completion. NA if `has_publication`, `iv_interventional`, `iv_completion`, or `iv_status` are FALSE.",manual,TRUE
+color_green_only,character,bronze; closed; gold; green; hybrid,"OA status of the journal publication based on Unpaywall. Only where `has_publication` is TRUE and a DOI was found. In case of multiple OA statuses, the following hierarchy was used: gold > hybrid > bronze > green > closed. The OA status ""green"" may include (self-)archived versions of a publication as well as preprints. NA where the publication does not resolve in Unpaywall on the query date.",unpaywall,TRUE
+color,character,bronze; closed; gold; green; hybrid,"OA status of the journal publication based on Unpaywall. Only where `has_publication` is TRUE and a DOI was found. In case of multiple OA statuses, the following hierarchy was used: gold > hybrid > green > bronze > closed. The OA status ""green"" may include (self-)archived versions of a publication as well as preprints. NA where the publication does not resolve in Unpaywall on the query date.",unpaywall,TRUE
+issn,character,NA,"Any ISSNs assigned to the journal of the publication, based on Unpaywall. Only where `has_publication` is TRUE and DOI resolves in Unpaywall on the query date.",unpaywall,FALSE
+journal_unpaywall,character,NA,"Name of the journal of the publication, based on Unpaywall. Only where `has_publication` is TRUE and DOI resolves in Unpaywall on the query date.",unpaywall,FALSE
+publisher,character,NA,"Name of the publisher of the publication, based on Unpaywall. Only where `has_publication` is TRUE and DOI resolves in Unpaywall on the query date.",unpaywall,FALSE
+publication_date_unpaywall,date,NA,"Publication date of the publication, based on Unpaywall. Only where `has_publication` is TRUE and DOI resolves in Unpaywall on the query date.",unpaywall,FALSE
+syp_response,character,no_best_permission; no_embargo_info; response; unresolved,"Shareyourpaper API response. Only where `has_publication` is TRUE and a DOI was found. Where the Shareyourpaper API response raises an exception, ""unresolved""; where there is no best permission in the Shareyourpaper API response, ""no_best_permission""; where there is no field `embargo_months` in the Shareyourpaper API response, ""no_embargo_info""; otherwise ""response"".",shareyourpaper,TRUE
+can_archive,logical,NA,Whether the publication can be archived in any way. Only where `has_publication` is TRUE and a DOI was found. From `can_archive` (best permission) in the Shareyourpaper API response. NA where `can_archive` (best permission) is not returned in the Shareyourpaper API response on the query date.,shareyourpaper,FALSE
+archiving_locations,character,"['Institutional Repository', 'Funder Designated Repository']; ['Institutional Repository', 'Non-commercial Subject Repository', ' Funder Designated Repository', ' Preprint Server']; ['Institutional Repository', 'Non-commercial Subject Repository', ' Funder Designated Repository']; ['Institutional Repository', 'Non-commercial Subject Repository', ' Preprint Server']; ['Institutional Repository', 'Non-commercial Subject Repository']; ['Institutional Repository', 'Personal Website']; ['Institutional Repository', 'PubMed Central']; ['Institutional Repository']; ['PubMed Central']; ['institutional repository']",Locations where the publication can be archived. Only where `has_publication` is TRUE and a DOI was found. From `locations` (best permission) in the Shareyourpaper API response. NA where `locations` (best permission) is not returned in the Shareyourpaper API response on the query date.,shareyourpaper,FALSE
+inst_repository,logical,NA,"Whether the publication can be archived in an institutional repository. Only where `has_publication` is TRUE and a DOI was found. TRUE if ""institutional repository"" in `locations` (best permission) of the Shareyourpaper API response. NA where `locations` is not returned in the Shareyourpaper API response on the query date.",shareyourpaper,TRUE
+versions,character,"['acceptedVersion', 'submittedVersion']; ['acceptedVersion']; ['publishedVersion', 'acceptedVersion']; ['publishedVersion']; ['submittedVersion', 'acceptedVersion', 'publishedVersion']; ['submittedVersion']; []",Version(s) of the publication that can be archived. Only where `has_publication` is TRUE and a DOI was found. From `versions` (best permission) in the Shareyourpaper API response. NA where `versions` (best permission) is not returned in the Shareyourpaper API response on the query date.,shareyourpaper,FALSE
+submitted_version,logical,NA,"Whether the submitted version of the publication can be archived. Only where `has_publication` is TRUE and a DOI was found. TRUE if ""submittedVersion"" in `versions` (best permission) of the Shareyourpaper API response. NA where `versions` is not returned in the Shareyourpaper API response on the query date.",shareyourpaper,TRUE
+accepted_version,logical,NA,"Whether the accepted version of the publication can be archived. Only where `has_publication` is TRUE and a DOI was found. TRUE if ""acceptedVersion"" in `versions` (best permission) of the Shareyourpaper API response. NA where `versions` is not returned in the Shareyourpaper API response on the query date.",shareyourpaper,TRUE
+published_version,logical,NA,"Whether the published version of the publication can be archived. Only where `has_publication` is TRUE and a DOI was found. TRUE if ""publishedVersion"" in `versions` (best permission) of the Shareyourpaper API response. NA where `versions` is not returned in the Shareyourpaper API response on the query date.",shareyourpaper,TRUE
+licenses_required,character,"[]; [{'type': ""Publisher's own license""}]; [{'type': 'CC BY'}, {'type': 'CC BY-NC'}, {'type': 'CC BY-NC-ND'}]; [{'type': 'CC BY'}, {'type': 'CC BY-NC'}, {'type': 'CC BY-SA'}, {'type': 'CC BY-NC-ND'}, {'type': 'CC BY-ND'}, {'type': 'CC BY-NC-SA'}]; [{'type': 'CC BY'}, {'type': 'CC BY-NC'}]; [{'type': 'CC BY'}, {'type': 'CC BY-NC-ND'}]; [{'type': 'CC BY'}, {'type': 'CC BY-NC-SA'}, {'type': 'CC BY-NC-ND'}]; [{'type': 'CC BY'}, {'type': 'CC BY-ND'}]; [{'type': 'CC BY'}, {'type': 'CC0'}]; [{'type': 'CC BY'}]; [{'type': 'CC BY-NC'}, {'type': 'CC BY'}, {'type': 'CC BY-NC-ND'}]; [{'type': 'CC BY-NC'}]; [{'type': 'CC BY-NC-ND'}]; [{'type': 'CC BY-NC-SA'}]; [{'type': 'CC-BY'}]; [{'type': 'Other (non-commercial)'}]; [{'type': 'cc-by'}]; [{'type': 'cc-by-nc'}]; [{'type': 'cc-by-nc-nd'}]; [{'type': 'cc-by-nc-sa'}]; [{'type': 'other (non-commercial)'}]; [{'type': 'other-closed'}]",License required to be applied to the publication. Only where `has_publication` is TRUE and a DOI was found. From `licences` (best permission) in the Shareyourpaper API response. NA where `licences` (best permission) is not returned in the Shareyourpaper API response on the query date.,shareyourpaper,FALSE
+permission_issuer,character,Journal; Publisher; article; journal,Organization issuing the permission to archive the publication. Only where `has_publication` is TRUE and a DOI was found. From `type` under `issuer` (best permission) in the Shareyourpaper API response. NA where `type` under `issuer` (best permission) is not returned in the Shareyourpaper API response on the query date.,shareyourpaper,FALSE
+embargo,numeric,NA,Embargo (in months) of the best permission to archive the publication. Only where `has_publication` is TRUE and a DOI was found. From `embargo_months` (best permission) in the Shareyourpaper API response. NA where `embargo_months` (best permission) is not returned in the Shareyourpaper API response on the query date.,shareyourpaper,FALSE
+date_embargo_elapsed,date,NA,Date at which the embargo elapses (if any). Only where `has_publication` is TRUE and a DOI was found. From `embargo_end` (best permission) in the Shareyourpaper API response. NA where `embargo_months` (best permission) equals 0 or is not returned in the Shareyourpaper API response on the query date.,shareyourpaper,FALSE
+is_embargo_elapsed,logical,NA,Whether the embargo (if any) elapsed by the query date. Only where `has_publication` is TRUE and a DOI was found. TRUE if `embargo` equals 0 or `date_embargo_elapsed` is before the query date. FALSE if `date_embargo_elapsed` is after the query date. NA where `embargo` is not returned in the Shareyourpaper API response on the query date.,shareyourpaper,TRUE
+permission_accepted,logical,NA,"Whether the accepted version of the publication be archived in an institutional repository, based on the best permission in the Shareyourpaper API response at the query date. Only where `has_publication` is TRUE and a DOI was found. TRUE if `can_archive`, `inst_repository`, `is_embargo_elapsed`, and `accepted_version` are all TRUE. NA if any of `can_archive`, `inst_repository`, `is_embargo_elapsed`, or `accepted_version` is NA. Otherwise FALSE.",shareyourpaper,TRUE
+permission_published,logical,NA,"Whether the published version of the publication be archived in an institutional repository, based on the best permission in the Shareyourpaper API response at the query date. Only where `has_publication` is TRUE and a DOI was found. TRUE if `can_archive`, `inst_repository`, `is_embargo_elapsed`, and `published_version` are all TRUE. NA if any of `can_archive`, `inst_repository`, `is_embargo_elapsed`, or `published_version` is NA. Otherwise FALSE.",shareyourpaper,TRUE
+is_oa,logical,NA,"Whether the publication is openly available. Derived from `color`. Only where `has_publication` is TRUE and a DOI was found. TRUE if `color` is ""gold"", ""hybrid"", ""green"", or ""bronze"". FALSE if `color` is ""closed"". NA where `color` is NA.",unpaywall,TRUE
+is_archivable,logical,NA,"Whether the publication can be archived, regardless of OA status. Only where `has_publication` is TRUE and a DOI was found. TRUE if either `permission_accepted` or `permission_published` is TRUE. FALSE if both `permission_accepted` and `permission_published` are FALSE. Otherwise NA.",unpaywall,TRUE
+is_closed_archivable,logical,NA,"Whether paywalled publications can be archived. Only where `has_publication` is TRUE and a DOI was found. Where `color` is ""closed"", corresponds to `is_archivable`. Otherwise NA.",unpaywall,TRUE

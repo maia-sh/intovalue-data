@@ -26,7 +26,7 @@ This dataset is modified from the [main IntoValue dataset](https://doi.org/10.52
 
 Detailed documentation for the parent IntoValue dataset is provided in a data dictionary and readme alongside the [dataset in Zenodo](https://doi.org/10.5281/zenodo.5141342). This readme serves to highlight/document changes.
 
-Note that `summary_results_date` for DRKS summary results was changed from the parent IntoValue dataset. The parent dataset included only a subset of summary results *manually* found during searches, whereas this dataset includes additional summary results found via *automated* search. The parent dataset used the `summary_results_date` manually extracted from *PDFs*, whereas this dataset uses the `summary_results_date` manually extracted from DRKS’ *change history* and reflects the date the results were uploaded and made publicly available.
+Note that `summary_results_date` for DRKS summary results was changed from the parent IntoValue dataset. The parent dataset included only a subset of summary results *manually* found during searches, whereas this dataset includes additional summary results found via *automated* search. The parent dataset used the `summary_results_date` manually extracted from *PDFs*, whereas this dataset uses the `summary_results_date` manually extracted from DRKS' *change history* and reflects the date the results were uploaded and made publicly available.
 
 ## Data sources
 
@@ -46,11 +46,11 @@ get_latest_query <- function(query, logs) {
 ```
 
 | Source                            | Type                          | Date                                               | Raw Data                                                                                                                  | Script                                                                                                            |
-|-----------------------------------|-------------------------------|----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+|------------|------------|------------|-------------------|-----------------|
 | IntoValue                         | Trials                        | NA                                                 | <https://doi.org/10.5281/zenodo.5141342>                                                                                  | [get-intovalue.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/01_get-intovalue.R)                 |
-| PubMed                            | Bibliometric                  | `r get_latest_query("PubMed", query_logs)`         | [Zenodo](https://zenodo.org/record/5506434/files/pubmed.zip?download=1) [last update: 2021-08-15]                                                                                                                    | [get-pubmed.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/02_get-pubmed.R)                       |
-| ClinicalTrials.gov/ AACT          | Registry                      | `r get_latest_query("AACT", query_logs)`           | [Zenodo](https://zenodo.org/record/5506434/files/ctgov.zip?download=1) [last update: 2021-08-15]                                                                                                                    | [get-process-aact.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/06_get-process-aact.R)                           |
-| DRKS                              | Registry                      | `r get_latest_query("DRKS", query_logs)`           | [Zenodo](https://zenodo.org/record/5506434/files/drks.zip?download=1) [last update: 2021-08-15]                                                                                                                    | [get-drks.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/08_get-drks.R)                           |
+| PubMed                            | Bibliometric                  | `r get_latest_query("PubMed", query_logs)`         | [Zenodo](https://zenodo.org/record/5506434/files/pubmed.zip?download=1) [last update: 2021-08-15]                         | [get-pubmed.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/02_get-pubmed.R)                       |
+| ClinicalTrials.gov/ AACT          | Registry                      | `r get_latest_query("AACT", query_logs)`           | [Zenodo](https://zenodo.org/record/5506434/files/ctgov.zip?download=1) [last update: 2021-08-15]                          | [get-process-aact.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/06_get-process-aact.R)           |
+| DRKS                              | Registry                      | `r get_latest_query("DRKS", query_logs)`           | [Zenodo](https://zenodo.org/record/5506434/files/drks.zip?download=1) [last update: 2021-08-15]                           | [get-drks.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/08_get-drks.R)                           |
 | Unpaywall/ institutional licenses | Full-text PDF                 | NA                                                 | NA, available only on local server `/data01/responsible_metrics/intovalue-data/fulltext`                                  | [get-ft-pdf.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/03_get-ft-pdf.R)                       |
 | GROBID                            | Full-text XML                 | NA                                                 | NA, available only on local server `/data01/responsible_metrics/intovalue-data/fulltext`                                  | PDF-to-XML conversion done in Python                                                                              |
 | Unpaywall                         | Open access status            | `r get_latest_query("Unpaywall", query_logs)`      | [oa-unpaywall.csv](https://github.com/maia-sh/intovalue-data/blob/main/data/raw/open-access/oa-unpaywall.csv)             | [get-oa-unpaywall-data.R](https://github.com/maia-sh/intovalue-data/blob/main/scripts/13_get-oa-unpaywall-data.R) |
@@ -66,70 +66,82 @@ fs::dir_tree(here::here("data", "raw"), recurse = FALSE)
 fs::dir_tree(here::here("data", "raw", "fulltext"))
 ```
 
-    ├── data
-        ├── processed
-        │   ├── codebook.csv
-        │   ├── trials.csv
-        │   ├── trials.rds
-        │   ├── pubmed
-        │   │   ├── pubmed-abstract.rds
-        │   │   ├── pubmed-ft-retrieved.rds
-        │   │   ├── pubmed-main.rds
-        │   │   └── pubmed-si.rds
-        │   ├── registries
-        │   │   ├── ctgov
-        │   │   │   ├── ctgov-crossreg.rds
-        │   │   │   ├── ctgov-facility-affiliations.rds
-        │   │   │   ├── ctgov-ids.rds
-        │   │   │   ├── ctgov-lead-affiliations.rds
-        │   │   │   ├── ctgov-references.rds
-        │   │   │   └── ctgov-studies.rds
-        │   │   ├── drks
-        │   │   │   ├── drks-crossreg.rds
-        │   │   │   ├── drks-facility-affiliations.rds
-        │   │   │   ├── drks-ids.rds
-        │   │   │   ├── drks-lead-affiliations.rds
-        │   │   │   ├── drks-references.rds
-        │   │   │   └── drks-studies.rds
-        │   │   ├── registry-crossreg.rds
-        │   │   ├── registry-references.rds
-        │   │   └── registry-studies.rds
-        │   └── trn
-        │       ├──  cross-registrations.rds
-        │       ├──  n-cross-registrations.rds
-        │       ├──  trn-abstract.rds
-        │       ├──  trn-all.rds
-        │       ├──  trn-ft-doi.rds
-        │       ├──  trn-ft-pmid.rds
-        │       ├──  trn-reported-long.rds
-        │       ├──  trn-reported-wide.rds
-        │       └──  trn-si.rds
-        └── raw
-            ├── intovalue.csv
-            ├── pubmed {raw files named [pmid].xml}
-            ├── registries
-            │   ├── ctgov
-            │   │   ├── centers.csv
-            │   │   ├── designs.csv
-            │   │   ├── facilities.csv
-            │   │   ├── ids.csv
-            │   │   ├── interventions.csv
-            │   │   ├── officials.csv
-            │   │   ├── references.csv
-            │   │   ├── responsible-parties.csv
-            │   │   ├── sponsors.csv
-            │   │   └── studies.csv
-            │   └── drks {raw files named [drks trn]}
-            ├── fulltext
-            │   ├── doi
-            │   │   ├── pdf {raw files named [doi].pdf}
-            │   │   └── xml {raw files named [doi].tei.xml}
-            │   └── pmid
-            │       ├── pdf {raw files named [pmid].pdf}
-            │       └── xml {raw files named [pmid].tei.xml}
-            └── open-access
-                ├── oa-syp-permissions.csv
-                └── oa-unpaywall.csv
+```         
+├── data
+    ├── processed
+    │   ├── codebook.csv
+    │   ├── trials.csv
+    │   ├── trials.rds
+    │   ├── pubmed
+    │   │   ├── pubmed-abstract.rds
+    │   │   ├── pubmed-ft-retrieved.rds
+    │   │   ├── pubmed-main.rds
+    │   │   └── pubmed-si.rds
+    │   ├── registries
+    │   │   ├── ctgov
+    │   │   │   ├── ctgov-crossreg.rds
+    │   │   │   ├── ctgov-facility-affiliations.rds
+    │   │   │   ├── ctgov-ids.rds
+    │   │   │   ├── ctgov-lead-affiliations.rds
+    │   │   │   ├── ctgov-references.rds
+    │   │   │   └── ctgov-studies.rds
+    │   │   ├── drks
+    │   │   │   ├── drks-crossreg.rds
+    │   │   │   ├── drks-facility-affiliations.rds
+    │   │   │   ├── drks-ids.rds
+    │   │   │   ├── drks-lead-affiliations.rds
+    │   │   │   ├── drks-references.rds
+    │   │   │   └── drks-studies.rds
+    │   │   ├── registry-crossreg.rds
+    │   │   ├── registry-references.rds
+    │   │   └── registry-studies.rds
+    │   └── trn
+    │       ├──  cross-registrations.rds
+    │       ├──  n-cross-registrations.rds
+    │       ├──  trn-abstract.rds
+    │       ├──  trn-all.rds
+    │       ├──  trn-ft-doi.rds
+    │       ├──  trn-ft-pmid.rds
+    │       ├──  trn-reported-long.rds
+    │       ├──  trn-reported-wide.rds
+    │       └──  trn-si.rds
+    └── raw
+        ├── intovalue.csv
+        ├── pubmed {raw files named [pmid].xml}
+        ├── registries
+        │   ├── ctgov
+        │   │   ├── centers.csv
+        │   │   ├── designs.csv
+        │   │   ├── facilities.csv
+        │   │   ├── ids.csv
+        │   │   ├── interventions.csv
+        │   │   ├── officials.csv
+        │   │   ├── references.csv
+        │   │   ├── responsible-parties.csv
+        │   │   ├── sponsors.csv
+        │   │   └── studies.csv
+        │   └── drks {raw files named [drks trn]}
+        ├── fulltext
+        │   ├── doi
+        │   │   ├── pdf {raw files named [doi].pdf}
+        │   │   └── xml {raw files named [doi].tei.xml}
+        │   └── pmid
+        │       ├── pdf {raw files named [pmid].pdf}
+        │       └── xml {raw files named [pmid].tei.xml}
+        └── open-access
+            ├── oa-syp-permissions.csv
+            └── oa-unpaywall.csv
+```
+
+## Data documentation
+
+Descriptions of the output tables and variables is available in:
+
+-   `tables-definitions.csv`: Overview of tables
+-   `codebook.csv`: Description of variables in 'trials' table which is the main dataset
+-   `data-dictionary.csv`: Description of variables in tables aside from 'trials'
+
+Additional documentation will be created as needed.
 
 ## Analysis dataset
 
@@ -290,5 +302,5 @@ as_kable(tbl_euctr)
 Of the `r n_iv_trials` unique trials completed between 2009 and 2017 and meeting the IntoValue inclusion criteria, we found that `r inline_text(tbl_euctr, row_level = "TRUE", col_level = "Total")` include an EUCTR id in their registration, and are presumably cross-registered in EUCTR. This includes `r inline_text(tbl_euctr, row_level = "TRUE", col_level = "ClinicalTrials.gov")` from ClinicalTrials.gov and `r inline_text(tbl_euctr, row_level = "TRUE", col_level = "DRKS")` from DRKS.
 
 ## Documentation TODOs
-- Update data dictionary
-- Add information about categories of data changes from IV1/2 dataset
+
+-   Add information about categories of data changes from IV1/2 dataset

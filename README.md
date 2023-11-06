@@ -117,6 +117,18 @@ are indicated with curly braces.
                 ├── oa-syp-permissions.csv
                 └── oa-unpaywall.csv
 
+## Data documentation
+
+Descriptions of the output tables and variables is available in:
+
+- `tables-definitions.csv`: Overview of tables
+- `codebook.csv`: Description of variables in ‘trials’ table which is
+  the main dataset
+- `data-dictionary.csv`: Description of variables in tables aside from
+  ‘trials’
+
+Additional documentation will be created as needed.
+
 ## Analysis dataset
 
 We are interested in interventional trials with a German UMC lead
@@ -326,5 +338,4 @@ DRKS.
 
 ## Documentation TODOs
 
-- Update data dictionary
 - Add information about categories of data changes from IV1/2 dataset

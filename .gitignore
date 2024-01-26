@@ -23,6 +23,7 @@ data/raw/open-access/oa-roadoi.rds
 data/ctgov-2018/ctgov/*
 data/processed/codebook-structure.csv
 data/raw/euctr_euctr_dump-2023-12-02-002347.csv
+TRN(registry data).rds
 
 # Python specific project settings
 .idea/

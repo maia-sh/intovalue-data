@@ -1,6 +1,7 @@
-## Script to combine all TRNs of IntoValue and all (potential) Cross Registrations, and all EU trials.
-## we are building our TRN (registry data) table, which will be a list of TRNs along with the other TRNs that are mentioned in their
-## registries.
+## Script to combine all TRNs of IntoValue and EU trials.
+## we are building our TRN (registry data) table, which will be a list of these TRNs along with the other TRNs that are mentioned in their
+## registries, and also the sponsor protocol number associated with each IV or EU TRN, if available. We will also record which TRNs are in IV
+## or not, so we can easily prioritize potential cross-registrations later.
 
 ##########################################################
 
@@ -16,6 +17,7 @@ library(ctregistries)
 dir_raw <- here("data", "raw")
 dir_processed <- here("data", "processed")
 
+# full set of IV trials downloaded here so we can easily check which TRNs are in IV
 trials <- read_csv(path(dir_processed, "trials.csv"))
 cross_registrations <- read_rds(path(dir_processed, "trn", "cross-registrations.rds"))
 
@@ -34,50 +36,55 @@ EU_ids = EU_dump %>% select(eudract_number) # %>% unique() # a lot of these are 
 EU_ids = rename(EU_ids, id = eudract_number)
 
 # combine into larger, union() gets rid of duplicates
-combined_ids = union(IV_ids, EU_ids) #%>% unique()
+#combined_ids = union(IV_ids, EU_ids) #%>% unique()
 
 ##########################################################
 
-#now we need to add info about what other TRNs/other IDs are mentioned in the registry of each of these above trials
+# Clean and prepare IV trns separately before merging with EU
 
-#for EU, we will collect all trial identifiers from EU_dump, including sponsor protocol number, NCT, and other identifiers if available
+IV_clean = cross_registrations %>%
+  filter(is_crossreg_reg) %>%
+  group_by(id) %>%
+  summarize(trns_reg = paste(crossreg_trn, collapse = ";")) %>%
+  mutate(protocol_number = NA) %>%
+  relocate(protocol_number, .before = trns_reg) %>%
+  mutate(is_IV = TRUE)
 
+##########################################################
+
+# Clean and prepare EU trns separately before merging with IV_clean
+
+# Maybe an unnecessary variable for now, but we want to collect sponsor/ country info for prioritization in title matching
 EU_trns_reg = EU_dump %>% select(eudract_number,sponsor_s_protocol_code_number,
                                  isrctn_international_standard_randomised_controlled_trial_numbe,
                                  us_nct_clinicaltrials_gov_registry_number, who_universal_trial_reference_number_utrn,
-                                 other_identifiers
-) # %>% unique()
-EU_trns_reg = rename(EU_trns_reg, id = eudract_number)
+                                 other_identifiers, member_state_concerned)
 
-TRN_registry_data = left_join(combined_ids, EU_trns_reg, by = "id")
+EU_clean = EU_trns_reg %>% select(eudract_number, sponsor_s_protocol_code_number,
+                                  isrctn_international_standard_randomised_controlled_trial_numbe, us_nct_clinicaltrials_gov_registry_number,
+                                  who_universal_trial_reference_number_utrn, other_identifiers)
 
-# for NCT/ all other trials, we will fill out the table in the following way:
-# Join TRN table and cross_registrations by ID, filter out all cross-registrations where the other TRN is not found in the IV registry
-# TRNs may have multiple cross-reg associated with them, so group by each TRN and add all related TRNs to semicolon separated list in new
-# column "all_crossregs"
+columns_to_clean = c("isrctn_international_standard_randomised_controlled_trial_numbe",
+                     "us_nct_clinicaltrials_gov_registry_number", "who_universal_trial_reference_number_utrn",
+                     "other_identifiers")
 
-cleaned_crossreg = left_join(TRN_registry_data,cross_registrations, by = "id") %>%
-  filter(is_crossreg_reg) %>%
-  group_by(id) %>%
-  summarize(all_crossregs = paste(crossreg_trn, collapse = ";"))
+# apply Maia's cleaning function to each column we want cleaned in EU table. All inputs that are uncleanable are returned the same
+EU_clean[columns_to_clean] = apply(EU_clean[columns_to_clean], c(1, 2), function(x) tryCatch(clean_trn(x, quiet = TRUE), error = function(e) x))
 
-# put all information from EU and IV crossregs together. Join first by ID
-# create new "trns_reg" column which will contain all identifier information taken from both EU_dump and cross_registration united in single
-# column "trns_reg", with each identifier separated by a semicolon.
+# merge all connected TRNs into "trns_reg", like in IV_clean, separate protocol number, and add is_IV boolean to see if
+# any of the EU trials are also in IV (none are)
 
-TRN_registry_data = left_join(TRN_registry_data, cleaned_crossreg, by = "id")
-TRN_registry_data = unite(TRN_registry_data, "trns_reg", all_crossregs,
-                          isrctn_international_standard_randomised_controlled_trial_numbe,
-                          us_nct_clinicaltrials_gov_registry_number, who_universal_trial_reference_number_utrn,
-                          other_identifiers, sep = ";", na.rm = TRUE) %>% rename(protocol_number = sponsor_s_protocol_code_number)
+EU_clean = unite(EU_clean, "trns_reg",isrctn_international_standard_randomised_controlled_trial_numbe,
+                 us_nct_clinicaltrials_gov_registry_number, who_universal_trial_reference_number_utrn,
+                 other_identifiers, sep = ";", na.rm = TRUE) %>%
+  rename(protocol_number = sponsor_s_protocol_code_number) %>%
+  rename(id = eudract_number) %>%
+  relocate(protocol_number, .before = trns_reg) %>%
+  mutate(is_IV = id %in% IV_ids$id)
 
 ##########################################################
-# Now we will clean the trns in each row of this table, as some are coming to us with unnecessary characters or otherwise messy
-# Maia's function will not be able to clean all of these TRNs, so some exception handling is necessary
-# so some TRNs don't get replaced with error messages
 
-TRN_registry_data$trns_reg <- sapply(TRN_registry_data$trns_reg, function(x) tryCatch(clean_trn(x, quiet = TRUE), error = function(e) x))
-
-TRN_copy = TRN_registry_data
+# now append EU_clean to IV_clean to create full TRN_registry_data table and save
+TRN_registry_data = rbind(EU_clean, IV_clean)
 
 saveRDS(TRN_registry_data, "TRN(registry data).rds" )

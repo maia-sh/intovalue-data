@@ -11,8 +11,10 @@ library(lubridate)
 library(stringr)
 library(ctregistries)
 
+# Load registry data
 TRN_registry_data = read_rds("TRN(registry data).rds")
-# this is where we will load the publications table once its ready
+
+# This is where we will load the publications table once its ready
 
 ## Build our empty TRN-TRN table
 
@@ -32,47 +34,75 @@ TRN_TRN = data.frame(
   comment = character(),
   stringsAsFactors = FALSE
 )
+
 ## First we will populate the matches table using our registry data
 # We will make a pair for every ID with any values in the trns_reg column.
 # We will look up the mentioned TRN in the table to see if that TRN contains any mention of the original TRN.
-# Before adding to the table, we will make sure that the current pair does not exist, both forwards and backwards.
+# Before adding to the table, we will make sure that the current pair does not exist
 
 
 ####################################################################################################################
 
+# Iterate through rows of TRN_registry_data
 
-add_connection <- function(trn1, trn2, trn1inreg2, trn2inreg1, connection_table) {
-  # Check if the connection already exists
-  if (!(trn1 %in% connection_table$TRN1 & trn2 %in% connection_table$TRN2) &&
-      !(trn2 %in% connection_table$TRN1 & trn1 %in% connection_table$TRN2)) {
-    # Add the new connection to the table
-    connection_table <- rbind(connection_table, c(trn1, trn2, trn1inreg2, trn2inreg1))
+for (i in seq_len(nrow(TRN_registry_data))) {
+
+  # Extract the current main ID we are linking through
+  current_id <- TRN_registry_data$id[i]
+
+   # Extract all linked trns
+  trials <- unlist(strsplit(as.character(TRN_registry_data$trns_reg[i]), ";"))
+
+  # Iterate through unique pairs of trials
+  for (j in seq_along(trials)) {
+
+    #if TRN_TRN is empty, just add the first pair since the code for checking for existing pairs breaks with an empty table
+    if (nrow(TRN_TRN) == 0) {
+
+      # Get registry information for TRNs using Maia's function
+      registry_info1 <- mutate_trn_registry(data.frame(id = current_id, stringsAsFactors = FALSE), id)
+      registry_info2 <- mutate_trn_registry(data.frame(id = trials[j], stringsAsFactors = FALSE), id)
+
+      # Append a new row to TRN_TRN
+      TRN_TRN <- rbind(
+          TRN_TRN,
+          data.frame(
+          TRN1 = current_id,
+          TRN2 = trials[j],
+          registry1 = registry_info1$registry,
+          registry2 = registry_info2$registry,
+          trn1inreg2 = current_id %in% unlist(strsplit(as.character(TRN_registry_data$trns_reg[i]), ";")),
+          trn2inreg1 = trials[j] %in% unlist(strsplit(as.character(TRN_registry_data$trns_reg[i]), ";"))
+        )
+      )
+    }
+    else {
+
+      #check for prior existence of pair
+      if (!(TRN_TRN$TRN1 %in% c(id, trials[j]) & TRN_TRN$TRN2 %in% c(id, trials[j])) &
+        !(TRN_TRN$TRN2 %in% c(id, trials[j]) & TRN_TRN$TRN1 %in% c(id, trials[j]))) {
+
+        # Get registry information for TRNs using Maia's function
+        registry_info1 <- mutate_trn_registry(data.frame(id = current_id, stringsAsFactors = FALSE), id)
+        registry_info2 <- mutate_trn_registry(data.frame(id = trials[j], stringsAsFactors = FALSE), id)
+
+        # Append a new row to TRN_TRN
+        TRN_TRN <- rbind(
+            TRN_TRN,
+            data.frame(
+            TRN1 = current_id,
+            TRN2 = trials[j],
+            registry1 = registry_info1$registry,
+            registry2 = registry_info2$registry,
+            trn1inreg2 = current_id %in% unlist(strsplit(as.character(TRN_registry_data$trns_reg[i]), ";")),
+            trn2inreg1 = trials[j] %in% unlist(strsplit(as.character(TRN_registry_data$trns_reg[i]), ";"))
+          )
+        )
+      }
+    }
   }
-  connection_table
 }
 
-# Iterate over rows in TRN_registry_data
-for (i in 1:nrow(TRN_registry_data)) {
-  # Extract information from the current row
-  current_id <- TRN_registry_data[i, "id"]
-  trns_reg <- strsplit(as.character(TRN_registry_data[i, "trns_reg"]), ";")[[1]]
 
-  # Iterate over pairs in trns_reg
-  for (j in 1:length(trns_reg)) {
-    trn1 <- current_id
-    trn2 <- trns_reg[j]
-
-    # Check if trn2 is in trn1's trns_reg
-    trn1inreg2 <- trn2 %in% strsplit(as.character(TRN_registry_data[TRN_registry_data$id == trn1, "trns_reg"]), ";")[[1]]
-
-    # Check if trn1 is in trn2's trns_reg
-    trn2inreg1 <- trn1 %in% strsplit(as.character(TRN_registry_data[TRN_registry_data$id == trn2, "trns_reg"]), ";")[[1]]
-
-    # Add the connection to TRN_TRN
-    TRN_TRN <- add_connection(trn1, trn2, trn1inreg2, trn2inreg1, TRN_TRN)
-  }
-}
-
-
-## Then we will populate the table using our publications data.
+## Here we will use the publications table when it is ready!
 

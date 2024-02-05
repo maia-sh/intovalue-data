@@ -52,13 +52,12 @@ IV_clean = cross_registrations %>%
   mutate(is_IV = TRUE)
 
 
-
 ##########################################################
 
 # Clean and prepare EU trns separately before merging with IV_clean
 
 EU_clean = EU_dump %>% select(eudract_number, sponsor_s_protocol_code_number,
-                                  isrctn_international_standard_randomised_controlled_trial_numbe, us_nct_clinicaltrials_gov_registry_number,
+                                  isrctn_international_standard_randomised_controlled_trial_numbe,us_nct_clinicaltrials_gov_registry_number,
                                   who_universal_trial_reference_number_utrn, other_identifiers)
 
 # Columns we want cleaned by Maia's script
@@ -105,6 +104,65 @@ for (col in columns_to_clean) {
 
 }
 
+##########################################################
+## Clean the last few stragglers from unclean_ids not caught by algorithm and put in trns_reg
+
+# 2011-000911-26 has 'DKRS00000766' (typo) in other_identifiers, won't be caught by algorithm
+# 2010-019181-91 has valid NCT and DRKS number, prob easier just to enter manually
+# also 2013-000577-77 ; 2020-005450-18
+
+# DRKS stragglers have format 'Name: DRKS Number: 00003246'
+# NCT stragglers have format 'Name: NCT Number: 03351608'
+
+# Function to identify and clean DRKS stragglers
+clean_drks_number <- function(string) {
+  drks_match <- regmatches(string, regexpr("DRKS Number: (\\d+)", string))
+
+  # If a match is found, return the cleaned value, otherwise, return NA
+  if (length(drks_match) < 1) {
+    return(NA)
+  }
+  else if (length(drks_match[[1]]) > 0) {
+    cleaned_value <- paste0("DRKS", gsub("\\D", "", drks_match[[1]]))
+    return(cleaned_value)
+  } else {
+    return(NA)
+  }
+}
+
+# Function to identify and clean NCT stragglers
+clean_nct_number <- function(string) {
+
+  # Use regex to extract the NCT number
+  nct_match <- regmatches(string, regexpr("NCT Number: (\\d+)", string))
+
+  # If a match is found, return the cleaned value, otherwise, return NA
+  if (length(nct_match) < 1) {
+    return(NA)
+  }
+  else if (length(nct_match[[1]]) > 0) {
+    cleaned_value <- paste0("NCT", gsub("\\D", "", nct_match[[1]]))
+    return(cleaned_value)
+  } else {
+    return(NA)
+  }
+}
+
+# Apply the cleaning functions to the unclean_ids column
+EU_clean$other_identifiers_drks <- sapply(EU_clean$unclean_ids, clean_drks_number)
+EU_clean$other_identifiers_nct <- sapply(EU_clean$unclean_ids, clean_nct_number)
+
+# Add new cleaned values to the existing values in a semicolon-separated list
+EU_clean$other_identifiers <- ifelse(
+  !is.na(EU_clean$other_identifiers_nct) | !is.na(EU_clean$other_identifiers_drks),
+  paste(EU_clean$other_identifiers_nct, EU_clean$other_identifiers_drks, sep = "; "),
+  EU_clean$other_identifiers
+)
+
+# Remove unnecessary columns
+EU_clean <- EU_clean[, !(names(EU_clean) %in% c("other_identifiers_nct", "other_identifiers_drks"))]
+
+##########################################################
 
 # merge all connected TRNs into "trns_reg", like in IV_clean, separate protocol number, and add is_IV boolean to see if
 # any of the EU trials are also in IV (none are)

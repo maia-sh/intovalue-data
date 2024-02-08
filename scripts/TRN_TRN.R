@@ -18,9 +18,9 @@ TRN_registry_data = read_rds("TRN(registry data).rds")
 
 ## Build our empty TRN-TRN table
 
-TRN_TRN = data.frame(
-  TRN1 = numeric(),
-  TRN2 = numeric(),
+trn_trn = data.frame(
+  trn1 = numeric(),
+  trn2 = numeric(),
   registry1 = character(),
   registry2 = character(),
   trn1inreg2 = logical(),
@@ -56,22 +56,18 @@ for (i in seq_len(nrow(TRN_registry_data))) {
   # Iterate through unique pairs of trials
   for (j in seq_along(trials)) {
 
-    #if TRN_TRN is empty, just add the first pair since the code for checking for existing pairs breaks with an empty table
-    if (nrow(TRN_TRN) == 0) {
+    #if trn_trn is empty, just add the first pair since the code for checking for existing pairs breaks with an empty table
+    if (nrow(trn_trn) == 0) {
 
-      # Get registry information for TRNs using Maia's function
-      registry_info1 <- mutate_trn_registry(data.frame(id = current_id, stringsAsFactors = FALSE), id)
-      registry_info2 <- mutate_trn_registry(data.frame(id = trials[j], stringsAsFactors = FALSE), id)
-
-      # Append a new row to TRN_TRN
-      TRN_TRN <- rbind(
-          TRN_TRN,
+      # Append a new row to trn_trn
+      trn_trn <- rbind(
+          trn_trn,
           data.frame(
-          TRN1 = current_id,
-          TRN2 = trials[j],
-          registry1 = registry_info1$registry,
-          registry2 = registry_info2$registry,
-          trn1inreg2 = current_id %in% unlist(strsplit(as.character(TRN_registry_data$trns_reg[i]), ";")),
+          trn1 = current_id,
+          trn2 = trials[j],
+          registry1 = which_registry(current_id),
+          registry2 = which_registry(trials[j]),
+          trn1inreg2 = current_id %in% unlist(strsplit(as.character(TRN_registry_data$trns_reg[i]), ";")), # This is not doing what we think it is
           trn2inreg1 = trials[j] %in% unlist(strsplit(as.character(TRN_registry_data$trns_reg[i]), ";"))
         )
       )
@@ -79,21 +75,17 @@ for (i in seq_len(nrow(TRN_registry_data))) {
     else {
 
       #check for prior existence of pair
-      if (!(TRN_TRN$TRN1 %in% c(id, trials[j]) & TRN_TRN$TRN2 %in% c(id, trials[j])) &
-        !(TRN_TRN$TRN2 %in% c(id, trials[j]) & TRN_TRN$TRN1 %in% c(id, trials[j]))) {
+      if (!(trn_trn$trn1 %in% c(id, trials[j]) & trn_trn$trn2 %in% c(id, trials[j])) & # Is this doing what I think it is?
+        !(trn_trn$trn2 %in% c(id, trials[j]) & trn_trn$trn1 %in% c(id, trials[j]))) {
 
-        # Get registry information for TRNs using Maia's function
-        registry_info1 <- mutate_trn_registry(data.frame(id = current_id, stringsAsFactors = FALSE), id)
-        registry_info2 <- mutate_trn_registry(data.frame(id = trials[j], stringsAsFactors = FALSE), id)
-
-        # Append a new row to TRN_TRN
-        TRN_TRN <- rbind(
-            TRN_TRN,
+        # Append a new row to trn_trn
+        trn_trn <- rbind(
+            trn_trn,
             data.frame(
-            TRN1 = current_id,
-            TRN2 = trials[j],
-            registry1 = registry_info1$registry,
-            registry2 = registry_info2$registry,
+            trn1 = current_id,
+            trn2 = trials[j],
+            registry1 = which_registry(current_id),
+            registry2 = which_registry(trials[j]),
             trn1inreg2 = current_id %in% unlist(strsplit(as.character(TRN_registry_data$trns_reg[i]), ";")),
             trn2inreg1 = trials[j] %in% unlist(strsplit(as.character(TRN_registry_data$trns_reg[i]), ";"))
           )
@@ -102,6 +94,24 @@ for (i in seq_len(nrow(TRN_registry_data))) {
     }
   }
 }
+
+
+## Let's pare down the resulting table and remove rows we're not interested in, including:
+# All rows which have the same trn1 and trn2
+# All rows which have NA as a value in either trn1 or trn2
+# Any duplicate rows
+
+# Remove rows where trn1 and trn2 are the same
+trn_trn <- trn_trn[trn_trn$trn1 != trn_trn$trn2, ]
+
+# Remove rows where trn1 or trn2 are NA or equal to the string "NA"
+trn_trn <- trn_trn[!(is.na(trn_trn$trn1) | trn_trn$trn1 == "NA" | is.na(trn_trn$trn2) | trn_trn$trn2 == "NA"), ]
+
+# Remove duplicate rows
+trn_trn <- unique(trn_trn)
+
+
+
 
 
 ## Here we will use the publications table when it is ready!

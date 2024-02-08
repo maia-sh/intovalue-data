@@ -14,6 +14,7 @@ library(lubridate)
 library(stringr)
 library(ctregistries)
 
+
 dir_raw <- here("data", "raw")
 dir_processed <- here("data", "processed")
 
@@ -36,7 +37,7 @@ IV_ids = trials %>% select(id) %>% unique()
 #EU_ids = rename(EU_ids, id = eudract_number)
 
 # combine into larger, union() gets rid of duplicates
-#combined_ids = union(IV_ids, EU_ids) #%>% unique()
+# combined_ids = union(IV_ids, EU_ids) #%>% unique()
 
 ##########################################################
 
@@ -49,20 +50,28 @@ IV_clean = cross_registrations %>%
   mutate(sponsor_s_protocol_code_number = NA) %>%
   relocate(sponsor_s_protocol_code_number, .before = trns_reg) %>%
   mutate(unclean_ids = NA) %>%
-  mutate(is_IV = TRUE)
+  mutate(is_IV = TRUE) %>%
+  mutate(who_universal_trial_reference_number_utrn = NA) %>%
+  relocate(who_universal_trial_reference_number_utrn, .before = unclean_ids)
 
 
 ##########################################################
 
 # Clean and prepare EU trns separately before merging with IV_clean
 
-EU_clean = EU_dump %>% select(eudract_number, sponsor_s_protocol_code_number,
-                                  isrctn_international_standard_randomised_controlled_trial_numbe,us_nct_clinicaltrials_gov_registry_number,
-                                  who_universal_trial_reference_number_utrn, other_identifiers)
+EU_clean = EU_dump %>% select(eudract_number,
+                              sponsor_s_protocol_code_number,
+                              isrctn_international_standard_randomised_controlled_trial_numbe,
+                              us_nct_clinicaltrials_gov_registry_number,
+                              who_universal_trial_reference_number_utrn,
+                              other_identifiers)
 
 # Columns we want cleaned by Maia's script
+# got rid of WHO number column as Maia said to keep it separate, plus the well formatted numbers here still return NA with which_registry()
+# which will mess up our logic
+
 columns_to_clean = c("isrctn_international_standard_randomised_controlled_trial_numbe",
-                     "us_nct_clinicaltrials_gov_registry_number", "who_universal_trial_reference_number_utrn",
+                     "us_nct_clinicaltrials_gov_registry_number",
                      "other_identifiers")
 
 # Column which should store the identifiers which cannot be cleaned by Maia's script
@@ -78,23 +87,34 @@ for (col in columns_to_clean) {
 
     trn <- EU_clean[i, col]
 
-    # Detects whether cleaning the string 'trn' throws an error. If it does, it replaces the TRN with NA
-    cleaned <- tryCatch(clean_trn(trn, quiet = TRUE), error = function(e) trn)
+    # Detects whether cleaning the string 'trn' throws an error. If yes, initialize 'cleaned' with "Error"
+    cleaned <- tryCatch(clean_trn(trn, quiet = TRUE), error = function(e) "Error")
 
-    # Cleaner does NOT always throw an error with garbage IDs and instead just removes spaces, messing up our logic
+    # Cleaner does NOT always throw an error with garbage IDs and instead just removes spaces, messing up our logic (duds)
     # Catch those mistakes here:
+
     trn_comparison <- gsub("\\s", "", tolower(trn))
     cleaned_comparison <- gsub("\\s", "", tolower(cleaned))
 
-    if(trn_comparison == cleaned_comparison || is.na(trn_comparison)) {
+    # If the TRN can't be cleaned, eliminate it from cleaned column and place in unclean_ids for later evaluation
+    if(cleaned == "Error" | is.na(trn)) {
+      cleaned_trns[[i]] <- NA
+      unclean_ids[[i]] <- trn # Could be either a garbage number or NA
+    }
+    # If the cleaned and original are the same AND the registry cannot be identified, it must be a dud (see above)
+    else if ((trn_comparison == cleaned_comparison) & !(which_registry(cleaned) %in% c("ANZCTR", "ChiCTR", "ClinicalTrials.gov", "CRiS", "CTRI", "DRKS", "IRCT", "ISRCTN", "JapicCTI", "jRCT", "EudraCT", "NTR", "PACTR", "UMIN-CTR"))){
       cleaned_trns[[i]] <- NA
       unclean_ids[[i]] <- trn
     }
+    # If the cleaned and original are the same and the registry CAN be identified, the original must have already been clean
+    else if ((trn_comparison == cleaned_comparison) & (which_registry(cleaned) %in% c("ANZCTR", "ChiCTR", "ClinicalTrials.gov", "CRiS", "CTRI", "DRKS", "IRCT", "ISRCTN", "JapicCTI", "jRCT", "EudraCT", "NTR", "PACTR", "UMIN-CTR"))){
+      cleaned_trns[[i]] <- cleaned
+      unclean_ids[[i]] <- NA
+    }
+    # Cleaned and original must be different, so save cleaned and discard the old TRN
     else {
-      # Cleaned will receive either the cleaned version of a TRN or an NA. If the TRN was uncleanable, it goes to unclean_ids
-      # if the cleaned TRN and the original TRN are the same, unclean_ids is blank (NA) for that row
-      cleaned_trns[[i]] <- ifelse(identical(tolower(cleaned), tolower(trn)), NA, cleaned)
-      unclean_ids[[i]] <- ifelse(identical(tolower(cleaned), tolower(trn)), NA, trn)
+      cleaned_trns[[i]] <- cleaned
+      unclean_ids[[i]] <- NA
     }
 
   }
@@ -168,7 +188,7 @@ EU_clean <- EU_clean[, !(names(EU_clean) %in% c("other_identifiers_nct", "other_
 # any of the EU trials are also in IV (none are)
 
 EU_clean = unite(EU_clean, "trns_reg",isrctn_international_standard_randomised_controlled_trial_numbe,
-                 us_nct_clinicaltrials_gov_registry_number, who_universal_trial_reference_number_utrn,
+                 us_nct_clinicaltrials_gov_registry_number,
                  other_identifiers, sep = ";", na.rm = TRUE) %>%
   rename(id = eudract_number) %>%
   relocate(sponsor_s_protocol_code_number, .before = trns_reg) %>%

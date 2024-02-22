@@ -24,6 +24,8 @@ data/ctgov-2018/ctgov/*
 data/processed/codebook-structure.csv
 data/raw/euctr_euctr_dump-2023-12-02-002347.csv
 TRN(registry data).rds
+data/raw/euctr_data_quality_results_scrape_feb_2024.csv
+
 
 # Python specific project settings
 .idea/

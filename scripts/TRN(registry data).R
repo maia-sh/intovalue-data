@@ -32,6 +32,10 @@ EU_protocol_dump <- read_csv(path(dir_raw, "euctr_euctr_dump-2024-02-03-054239.c
 EU_results_dump <- read_csv(path(dir_raw, "euctr_data_quality_results_scrape_feb_2024.csv" ))
 EU_results_dump <- EU_results_dump[EU_results_dump$trial_id != "2006-005253-30", ]
 
+## Download ids table in ctgov folder from zenodo
+# will be left joined by sponsor_s_protocol number to see if we get any more extra TRNs
+
+sponsor_linked_ids = read_csv(path(dir_raw, "ids.csv"))
 ##########################################################
 
 # extract only IDs from each of the big tables
@@ -362,4 +366,17 @@ TRN_duplicates = rbind(EU_clean, IV_clean)
 # Removes only rows that are exact duplicates of each other. No loss of data from differing sponsor protocol numbers
 TRN_registry_data = TRN_duplicates[!duplicated(TRN_duplicates),]
 
+##########################################################
+# Now in one final addition of information, we will join in ids.csv
+# See if id_value field in that table matches with our sponsor_s_protocol_code_number field. If they match, bring in the value from the nct_id field in ids.csv table
+
+sponsor_linked_ids = sponsor_linked_ids %>%
+                     rename(sponsor_s_protocol_code_number = id_value) %>%
+                     rename(sponsor_linked_trn = nct_id) %>%
+                     select(sponsor_linked_trn, sponsor_s_protocol_code_number)
+
+TRN_registry_data = left_join(TRN_registry_data, sponsor_linked_ids, by = "sponsor_s_protocol_code_number") %>%
+                    relocate(sponsor_linked_trn, .after = trns_reg)
+
+## Save as RDS
 saveRDS(TRN_registry_data, "TRN(registry data).rds" )

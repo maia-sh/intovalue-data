@@ -260,7 +260,7 @@ clean_nederlands_number <- function(string) {
   matches <- regmatches(string, gregexpr("(NL\\d+|NTR\\d+)", string))
 
   if (length(matches) > 0 && length(unlist(matches)) > 0) {
-    cleaned_value <- paste(unlist(matches), collapse = "; ")
+    cleaned_value <- paste(unlist(matches), collapse = ";")
     return(cleaned_value)
   } else {
     return(string)  # Return the original value if no matches are found

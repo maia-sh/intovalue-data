@@ -27,6 +27,7 @@ TRN(registry data).rds
 data/raw/euctr_data_quality_results_scrape_feb_2024.csv
 euctr_euctr_dump-2024-02-03-054239.csv
 ids.csv
+studies.csv
 
 # Python specific project settings
 .idea/

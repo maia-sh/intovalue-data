@@ -28,7 +28,8 @@ trn_trn = data.frame(
   pub_si = logical(),
   pub_abs = logical(),
   pub_ft = logical(),
-  is_match_sponsor_protocol_id = logical(),
+  is_match_protocol_sponsor_protocol_id = logical(),
+  is_match_results_sponsor_protocol_id = logical(),
   other = character(),
   crossreg_manual_valid = logical(),
   validation_date = as.Date(character(), format = "%Y-%m-%d"),
@@ -42,7 +43,7 @@ trn_trn = data.frame(
 # Only required parameters are trn1 and trn2. All else are NA by default, so that the structure of the table stays intact throughout adding/editing
 add_trn_trn_row <- function(trn1, trn2, registry1 = NA, registry2 = NA,
                             trn1inreg2 = NA, trn2inreg1 = NA, pub_si = NA, pub_abs = NA,
-                            pub_ft = NA, is_match_sponsor_protocol_id = NA, other = NA,
+                            pub_ft = NA, is_match_protocol_sponsor_protocol_id = NA, is_match_results_sponsor_protocol_id = NA, other = NA,
                             crossreg_manual_valid = NA, validation_date = NA, comment = NA) {
 
   # Create a new row with the provided parameters
@@ -56,7 +57,8 @@ add_trn_trn_row <- function(trn1, trn2, registry1 = NA, registry2 = NA,
     pub_si = as.logical(pub_si),
     pub_abs = as.logical(pub_abs),
     pub_ft = as.logical(pub_ft),
-    is_match_sponsor_protocol_id = as.logical(is_match_sponsor_protocol_id),
+    is_match_protocol_sponsor_protocol_id = as.logical(is_match_protocol_sponsor_protocol_id),
+    is_match_results_sponsor_protocol_id = as.logical(is_match_results_sponsor_protocol_id),
     other = as.character(other),
     crossreg_manual_valid = as.logical(crossreg_manual_valid),
     validation_date = as.Date(validation_date, format = "%Y-%m-%d"),
@@ -74,7 +76,7 @@ add_trn_trn_row <- function(trn1, trn2, registry1 = NA, registry2 = NA,
 # Checks in row that existing values are not overwritten by the default values of NA in function signature
 update_trn_trn_row <- function(trn1, trn2, registry1 = NA, registry2 = NA,
                                trn1inreg2 = NA, trn2inreg1 = NA, pub_si = NA,
-                               pub_abs = NA, pub_ft = NA, is_match_sponsor_protocol_id = NA,
+                               pub_abs = NA, pub_ft = NA, is_match_protocol_sponsor_protocol_id = NA, is_match_results_sponsor_protocol_id = NA,
                                other = NA, crossreg_manual_valid = NA,
                                validation_date = NA, comment = NA) {
 
@@ -92,7 +94,8 @@ update_trn_trn_row <- function(trn1, trn2, registry1 = NA, registry2 = NA,
   existing_values$pub_si <- ifelse(!is.na(pub_si), pub_si, existing_values$pub_si)
   existing_values$pub_abs <- ifelse(!is.na(pub_abs), pub_abs, existing_values$pub_abs)
   existing_values$pub_ft <- ifelse(!is.na(pub_ft), pub_ft, existing_values$pub_ft)
-  existing_values$is_match_sponsor_protocol_id <- ifelse(!is.na(is_match_sponsor_protocol_id), is_match_sponsor_protocol_id, existing_values$is_match_sponsor_protocol_id)
+  existing_values$is_match_protocol_sponsor_protocol_id <- ifelse(!is.na(is_match_protocol_sponsor_protocol_id), is_match_protocol_sponsor_protocol_id, existing_values$is_match_protocol_sponsor_protocol_id)
+  existing_values$is_match_results_sponsor_protocol_id <- ifelse(!is.na(is_match_results_sponsor_protocol_id), is_match_results_sponsor_protocol_id, existing_values$is_match_results_sponsor_protocol_id)
   existing_values$other <- ifelse(!is.na(other), other, existing_values$other)
   existing_values$crossreg_manual_valid <- ifelse(!is.na(crossreg_manual_valid), crossreg_manual_valid, existing_values$crossreg_manual_valid)
   existing_values$validation_date <- ifelse(!is.na(validation_date), as.Date(validation_date, format = "%Y-%m-%d"), existing_values$validation_date)
@@ -162,36 +165,74 @@ for (i in 1:nrow(TRN_registry_data)) {
 # sponsor connection boolean to TRUE. If the pair already exists, just update the boolean value.
 
 
+# FIRST go through the protocol_sponsor_linked_trn
+
 for (i in 1:nrow(TRN_registry_data)) {
 
   current_id <- TRN_registry_data$id[i]
-  current_sponsor_linked_trn <- TRN_registry_data$sponsor_linked_trn[i]
+  current_protocol_sponsor_linked_trn <- TRN_registry_data$protocol_sponsor_linked_trn[i]
 
   # Skip rows where sponsor_linked_trn is empty
-  if (is.na(current_sponsor_linked_trn) || current_sponsor_linked_trn == "") {
+  if (is.na(current_protocol_sponsor_linked_trn) || current_protocol_sponsor_linked_trn == "") {
     next
   }
 
 
   # Ensure trn-trn does not capture self-references
-  if (current_id != current_sponsor_linked_trn) {
+  if (current_id != current_protocol_sponsor_linked_trn) {
 
     # If the pair exists already, update the boolean is_match_sponsor_protocol ID to reflect new layer of connection
-    if (any(trn_trn$trn1 == current_id & trn_trn$trn2 == current_sponsor_linked_trn)) {
+    if (any(trn_trn$trn1 == current_id & trn_trn$trn2 == current_protocol_sponsor_linked_trn)) {
 
       trn_trn <- update_trn_trn_row(trn1 = current_id,
-                                    trn2 = current_sponsor_linked_trn,
-                                    is_match_sponsor_protocol_id = TRUE)
+                                    trn2 = current_protocol_sponsor_linked_trn,
+                                    is_match_protocol_sponsor_protocol_id = TRUE)
     }
     # If the pairing is unique, add new row to table with is_match_sponsor_protocol_id initialized to TRUE
     else {
       trn_trn <- add_trn_trn_row(trn1 = current_id,
-                                 trn2 = current_sponsor_linked_trn,
+                                 trn2 = current_protocol_sponsor_linked_trn,
                                  registry1 = which_registry(current_id),
-                                 registry2 = which_registry(current_sponsor_linked_trn),
+                                 registry2 = which_registry(current_protocol_sponsor_linked_trn),
                                  trn1inreg2 = NA,
                                  trn2inreg1 = NA,
-                                 is_match_sponsor_protocol_id = TRUE)
+                                 is_match_protocol_sponsor_protocol_id = TRUE)
+    }
+  }
+}
+
+# SECOND go through results_sponsor_linked_trn
+
+for (i in 1:nrow(TRN_registry_data)) {
+
+  current_id <- TRN_registry_data$id[i]
+  current_results_sponsor_linked_trn <- TRN_registry_data$results_sponsor_linked_trn[i]
+
+  # Skip rows where sponsor_linked_trn is empty
+  if (is.na(current_results_sponsor_linked_trn) || current_results_sponsor_linked_trn == "") {
+    next
+  }
+
+
+  # Ensure trn-trn does not capture self-references
+  if (current_id != current_results_sponsor_linked_trn) {
+
+    # If the pair exists already, update the boolean is_match_sponsor_protocol ID to reflect new layer of connection
+    if (any(trn_trn$trn1 == current_id & trn_trn$trn2 == current_results_sponsor_linked_trn)) {
+
+      trn_trn <- update_trn_trn_row(trn1 = current_id,
+                                    trn2 = current_results_sponsor_linked_trn,
+                                    is_match_results_sponsor_protocol_id = TRUE)
+    }
+    # If the pairing is unique, add new row to table with is_match_sponsor_protocol_id initialized to TRUE
+    else {
+      trn_trn <- add_trn_trn_row(trn1 = current_id,
+                                 trn2 = current_results_sponsor_linked_trn,
+                                 registry1 = which_registry(current_id),
+                                 registry2 = which_registry(current_results_sponsor_linked_trn),
+                                 trn1inreg2 = NA,
+                                 trn2inreg1 = NA,
+                                 is_match_results_sponsor_protocol_id = TRUE)
     }
   }
 }

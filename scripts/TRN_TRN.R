@@ -14,6 +14,9 @@ library(ctregistries)
 # Load registry data
 TRN_registry_data = read_rds("TRN(registry data).rds")
 
+# Load title matching data
+title_matches = read_rds("title_matched_7.rds")
+
 # This is where we will load the publications table once its ready
 
 ## Build our empty TRN-TRN table
@@ -30,6 +33,7 @@ trn_trn = data.frame(
   pub_ft = logical(),
   is_match_protocol_sponsor_protocol_id = logical(),
   is_match_results_sponsor_protocol_id = logical(),
+  is_title_matched = logical(),
   other = character(),
   crossreg_manual_valid = logical(),
   validation_date = as.Date(character(), format = "%Y-%m-%d"),
@@ -43,8 +47,8 @@ trn_trn = data.frame(
 # Only required parameters are trn1 and trn2. All else are NA by default, so that the structure of the table stays intact throughout adding/editing
 add_trn_trn_row <- function(trn1, trn2, registry1 = NA, registry2 = NA,
                             trn1inreg2 = NA, trn2inreg1 = NA, pub_si = NA, pub_abs = NA,
-                            pub_ft = NA, is_match_protocol_sponsor_protocol_id = NA, is_match_results_sponsor_protocol_id = NA, other = NA,
-                            crossreg_manual_valid = NA, validation_date = NA, comment = NA) {
+                            pub_ft = NA, is_match_protocol_sponsor_protocol_id = NA, is_match_results_sponsor_protocol_id = NA, is_title_matched = NA,
+                            other = NA, crossreg_manual_valid = NA, validation_date = NA, comment = NA) {
 
   # Create a new row with the provided parameters
   new_row <- data.frame(
@@ -59,6 +63,7 @@ add_trn_trn_row <- function(trn1, trn2, registry1 = NA, registry2 = NA,
     pub_ft = as.logical(pub_ft),
     is_match_protocol_sponsor_protocol_id = as.logical(is_match_protocol_sponsor_protocol_id),
     is_match_results_sponsor_protocol_id = as.logical(is_match_results_sponsor_protocol_id),
+    is_title_matched = as.logical(is_title_matched),
     other = as.character(other),
     crossreg_manual_valid = as.logical(crossreg_manual_valid),
     validation_date = as.Date(validation_date, format = "%Y-%m-%d"),
@@ -76,7 +81,7 @@ add_trn_trn_row <- function(trn1, trn2, registry1 = NA, registry2 = NA,
 # Checks in row that existing values are not overwritten by the default values of NA in function signature
 update_trn_trn_row <- function(trn1, trn2, registry1 = NA, registry2 = NA,
                                trn1inreg2 = NA, trn2inreg1 = NA, pub_si = NA,
-                               pub_abs = NA, pub_ft = NA, is_match_protocol_sponsor_protocol_id = NA, is_match_results_sponsor_protocol_id = NA,
+                               pub_abs = NA, pub_ft = NA, is_match_protocol_sponsor_protocol_id = NA, is_match_results_sponsor_protocol_id = NA, is_title_matched = NA,
                                other = NA, crossreg_manual_valid = NA,
                                validation_date = NA, comment = NA) {
 
@@ -96,6 +101,7 @@ update_trn_trn_row <- function(trn1, trn2, registry1 = NA, registry2 = NA,
   existing_values$pub_ft <- ifelse(!is.na(pub_ft), pub_ft, existing_values$pub_ft)
   existing_values$is_match_protocol_sponsor_protocol_id <- ifelse(!is.na(is_match_protocol_sponsor_protocol_id), is_match_protocol_sponsor_protocol_id, existing_values$is_match_protocol_sponsor_protocol_id)
   existing_values$is_match_results_sponsor_protocol_id <- ifelse(!is.na(is_match_results_sponsor_protocol_id), is_match_results_sponsor_protocol_id, existing_values$is_match_results_sponsor_protocol_id)
+  existing_values$is_title_matched <- ifelse(!is.na(is_title_matched), is_title_matched, existing_values$is_title_matched)
   existing_values$other <- ifelse(!is.na(other), other, existing_values$other)
   existing_values$crossreg_manual_valid <- ifelse(!is.na(crossreg_manual_valid), crossreg_manual_valid, existing_values$crossreg_manual_valid)
   existing_values$validation_date <- ifelse(!is.na(validation_date), as.Date(validation_date, format = "%Y-%m-%d"), existing_values$validation_date)
@@ -234,6 +240,42 @@ for (i in 1:nrow(TRN_registry_data)) {
                                  trn2inreg1 = NA,
                                  is_match_results_sponsor_protocol_id = TRUE)
     }
+  }
+}
+
+
+####################################################################################################################
+# Now lets add matches made from the title matching algorithm. Will follow similar logic to steps above
+
+for (i in 1:nrow(title_matches)) {
+  current_trn1 = title_matches$id[i]
+  current_trn2 = title_matches$euctr_id[i]
+
+  # Eliminate all self-references
+  if (current_trn1 != current_trn2) {
+
+    # If the pair exists already, update the boolean is_match_sponsor_protocol ID to reflect new layer of connection
+    if (any(trn_trn$trn1 == current_trn1 & trn_trn$trn2 == current_trn2)) {
+
+      trn_trn <- update_trn_trn_row(trn1 = current_trn1,
+                                    trn2 = current_trn2,
+                                    is_title_matched = TRUE)
+    }
+    else {
+
+      current_trn1inreg2 = current_trn1 %in% unlist(lapply(strsplit(TRN_registry_data$trns_reg[TRN_registry_data$id == current_trn2], ";"), unlist))
+      current_trn2inreg1 = current_trn2 %in% unlist(lapply(strsplit(TRN_registry_data$trns_reg[TRN_registry_data$id == current_trn1], ";"), unlist))
+
+      # Add new row to trn_trn if pairing is unique and not self-referential.
+      trn_trn <- add_trn_trn_row(trn1 = current_trn1,
+                                 trn2 = current_trn2,
+                                 registry1 = which_registry(current_trn1),
+                                 registry2 = which_registry(current_trn2),
+                                 trn1inreg2 = current_trn1inreg2,
+                                 trn2inreg1 = current_trn2inreg1,
+                                 is_title_matched = TRUE)
+      }
+
   }
 }
 

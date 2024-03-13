@@ -29,6 +29,7 @@ euctr_euctr_dump-2024-02-03-054239.csv
 ids.csv
 studies.csv
 title_matched_7.rds
+publications_final.rds
 
 # Python specific project settings
 .idea/

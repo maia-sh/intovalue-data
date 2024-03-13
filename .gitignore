@@ -30,6 +30,7 @@ ids.csv
 studies.csv
 title_matched_7.rds
 publications_final.rds
+trn_trn.rds
 
 # Python specific project settings
 .idea/

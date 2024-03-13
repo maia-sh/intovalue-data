@@ -1,4 +1,5 @@
-## Script to compile all current publications associated with the IV dataset and catalogue which TRNs are found in which section of the pub.
+## Script to compile all current publications associated with the IV dataset and catalogue
+## which TRNs are found in which section of the pub.
 
 ##############################################################################################
 
@@ -9,69 +10,74 @@ library(fs)
 library(lubridate)
 library(stringr)
 
-dir_raw <- here("data", "raw")
 dir_processed <- here("data", "processed")
 
 trials <- read_csv(path(dir_processed, "trials.csv"))
 cross_registrations <- read_rds(path(dir_processed, "trn", "cross-registrations.rds"))
 
-# for our matching, we need to have cross_registration with the relevant urls attached, since not all publications have a DOI or PMID
-urls <- trials %>% select(id, url)
-cr_with_url <- left_join(cross_registrations, urls, by = "id")
+# Separate publications from IV data in 'trials'. This table gives us information about URL and pub_type to supplement what
+# we know from crossreg
+# this has 2700 rows after running
+pubs_supplementary_info = trials %>% select(doi, url, publication_type) %>% unique()
 
-## the above results in a warning that I'm not sure is an issue or not yet!
+# pubs_with_crossreg will give us information about WHERE in the publication the cross-registered TRNs can be found
+# this has 599 rows after running
+pubs_from_crossreg = cross_registrations %>%
+  filter(is_crossreg_secondary_id == TRUE | is_crossreg_abstract == TRUE | is_crossreg_ft == TRUE) %>% # filter out all cross-regs that aren't linked by a pub
+  select(id, pmid, doi, crossreg_trn, crossreg_registry, is_crossreg_secondary_id, is_crossreg_abstract, is_crossreg_ft) %>% unique()
 
 ##############################################################################################
+# Why does this have 654 rows? Why are there 55 new rows? Figure this out.
 
-# starting with initial table isolating just the DOI of a pub, the PMID, the publication type, and the IV trial it is associated with from trials.csv
+# I think its because some DOIs have multiple URLs associated with them. Not sure what to do about this.
+# Maybe collapse into semicolon separated list again? Move forward for now: collapsing all urls into semicolon separated list.
+pubs_with_info = merge(pubs_from_crossreg, pubs_supplementary_info, by = "doi") %>%
+                 unique() %>%
+                 relocate(url, .after = pmid) %>%
+                 relocate(publication_type, .after = url) %>%
+                 rename(primary_IV_id = id) %>%
+                 relocate(primary_IV_id, .after = publication_type)
 
-doi_pmid_iv <- trials %>% select(id, doi, pmid, url, publication_type) %>% rename(trns_iv = id)
 
-# Now we will fill our publications with the TRNs that are found in each section of every paper using cross_registrations
 
-publications <- doi_pmid_iv %>% add_column(trns_si = NA, trns_abs = NA, trns_ft = NA, trns_other = NA) %>%
-  relocate(trns_iv, .after = trns_ft) %>%
-  relocate(publication_type, .after = trns_other)
+# Once merged, can start putting TRNs in semicolon separated list in each column
 
-# We will iterate through cr_with_url, if a DOI/PMID/url in 'publications' matches with a DOI/PMID/url in cr_with_url, we will make note of
-# crossreg_trn, which is the non-IV TRN found in the pub
-# If the value in any of the boolean columns in cross_registrations is TRUE, then we add crossreg_trn to the corresponding column in 'publications'
+pubs_with_info$trns_si <- NA
+pubs_with_info$trns_abs <- NA
+pubs_with_info$trns_ft <- NA
+pubs_with_info$trns_other <- NA
 
-update_publications <- function(doi, pmid, url, crossreg_trn, bool_col, col_name, publications) {
-  matching_rows <- which(publications$doi == doi | publications$pmid == pmid | publications$url == url)
-  publications[matching_rows, col_name] <- paste(publications[matching_rows, col_name], crossreg_trn, sep = ";")
-  publications
+for (i in seq_len(nrow(pubs_with_info))) {
+
+  # Check and append to the list for each section
+  if (!is.na(pubs_with_info$crossreg_trn[i]) & pubs_with_info$is_crossreg_secondary_id[i]) {
+    pubs_with_info$trns_si[i] <- paste(pubs_with_info$crossreg_trn[i], pubs_with_info$trns_si[i], sep = ";")
+  }
+
+  if (!is.na(pubs_with_info$crossreg_trn[i]) & pubs_with_info$is_crossreg_abstract[i]) {
+    pubs_with_info$trns_abs[i] <- paste(pubs_with_info$crossreg_trn[i], pubs_with_info$trns_abs[i], sep = ";")
+  }
+
+  if (!is.na(pubs_with_info$crossreg_trn[i]) & pubs_with_info$is_crossreg_ft[i]) {
+    pubs_with_info$trns_ft[i] <- paste(pubs_with_info$crossreg_trn[i], pubs_with_info$trns_ft[i], sep = ";")
+  }
 }
 
-# Iterate over rows of cr_with_url
-for (i in 1:nrow(cr_with_url)) {
+publications_clean = pubs_with_info %>%
+                     select(-is_crossreg_secondary_id, -is_crossreg_abstract, -is_crossreg_ft)
 
-  # Update publications for each boolean condition and column
-  publications <- update_publications(
-    cr_with_url[i, "doi"],
-    cr_with_url[i, "pmid"],
-    cr_with_url[i, "url"],
-    cr_with_url[i, "crossreg_trn"],
-    cr_with_url[i, "is_crossreg_secondary_id"],
-    "trns_si",
-    publications
+# Now we have multiple rows per publication, so lets collapse the table into one row per publication while conserving
+# all the information
+
+
+# Fix the below so that publication type gets included in final table
+publications_final <- publications_clean %>%
+  group_by(pmid, doi, url, primary_IV_id) %>%
+  summarize(trns_si = paste(trns_si, collapse = ";"),
+            trns_abs = paste(trns_abs, collapse = ";"),
+            trns_ft = paste(trns_ft, collapse = ";"),
+            url = paste(url, collapse = ";"),
+
   )
-  publications <- update_publications(
-    cr_with_url[i, "doi"],
-    cr_with_url[i, "pmid"],
-    cr_with_url[i, "url"],
-    cr_with_url[i, "crossreg_trn"],
-    cr_with_url[i, "is_crossreg_abstract"],
-    "trns_abs",
-    publications
-  )
-  publications <- update_publications(
-    cr_with_url[i, "doi"],
-    cr_with_url[i, "pmid"],
-    cr_with_url[i, "url"],
-    cr_with_url[i, "crossreg_trn"],
-    cr_with_url[i, "is_crossreg_ft"],
-    "trns_ft",
-    publications
-  )
-}
+
+saveRDS(publications_final, "publications_final.rds")

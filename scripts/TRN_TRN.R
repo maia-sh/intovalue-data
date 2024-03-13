@@ -18,9 +18,9 @@ TRN_registry_data = read_rds("TRN(registry data).rds")
 title_matches = read_rds("title_matched_7.rds")
 
 # This is where we will load the publications table once its ready
+publications = read_rds("publications_final.rds")
 
 ## Build our empty TRN-TRN table
-
 trn_trn = data.frame(
   trn1 = numeric(),
   trn2 = numeric(),
@@ -279,6 +279,148 @@ for (i in 1:nrow(title_matches)) {
   }
 }
 
+####################################################################################################################
+## Finally let's add matches from TRNs found in publications
+
+# Iterate through publications table and add matches not found before, or update info on matches that already exist
+
+for (i in 1:nrow(publications)) {
+
+  # load variables for each row
+  current_trn1 = publications$primary_IV_id[i]
+  current_trns_si = publications$trns_si[i]
+  current_trns_abs = publications$trns_abs[i]
+  current_trns_ft = publications$trns_ft[i]
+
+  # unlist TRNs from semicolon separated format for each row
+  si_list =  strsplit(current_trns_si, ";")[[1]]
+  abs_list = strsplit(current_trns_abs, ";")[[1]]
+  ft_list = strsplit(current_trns_ft, ";")[[1]]
+
+  ###### First go through SI TRNs, provided that the field is not NA or empty
+  if (!is.na(current_trns_si) & current_trns_si != "") {
+    for (current_trn2 in si_list) {
+
+      # If the current trn2 is NA or empty, skip to next
+      if(current_trn2 == "NA" | is.na(current_trn2) | current_trn2 == "") {
+        next
+      }
+
+      # If the current trn2 is equal to trn1, skip to next (eliminate self references)
+      if (current_trn1 == current_trn2) {
+        next
+      }
+      else {
+
+        # If the match already exists, just update with new boolean info
+        if (any(trn_trn$trn1 == current_trn1 & trn_trn$trn2 == current_trn2)) {
+
+          trn_trn <- update_trn_trn_row(trn1 = current_trn1,
+                                        trn2 = current_trn2,
+                                        pub_si = TRUE)
+        }
+        # If the match is unique, add new row with necessary info
+        else {
+          current_trn1inreg2 = current_trn1 %in% unlist(lapply(strsplit(TRN_registry_data$trns_reg[TRN_registry_data$id == current_trn2], ";"), unlist))
+          current_trn2inreg1 = current_trn2 %in% unlist(lapply(strsplit(TRN_registry_data$trns_reg[TRN_registry_data$id == current_trn1], ";"), unlist))
+
+          # Add new row to trn_trn if pairing is unique and not self-referential.
+          trn_trn <- add_trn_trn_row(trn1 = current_trn1,
+                                     trn2 = current_trn2,
+                                     registry1 = which_registry(current_trn1),
+                                     registry2 = which_registry(current_trn2),
+                                     trn1inreg2 = current_trn1inreg2,
+                                     trn2inreg1 = current_trn2inreg1,
+                                     pub_si = TRUE)
+        }
+      }
+    }
+  }
+
+  ###### Second go through abstract information. Similar logic to SI section
+  if (!is.na(current_trns_abs) & current_trns_abs != "") {
+    for (current_trn2 in abs_list) {
+
+      # If the current trn2 is NA or empty, skip to next
+      if(current_trn2 == "NA" | is.na(current_trn2) | current_trn2 == "") {
+        next
+      }
+
+      # If the current trn2 is equal to trn1, skip to next (eliminate self references)
+      if (current_trn1 == current_trn2) {
+        next
+      }
+      else {
+
+        # If the match already exists, just update with new boolean info
+        if (any(trn_trn$trn1 == current_trn1 & trn_trn$trn2 == current_trn2)) {
+
+          trn_trn <- update_trn_trn_row(trn1 = current_trn1,
+                                        trn2 = current_trn2,
+                                        pub_abs = TRUE)
+        }
+        # If the match is unique, add new row with necessary info
+        else {
+          current_trn1inreg2 = current_trn1 %in% unlist(lapply(strsplit(TRN_registry_data$trns_reg[TRN_registry_data$id == current_trn2], ";"), unlist))
+          current_trn2inreg1 = current_trn2 %in% unlist(lapply(strsplit(TRN_registry_data$trns_reg[TRN_registry_data$id == current_trn1], ";"), unlist))
+
+          # Add new row to trn_trn if pairing is unique and not self-referential.
+          trn_trn <- add_trn_trn_row(trn1 = current_trn1,
+                                     trn2 = current_trn2,
+                                     registry1 = which_registry(current_trn1),
+                                     registry2 = which_registry(current_trn2),
+                                     trn1inreg2 = current_trn1inreg2,
+                                     trn2inreg1 = current_trn2inreg1,
+                                     pub_abs = TRUE)
+        }
+      }
+    }
+  }
+
+  ###### LASTLY, go through full text information. Same logic as SI and abstract sections
+
+  if (!is.na(current_trns_ft) & current_trns_ft != "") {
+    for (current_trn2 in ft_list) {
+
+      # If the current trn2 is NA or empty, skip to next
+      if(current_trn2 == "NA" | is.na(current_trn2) | current_trn2 == "") {
+        next
+      }
+
+      # If the current trn2 is equal to trn1, skip to next (eliminate self references)
+      if (current_trn1 == current_trn2) {
+        next
+      }
+      else {
+
+        # If the match already exists, just update with new boolean info
+        if (any(trn_trn$trn1 == current_trn1 & trn_trn$trn2 == current_trn2)) {
+
+          trn_trn <- update_trn_trn_row(trn1 = current_trn1,
+                                        trn2 = current_trn2,
+                                        pub_ft = TRUE)
+        }
+        # If the match is unique, add new row with necessary info
+        else {
+          current_trn1inreg2 = current_trn1 %in% unlist(lapply(strsplit(TRN_registry_data$trns_reg[TRN_registry_data$id == current_trn2], ";"), unlist))
+          current_trn2inreg1 = current_trn2 %in% unlist(lapply(strsplit(TRN_registry_data$trns_reg[TRN_registry_data$id == current_trn1], ";"), unlist))
+
+          # Add new row to trn_trn if pairing is unique and not self-referential.
+          trn_trn <- add_trn_trn_row(trn1 = current_trn1,
+                                     trn2 = current_trn2,
+                                     registry1 = which_registry(current_trn1),
+                                     registry2 = which_registry(current_trn2),
+                                     trn1inreg2 = current_trn1inreg2,
+                                     trn2inreg1 = current_trn2inreg1,
+                                     pub_ft = TRUE)
+        }
+      }
+    }
+  }
+}
+
+
+####################################################################################################################
 
 ## Let's pare down the resulting table and remove rows we're not interested in, including:
 # All rows which have the same trn1 and trn2
@@ -293,10 +435,4 @@ trn_trn <- trn_trn[!(is.na(trn_trn$trn1) | trn_trn$trn1 == "NA" | is.na(trn_trn$
 
 # Remove duplicate rows
 trn_trn <- unique(trn_trn) # if this is doing anything it means something isn't working further up; we should only be adding unique pairings in the first place
-
-
-
-
-
-## Here we will use the publications table when it is ready!
 

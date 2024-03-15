@@ -20,6 +20,12 @@ title_matches = read_rds("title_matched_7.rds")
 # This is where we will load the publications table once its ready
 publications = read_rds("publications_final.rds")
 
+# Load list of IV trials
+dir_processed <- here("data", "processed")
+trials <- read_csv(path(dir_processed, "trials.csv"))
+trials = trials %>% select(id)
+
+
 ## Build our empty TRN-TRN table
 trn_trn = data.frame(
   trn1 = numeric(),
@@ -436,3 +442,86 @@ trn_trn <- trn_trn[!(is.na(trn_trn$trn1) | trn_trn$trn1 == "NA" | is.na(trn_trn$
 # Remove duplicate rows
 trn_trn <- unique(trn_trn) # if this is doing anything it means something isn't working further up; we should only be adding unique pairings in the first place
 
+####################################################################################################################
+## Adding so called 'meta booleans' to make it easier to assign priorities to rows for manual validation stage
+
+# Boolean for whether at least one of the registries is EU
+trn_trn = trn_trn %>% mutate(at_least_one_EU = if_else((registry1 == "EudraCT" | registry2 == "EudraCT"), TRUE, FALSE))
+
+# Boolean for whether at least one of the TRNs is in IV
+trn_trn = trn_trn %>% mutate(at_least_one_IV = if_else((trn1 %in% trials | trn2 %in% trials$id), TRUE, FALSE))
+
+# Boolean for at least one of the pub booleans being TRUE
+trn_trn = trn_trn %>% mutate(at_least_one_pub = if_else(!is.na(pub_si) | !is.na(pub_abs) | !is.na(pub_ft), TRUE, FALSE))
+
+# Boolean for at least one of the sponsor protocol ID booleans being TRUE
+trn_trn = trn_trn %>% mutate(at_least_one_sponsor_match = if_else(!is.na(is_match_protocol_sponsor_protocol_id) | !is.na(is_match_results_sponsor_protocol_id), TRUE, FALSE))
+
+
+####################################################################################################################
+# Assigning priorities for manual checks using meta booleans and other columns
+
+# Need to account for NA values here for non 'meta-booleans'
+# Use coalesce() function: returns the first non-NA value in a list. Eg.) coalesce(NA, FALSE) == FALSE ; coalesce(NA, NA, 7) == 7
+
+trn_trn = trn_trn %>%
+          mutate(priority = case_when(
+
+            # Priority 1
+            at_least_one_EU &
+            at_least_one_IV &
+            coalesce(trn1inreg2, FALSE) &   # Replace NA with FALSE
+            coalesce(trn2inreg1, FALSE) &   # Replace NA with FALSE
+            (at_least_one_pub | at_least_one_sponsor_match | coalesce(is_title_matched, FALSE)) ~ 1,
+
+            # Priority 2
+            at_least_one_EU &
+            at_least_one_IV &
+            coalesce(trn1inreg2, FALSE) &
+            coalesce(trn2inreg1, FALSE) ~ 2,
+
+            # Priority 3
+            at_least_one_EU &
+            at_least_one_IV &
+            (coalesce(trn1inreg2, FALSE) | coalesce(trn2inreg1, FALSE)) &
+            (at_least_one_pub | at_least_one_sponsor_match | coalesce(is_title_matched, FALSE)) ~ 3,
+
+            # Priority 4
+            at_least_one_EU &
+            at_least_one_IV &
+            (coalesce(trn1inreg2, FALSE) | coalesce(trn2inreg1, FALSE)) ~ 4,
+
+            # Priority 5
+            at_least_one_EU &
+            at_least_one_IV &
+            (at_least_one_pub | at_least_one_sponsor_match | coalesce(is_title_matched, FALSE)) ~ 5,
+
+            # Priority 6
+            at_least_one_EU &
+            at_least_one_IV ~ 6,
+
+            # Priority 7
+            coalesce(trn1inreg2, FALSE) &
+            coalesce(trn2inreg1, FALSE) &
+            (at_least_one_pub | at_least_one_sponsor_match | coalesce(is_title_matched, FALSE)) ~ 7,
+
+            # Priority 8
+            coalesce(trn1inreg2, FALSE) &
+            coalesce(trn2inreg1, FALSE) ~ 8,
+
+            # Priority 9
+            (coalesce(trn1inreg2, FALSE) | coalesce(trn2inreg1, FALSE)) &
+            (at_least_one_pub | at_least_one_sponsor_match | coalesce(is_title_matched, FALSE)) ~ 9,
+
+            # Priority 10
+            (coalesce(trn1inreg2, FALSE) | coalesce(trn2inreg1, FALSE)) ~ 10,
+
+            # Priority 11
+            (at_least_one_pub | at_least_one_sponsor_match | coalesce(is_title_matched, FALSE)) ~ 11,
+
+            # Everything else
+            TRUE ~ 12
+            ))
+
+# save
+saveRDS(trn_trn, "trn_trn.rds")

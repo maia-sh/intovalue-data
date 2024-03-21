@@ -1,4 +1,4 @@
-## Script to build TRN-TRN table for manual proofing using publications table and TRN(registry data) table
+## Script to build TRN-TRN table for manual proofing using publications table, title matching, and TRN(registry data) table
 
 ##########################################################
 
@@ -17,7 +17,7 @@ TRN_registry_data = read_rds("TRN(registry data).rds")
 # Load title matching data
 title_matches = read_rds("title_matched_7.rds")
 
-# This is where we will load the publications table once its ready
+# Load the publications table once it's ready
 publications = read_rds("publications_final.rds")
 
 # Load list of IV trials
@@ -124,9 +124,9 @@ update_trn_trn_row <- function(trn1, trn2, registry1 = NA, registry2 = NA,
 
 ## First we will populate the matches table using our registry data
 # We will make a pair for every ID with any values in the trns_reg column.
+
 # We will look up the mentioned TRN in the table to see if that TRN contains any mention of the original TRN.
 # Before adding to the table, we will make sure that the current pair does not exist
-
 
 # Iterate through each row of TRN_registry_data
 for (i in 1:nrow(TRN_registry_data)) {
@@ -175,7 +175,6 @@ for (i in 1:nrow(TRN_registry_data)) {
 
 # Now we integrate any connections made from the sponsor protocol number. If the pair is unique, add it in table and set
 # sponsor connection boolean to TRUE. If the pair already exists, just update the boolean value.
-
 
 # FIRST go through the protocol_sponsor_linked_trn
 

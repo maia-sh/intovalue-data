@@ -1,5 +1,5 @@
 ## Script to combine all TRNs of IntoValue and EU trials.
-## we are building our TRN (registry data) table, which will be a list of these TRNs along with the other TRNs that are mentioned in their
+## The TRN (registry data) table,  will be a list of these TRNs along with the other TRNs that are mentioned in their
 ## registries, and also the sponsor protocol number associated with each IV or EU TRN, if available. We will also record which TRNs are in IV
 ## or not, so we can easily prioritize potential cross-registrations later.
 
@@ -38,7 +38,7 @@ EU_results_dump <- EU_results_dump[EU_results_dump$trial_id != "2006-005253-30",
 sponsor_linked_ids = read_csv(path(dir_raw, "ids.csv"))
 ##########################################################
 
-# extract only IDs from each of the big tables
+# extract only IDs from 'trials' so that we can check what TRNs are in IV later
 IV_ids = trials %>% select(id) %>% unique()
 
 ##########################################################
@@ -92,18 +92,12 @@ for (col in protocol_columns_to_clean) {
   cleaned_trns <- vector("list", length = nrow(EU_protocol_clean))
 
   # 'trn' is the id in each row currently being cleaned
-  for (i in seq_len(nrow(EU_protocol_clean))) {
+  for (i in 1:nrow(EU_protocol_clean)) {
 
     trn <- EU_protocol_clean[i, col]
 
     # Detects whether cleaning the string 'trn' throws an error. If yes, initialize 'cleaned' with "Error"
     cleaned <- tryCatch(clean_trn(trn, quiet = TRUE), error = function(e) "Error")
-
-    # Cleaner does NOT always throw an error with garbage IDs and instead just removes spaces, messing up our logic (duds)
-    # Catch those mistakes here:
-
-    trn_comparison <- gsub("\\s", "", tolower(trn))
-    cleaned_comparison <- gsub("\\s", "", tolower(cleaned))
 
     # If the TRN can't be cleaned, eliminate it from cleaned column and place in corresponding unclean column for later evaluation
     if(cleaned == "Error" | is.na(trn)) {
@@ -111,7 +105,8 @@ for (col in protocol_columns_to_clean) {
       unclean_col <- paste0(col, "_protocol_unclean")
       EU_protocol_clean[[unclean_col]][i] <- trn # Could be either a garbage number or NA
     }
-    # Cleaned and original must be different, so save cleaned and discard the old TRN
+
+    # If 'trn' can be cleaned, save it and discard the old TRN
     else {
       cleaned_trns[[i]] <- cleaned
       unclean_col <- paste0(col, "_protocol_unclean")
@@ -196,8 +191,6 @@ EU_results_clean = EU_results_dump %>% select(trial_id,
 # like 2020-002109-24, where a valid Chinese and a valid Japanese ID are just smushed together. Must figure out how to deal with this.
 # multiple valid IDs in a list sometimes don't get recognized: 2021-000904-39
 
-# some stragglers with Dutch trial registries: 2012-001909-24
-#  2017-002288-16, etc
 
 results_columns_to_clean = c("nct_number",
                             "isrctn_number",
@@ -214,18 +207,12 @@ for (col in results_columns_to_clean) {
   cleaned_trns <- vector("list", length = nrow(EU_results_clean))
 
   # 'trn' is the id in each row currently being cleaned
-  for (i in seq_len(nrow(EU_results_clean))) {
+  for (i in 1:nrow(EU_results_clean)) {
 
     trn <- EU_results_clean[i, col]
 
     # Detects whether cleaning the string 'trn' throws an error. If yes, initialize 'cleaned' with "Error"
     cleaned <- tryCatch(clean_trn(trn, quiet = TRUE), error = function(e) "Error")
-
-    # Cleaner does NOT always throw an error with garbage IDs and instead just removes spaces, messing up our logic (duds)
-    # Catch those mistakes here:
-
-    trn_comparison <- gsub("\\s", "", tolower(trn))
-    cleaned_comparison <- gsub("\\s", "", tolower(cleaned))
 
     # If the TRN can't be cleaned, eliminate it from cleaned column and place in corresponding unclean column for later evaluation
     if(cleaned == "Error" | is.na(trn)) {
@@ -233,7 +220,8 @@ for (col in results_columns_to_clean) {
       unclean_col <- paste0(col, "_results_unclean")
       EU_results_clean[[unclean_col]][i] <- trn # Could be either a garbage number or NA
     }
-    # Cleaned and original must be different, so save cleaned and discard the old TRN
+
+    # If 'trn' can be cleaned, save it and discard old trn
     else {
       cleaned_trns[[i]] <- cleaned
       unclean_col <- paste0(col, "_results_unclean")
@@ -312,7 +300,7 @@ EU_clean = unite(EU_clean, who_utn_combined, who_utn_number_protocol, who_utn_nu
 EU_clean$combined_trns_reg <- NA
 
 # concatenate 'trns_reg' values from both tables together
-for (i in seq_len(nrow(EU_clean))) {
+for (i in 1:nrow(EU_clean)) {
   trns_reg1 <- EU_clean$trns_reg_protocol[i]
   trns_reg2 <- EU_clean$trns_reg_results[i]
 

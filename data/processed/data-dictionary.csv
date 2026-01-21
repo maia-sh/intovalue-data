@@ -1,0 +1,13 @@
+table,column,type,description
+registry-crossreg,id,character,"Trial registration number, either a ClinicalTrials.gov NCT id or DRKS id. Includes trns found in 'trials' table `id` column, as well as additional trns found in metadata, abstract, or full-text of an associated publication."
+registry-crossreg,crossreg_registry,character,Registry of `crossreg_trn`
+registry-crossreg,crossreg_trn,character,Trial registration number that appears in `id` registration
+cross-registrations,id,character,"Trial registration number, either a ClinicalTrials.gov NCT id or DRKS id. Subset of `id` in 'trials' table."
+cross-registrations,pmid,numeric,Publication PMID
+cross-registrations,doi,character,Publication DOI
+cross-registrations,crossreg_trn,character,Trial registration number found in one or more sources encoded with `is_crossreg_`
+cross-registrations,crossreg_registry,character,Registry of `crossreg_trn`
+cross-registrations,is_crossreg_secondary_id,logical,Whether `crossreg_trn` appears in PubMed secondary id of results publication
+cross-registrations,is_crossreg_abstract,logical,Whether `crossreg_trn` appears in PubMed abstract of results publication
+cross-registrations,is_crossreg_ft,logical,Whether `crossreg_trn` appears in full text of results publication
+cross-registrations,is_crossreg_reg,logical,Whether `crossreg_trn` appears in `id` registration. Taken from 'registry-crossreg' table.
